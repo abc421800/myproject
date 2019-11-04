@@ -1,0 +1,226 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加请假申请</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/res/plugin/layui-master/src/css/layui.css">
+	<style type="text/css">
+        .table_edit td{padding:5px !important;}
+	</style>
+</head>
+<script src="${pageContext.request.contextPath}/res/plugin/layui-master/src/layui.js"></script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //时间范围
+        laydate.render({
+            elem: '#leaveTime',range: true
+        });
+    });
+</script>
+<body class="easyui-layout">
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+<div data-options="region:'center',border:0" class="wrap_center">
+    <form action="" id="formId">
+    	<c:if test="${!empty obj.id}">
+	    	<input type="hidden" value="${obj.id}" name="id">
+    	</c:if>
+    	<table class="table_edit" id="table" cellspacing="0" cellpadding="0" >
+                <tbody>
+                <tr style="height:40px;background-color: #dde3e8;">
+                    <td colspan="2" style="text-align: center">
+                        <strong style="text-align: center;font-size: 16px">请假申请单</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>&nbsp;</strong>
+                       	 编号：
+                    </td>
+                    <td>
+                        <input type="text" id="code" name="code"  value="${obj.code}" readonly placeholder="请输入联系地址" style="width:100%;">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bgcolor" style="width:30%"><strong>&nbsp;</strong>申请人：</td>
+                    <td>
+                    	<input  name="proposer" type="hidden" value="${obj.proposer }">
+                        <input name="proposerName" type="text"  value="${obj.proposerName }" placeholder="请输入申请人" style="width:100%;">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>&nbsp;</strong>所属驻场企业：</td>
+                    <td>
+                    	<input name="enterpriseId" type="hidden" value="${obj.enterpriseId }">
+                        <input type="text" name="enterpriseName"  value="${obj.enterpriseName}" placeholder="请输入所属驻场企业" style="width:100%">
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>&nbsp;</strong>可休年假：</td>
+                    <td style="text-align: left">
+                        <input readonly="readonly"  type="text" style="width:15%;display: inline-block" value="<fmt:formatDate value="${workPerson.annualLeaveStartTime}" pattern="yyyy-MM-dd"/>" class="form-control input-sm" /> 至
+                        <input readonly="readonly"  type="text" style="width:15%;display: inline-block" value="<fmt:formatDate value="${workPerson.annualLeaveEndTime}" pattern="yyyy-MM-dd"/>" class="form-control input-sm" />
+                        &nbsp;&nbsp;&nbsp;
+                        <label for="">共</label>
+                        <input type="text" style="width:30px;display: inline-block;text-align: center" value="${workPerson.annualLeaveTotal }" />
+                        <label for="" style="margin-right: 50px">天</label>
+                        <label for="">已休：</label>
+                        <input type="text" style="width:30px;display: inline-block;text-align: center" value="${workPerson.annualLeaveUseup }" />
+                        <label for="">天</label>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>*</strong>请假事由：</td>
+                    <td>
+                        <textarea id="content" name="content"  rows="4">${obj.content }</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>*</strong>请假类型：</td>
+                    <td >
+                        <select id="type" name="type" class="custom-select" style="width:50%">
+                            <option value="">请选择</option>
+                            <option value="年休假">年休假</option>
+                            <option value="探亲假">探亲假</option>
+                            <option value="事假">事假</option>
+                            <option value="生育假">生育假</option>
+                            <option value="计生假">计生假</option>
+                            <option value="病假">病假</option>
+                            <option value="婚假">婚假</option>
+                            <option value="丧假">丧假</option>
+                            <option value="离岗学习">离岗学习</option>
+                            <option value="出差">出差</option>
+                            <option value="其他">其他</option>
+                        </select>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>*</strong>请假时间：</td>
+                    <td>
+                        <input class="Wdate search_text_form" type="text" name="leaveTime" id="leaveTime" style="width:50%;margin-right:20px">
+                        <input id="am"  onclick=""  name="morAftAll" value="上午" type="radio"><label for="am">上午</label>&nbsp;&nbsp;
+                        <input id="pm"  onclick=""  name="morAftAll" value="下午" type="radio"><label for="pm">下午</label>&nbsp;&nbsp;
+                        <input id="all" onclick="" checked="checked" value="全天" name="morAftAll" type="radio"><label for="all">全天</label>&nbsp;&nbsp;
+                    </td>
+
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>&nbsp;</strong>审批人：</td>
+                    <td style="text-align: left">
+                    	<input type="hidden" name="nextperson" id="nextperson" value="taoxingyou">
+                        <input type="text" id="nextpersonName" name="nextpersonName" readonly="readonly"  value="陶兴友" placeholder="请选择审批人"  style="width:80%;margin-top:5px;">
+                        <%--<a href="javascript:void(0)" class="fr" style="margin-top:5px;"><img src="${pageContext.request.contextPath}/res/images/pagecommon/person.png" onclick="person();" alt="" width="19" height="19"></a>
+                    --%></td>
+                </tr>
+                <tr>
+                    <td class="bgcolor"><strong>&nbsp;</strong>传阅对象：</td>
+                    <td style="text-align: left">
+                    	<input type="hidden" name="relatedId" id="relatedId" value="tanhuimin">
+                        <input type="text" id="relatedName" readonly="readonly" name="relatedName"  value="谭惠敏" placeholder="请选择传阅对象"  style="width:80%;margin-top:5px;">
+                        <%--<a href="javascript:void(0)" class="fr" style="margin-top:5px;"><img src="${pageContext.request.contextPath}/res/images/pagecommon/person.png" alt="" width="19" height="19"></a>
+                    --%></td>
+                </tr>
+                <tr style="height:40px">
+                    <td colspan="2" style="text-align: center">
+                        <input type="button" class="btn btn-primary" id="save"  value="提交">&nbsp;&nbsp;
+                        <input type="button" class="btn btn-success" onclick="top.closeWindow('添加请假申请')" value="取消">
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+    </form>
+</div>
+<div id="person"></div>
+<script src="${pageContext.request.contextPath}/res/js/cost/contract/taskType.js"></script>
+<script>
+	var url="${url}";
+    <!-- 禁用所有Form表单 -->
+    function disableForm(formId,isDisabled) {
+        var attr="disable";
+        if(!isDisabled){
+            attr="enable";
+        }
+        $("form[id='"+formId+"'] :text").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] textarea").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] select").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :radio").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :checkbox").attr("readonly",isDisabled);
+    }
+    var editFlag="${param.editFlag}";
+	$(function(){
+		
+		if(editFlag=="n"){
+			disableForm("formId",true);
+		}
+		$("#save").click(function(){
+			
+			var content=$("#content").val();
+	    	var type=$("#type").val();
+	    	var leaveTime=$("#leaveTime").val();
+	    	var nextperson=$("#nextperson").val();
+	    	var relatedId=$("#relatedId").val();
+	    	if(content==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写请假事由！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(type==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请选择请假类型！', icon: 'error', top:100});
+	          	return;
+		    }
+		    if(leaveTime==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请选择请假时间！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	
+			$.ajax({
+				  url: url,
+				  dataType: "json",
+				  type:"post",
+				  async: false,
+				  data: $("#formId").serialize(),
+				  success: function(result){
+					  if(result.status==200){
+						  var json1={tabTitle:'请假申请',url:'/forward_processApply_list'};
+						  window.parent.refreshTab(json1);
+					  	  window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+					  	  top.closeWindow('添加请假申请')
+					  }else if(result.status==300){
+						  $.messager.alert("温馨提示","抱歉！您的年假不足 。", "error");
+					  }else{
+						  $.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+					  }
+				  }
+			});
+		});
+		
+	});
+    //选择审批人
+	function person() {
+	    $('#person').dialog({
+	        title: '系统用户',
+	        width: 805,
+	        height: 520,
+	        closed: false,
+	        cache: false,
+	        top:100,
+	        content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_processApply_person'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+	        modal: true
+	    });
+	}
+</script>
+</body>
+</html>

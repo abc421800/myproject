@@ -1,0 +1,54 @@
+package com.cost168.costaudit.service.cost.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.cost.CostProjectNodeMapper;
+import com.cost168.costaudit.pojo.cost.CostProjectNode;
+import com.cost168.costaudit.service.cost.CostProjectNodeService;
+
+@Service
+public class CostProjectNodeServiceImpl implements CostProjectNodeService{
+	@Autowired
+	public CostProjectNodeMapper costProjectNodeMapper;
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		// TODO Auto-generated method stub
+		return costProjectNodeMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(CostProjectNode record) {
+		// TODO Auto-generated method stub
+		return costProjectNodeMapper.insertSelective(record);
+	}
+
+	@Override
+	public CostProjectNode selectByPrimaryKey(String id) {
+		// TODO Auto-generated method stub
+		return costProjectNodeMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(CostProjectNode record) {
+		// TODO Auto-generated method stub
+		return costProjectNodeMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public List<CostProjectNode> getList(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return costProjectNodeMapper.getList(map);
+	}
+
+	@Override
+	public int getCount(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return costProjectNodeMapper.getCount(map);
+	}
+
+}

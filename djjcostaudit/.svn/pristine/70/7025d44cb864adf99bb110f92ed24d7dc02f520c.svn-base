@@ -1,0 +1,55 @@
+package com.cost168.costaudit.utils;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
+
+/**
+ * 
+ * ClassName: OrderUtil 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-5-30下午3:53:33
+ * @Company  广东华联软件科技有限公司
+ */
+public class OrderUtil {
+	public static AtomicInteger race = new AtomicInteger(0);
+	private static Date date = new Date();
+	private static final int THREADS_COUNT = 99;
+
+	private static int increase() {
+		if(race.get() >= THREADS_COUNT) {
+			race = new AtomicInteger(0);
+		} else {
+			return race.incrementAndGet();
+		}
+		return race.get();
+	}
+	
+	public static synchronized String buildOrderId(String prefix) {
+		date.setTime(System.currentTimeMillis());
+		return prefix + String.format("%1$tY%1$tm%1$td%1$tH%1$tM%1$tS%2$02d", date, increase());
+	}
+	
+	public static long getDaySub(String beginDateStr, String endDateStr) {
+		Date beginDate;
+		Date endDate;
+		long day = 0;
+		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+			beginDate = format.parse(beginDateStr);
+			endDate = format.parse(endDateStr);
+			double dday = (double)(endDate.getTime() - beginDate.getTime()) / (24 * 60 * 60 * 1000);
+			if(dday>0 && dday<1){
+				day = 1;
+			}else{
+				day = Math.round(dday);
+			}
+		} catch (java.text.ParseException e) {
+			e.printStackTrace();
+		}
+		return day+1;
+	}
+	
+	
+}

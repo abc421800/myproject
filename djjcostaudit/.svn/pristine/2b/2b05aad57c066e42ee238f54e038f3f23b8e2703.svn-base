@@ -1,0 +1,82 @@
+package com.cost168.costaudit.controller.work;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.GlobalResult;
+
+@Controller
+@RequestMapping("/workEnterprise")
+public class WorkEntrpriseController {
+	
+	@Autowired
+	private WorkEnterpriseService workEnterpriseService;
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,WorkEnterprise workEnterprise, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+		    List<WorkEnterprise> list= workEnterpriseService.selectListByMap(map);
+		    int total= workEnterpriseService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toEdit")
+	public String toEdit(HttpServletRequest request){
+		String url="";
+		String id=request.getParameter("id");
+		if(null!=id && !"".equals(id)) {
+			url="/workEnterprise/upd";
+			WorkEnterprise workEnterprise = workEnterpriseService.selectByPrimaryKey(id);
+			request.setAttribute("obj", workEnterprise);
+		}else{
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			url="/workEnterprise/save";
+			String enterpriseId=UUID.randomUUID().toString().replace("-", "");
+			WorkEnterprise workEnterprise=new WorkEnterprise();
+			workEnterprise.setId(enterpriseId);
+			workEnterprise.setCreater(currentUser.getName());
+			request.setAttribute("obj", workEnterprise);
+		}
+		request.setAttribute("url", url);
+		return "workEnterprise/add";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,WorkEnterprise workEnterprise){
+		GlobalResult result=new GlobalResult();
+		try {
+			workEnterprise.setCreateTime(new Date());
+			workEnterpriseService.insertSelective(workEnterprise);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+
+}

@@ -1,0 +1,65 @@
+package com.cost168.costaudit.service.cost.impl;
+
+import com.cost168.costaudit.mapper.cost.CostAttachmentMapper;
+import com.cost168.costaudit.mapper.cost.CostContentTemplateMapper;
+import com.cost168.costaudit.mapper.cost.CostProjectMapper;
+import com.cost168.costaudit.mapper.cost.CostUnitProjectMapper;
+import com.cost168.costaudit.pojo.cost.CostAttachment;
+import com.cost168.costaudit.service.cost.CostContentTemplateService;
+import com.cost168.costaudit.utils.ExcelUtil;
+import com.cost168.costaudit.utils.GlobalResult;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+/**
+ * @description: 模版实现层
+ * @author: ZYL
+ * @created: 2019-09-05
+ */
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class CostContentTemplateServiceImpl implements CostContentTemplateService {
+
+    @Resource
+    private CostAttachmentMapper costAttachmentMapper;
+    @Resource
+    private CostContentTemplateMapper contentTemplateMapper;
+    @Resource
+    private CostUnitProjectMapper costUnitProjectMapper;
+    @Resource
+    private CostProjectMapper costProjectMapper;
+    private final Logger LOG = LogManager.getLogger(CostContentTemplateServiceImpl.class);
+
+    @Override
+    public GlobalResult importContentTemplate(HttpServletRequest request) {
+        GlobalResult result = new GlobalResult();
+        try {
+            String attId = request.getParameter("id");
+            Properties props = new Properties();
+            props.load(this.getClass().getResourceAsStream("/resource/resource.properties"));
+            String path = (String) props.get("fileupload");
+            CostAttachment att = costAttachmentMapper.selectByPrimaryKey(attId);
+            path = path.substring(0, 2) + att.getUrl();
+            //读取exc
+            HashMap<String, HashMap<Integer, ArrayList<Object>>> excelMap = ExcelUtil.readExcel(2, path, 0);
+            //遍历excel的sheet
+            for (Map.Entry<String, HashMap<Integer, ArrayList<Object>>> excel : excelMap.entrySet()) {
+
+            }
+            result.setStatus(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(500);
+        }
+        return result;
+    }
+}

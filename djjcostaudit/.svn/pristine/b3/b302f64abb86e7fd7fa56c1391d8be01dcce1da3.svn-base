@@ -1,0 +1,57 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoPunishMapper;
+import com.cost168.costaudit.pojo.yaohao.YaohaoPunish;
+import com.cost168.costaudit.pojo.yaohao.YaohaoPunishExample;
+import com.cost168.costaudit.service.yaohao.YaohaoPunishService;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class YaohaoPunishServiceImpl implements YaohaoPunishService {
+	
+	@Autowired
+	private YaohaoPunishMapper yaohaoPunishMapper;
+
+	@Override
+	public List<YaohaoPunish> selectByExample(YaohaoPunishExample example) {
+		return yaohaoPunishMapper.selectByExample(example);
+	}
+
+	@Override
+	public YaohaoPunish selectByPrimaryKey(String id) {
+		return yaohaoPunishMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(YaohaoPunish record) {
+		return yaohaoPunishMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoPunish yaohaoPunish) {
+		return yaohaoPunishMapper.updateByPrimaryKeySelective(yaohaoPunish);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoPunishMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<YaohaoPunish> selectListByMap(Map<String, Object> map) {
+		return yaohaoPunishMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoPunishMapper.selectCountByMap(map);
+	}
+
+}

@@ -1,0 +1,252 @@
+$(function () {
+    var bool = false;
+    $(".switchBtn").on('click', function () {
+        $(".filter").toggle();
+        if (!bool) {
+            $(this).addClass("active");
+            $('#addRockNumber').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+            bool = true;
+        } else {
+            $(this).removeClass("active");
+            bool = false;
+            $('#addRockNumber').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+    var yaohaoGrade=$("#yaohaoGrade").val();
+    var yaohaoJoin=$("#yaohaoJoin").val();
+    var status=$("#status").val();
+    var date=new Date;
+    var year = date.getFullYear()
+    $('#addRockNumber').datagrid({
+        url: '/yaohaoCandidate/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        rownumbers: true,
+        height: tableHeight(),
+        fitColumns: true,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 50,
+        singleSelect: false,
+        queryParams:{
+        	yaohaoGrade:yaohaoGrade,
+        	yaohaoYear:year,
+        	//新增部分
+        	yaohaoJoin:yaohaoJoin
+        	//status:status
+        },
+        columns: [
+            [
+                {
+                    field: 'id',
+                    title: '单选框',
+                    checkbox: true
+                }, {
+                field: 'enterpriseName',
+                title: '参加摇号候选企业名称',
+                width: 200,
+                align: 'left',
+                sortable: false,
+                formatter: function (value, rowData, index){
+                	if(rowData.id==undefined){
+                		return "未找到相关信息！";
+                	}else{
+                		 return "<a href=\"javascript:void(0)\" title="+value+" style=\"color:#549de3;padding-left:2px;" +
+                 		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+                 		"max-width: 100%;vertical-align: middle;\" onclick=\"editInfo('"+rowData.enterpriseId+"')\">"+value+"</a>";
+                	}
+	                
+                }
+            }, {
+                field: 'assessResult',
+                title: '上一年度综评',
+                width: 120,
+                align: 'center',
+                sortable: false,
+                formatter: function (value, rowData, index){
+                	if(rowData.id){
+	                	if(value!=null){
+	                		return value;
+	                	}else{
+	                		return "未评定";
+	                	}
+                	}
+                }
+            },
+            {
+                field: 'winNum',
+                title: '本档中签次数',
+                width: 120,
+                align: 'center',
+                sortable: false,
+                formatter: function (value, rowData, index){
+                	if(rowData.id){
+                		if(value!=null){
+                			return value;
+                		}else{
+                			return "0";
+                		}
+                	}
+                }
+            }, {
+                field: 'yaohaoYear',
+                title: '摇号年份',
+                width: 120,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'yaohaoGrade',
+                title: '摇号档次',
+                width: 120,
+                align: 'center',
+                sortable: false
+                
+            }, {
+                field: 'remarkStr',
+                title: '备注',
+                width: 120,
+                align: 'center',
+                sortable: false
+                
+            }]
+        ],
+        toolbar: '#tit1',
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#addRockNumber').datagrid('loadData', {total: 1, rows: [{enterpriseName: "未找到相关信息！"}]});
+            }
+        }
+    });
+    $(window).resize(function () {
+        if(bool){
+            $('#addRockNumber').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+        }else{
+            $('#addRockNumber').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+
+    });
+
+});
+
+
+var _title='添加第二档摇号候选企业';
+var yaohaoGradeFlag="B";
+function changeHandler(){
+    if($("#yaohaoGrade").val()=='第一档'){
+        _title='添加第一档摇号候选企业';
+        yaohaoGradeFlag='A';
+    }else if($("#yaohaoGrade").val()=='第二档'){
+        _title='添加第二档摇号候选企业';
+        yaohaoGradeFlag='B';
+    }
+}
+//添加摇号
+function addCompany() {
+    $('#addCompany').dialog({
+        title: _title,
+        width: 820,
+        height: 510,
+        closed: false,
+        cache: false,
+        top:50,
+        content:"<iframe name=\"fileFrame\" frameborder=\"0\" src="+'/forward_yaohao_yaohaoMng_containEnterprise?yaohaoGradeFlag='+yaohaoGradeFlag+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+        modal: true
+    });
+}
+
+function deleteHandler() {
+    var selections = $('#addRockNumber').datagrid('getSelections');
+    if (selections.length == 0) {
+        $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+        return;
+    }
+    $.messager.confirm('提示信息', '确认本次摇号机会剔除这' + selections.length + '家企业吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        var ids = [];
+        for (var i in selections) {
+            ids[i] = selections[i].id;
+        }
+        $.ajax({
+            url: '/yaohaoCandidate/del',
+            type: 'POST',
+            data: {'ids': ids.toString()},
+            traditional: true,
+            success: function (result) {
+            	if(result.status==200){
+ 				  	window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+ 				  	$('#addRockNumber').datagrid('reload');
+ 				}else{
+ 					$.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+ 				}
+            }
+        });
+    });
+}
+
+function searchCan(){
+	var enterpriseName = $("#enterpriseName").val().trim();
+	var yearAssess = $("#yearAssess").val();
+	var yaohaoGrade = $("#yaohaoGrade").val();
+	var roundNum;
+	if(yaohaoGrade=='第二档'){
+		roundNum=codeB;
+	}else{
+		roundNum=codeA;
+	}
+	//是否参与
+	var yaohaoJoin=$("#yaohaoJoin").val();
+	var status=$("#status").val();
+    $('#addRockNumber').datagrid({
+		queryParams: {
+			enterpriseName:enterpriseName,
+			yearAssess:yearAssess,
+			yaohaoGrade:yaohaoGrade,
+			roundNum:roundNum,
+			//新增部分
+			yaohaoJoin:yaohaoJoin,
+			status:status
+		}
+	}); 
+}
+function refresh() {
+	var json1={tabTitle:'摇号名单',url:'/forward_yaohao_yaohaoMng_nameList'};
+	window.parent.refreshTab(json1); 
+}
+function editInfo(id) {
+	$("#addRockNumber").datagrid("clearChecked");
+    var href = "/costEnterprise/toEdit?editFlag=y&id="+id;
+    var title = "入库企业修改";
+    top.addTabGrid(title, href);
+}
+
+//导出
+function exportDate(){
+	var selections = $('#addRockNumber').datagrid('getSelections');
+	var ids = "";
+	if (selections.length != 0) {
+		for(var i = 0;i<selections.length;i++){
+    		ids+=selections[i].id+",";
+    	}
+    	ids = ids.substring(0,ids.length-1);
+    }
+	window.location.href = "/yaohaoCandidate/exportYaohaoCandidate?ids="+ids;
+}
+//摇号签到表
+function uploadQdb(){
+  	window.location.href = "/yaohaoCandidate/uploadQdb";
+}
+//摇号记录表
+function uploadJlb(){
+  	window.location.href = "/yaohaoCandidate/uploadJlb";
+}

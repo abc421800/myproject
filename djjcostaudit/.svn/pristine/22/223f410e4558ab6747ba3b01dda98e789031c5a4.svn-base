@@ -1,0 +1,176 @@
+package com.cost168.costaudit.pojo.yaohao;
+
+import java.util.Date;
+
+public class YaohaoAssess {
+    private String id;
+
+    private String enterpriseCode;
+
+    private String workEnterpriseId;
+
+    private String year;
+
+    private Integer winbidNum;
+
+    private Integer rewardNum;
+
+    private Integer punishNum;
+
+    private String joinAssessFlag;
+
+    private double assessScore;
+
+    private Integer scoreRank;
+
+    private String assessResult;
+
+    private String rukuStatus;
+
+    private String yaohaoGrade;
+
+    private Date createTime;
+
+    private String rater;
+
+    private String creater;
+
+    private String remark;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getEnterpriseCode() {
+        return enterpriseCode;
+    }
+
+    public void setEnterpriseCode(String enterpriseCode) {
+        this.enterpriseCode = enterpriseCode == null ? null : enterpriseCode.trim();
+    }
+
+    public String getWorkEnterpriseId() {
+        return workEnterpriseId;
+    }
+
+    public void setWorkEnterpriseId(String workEnterpriseId) {
+        this.workEnterpriseId = workEnterpriseId == null ? null : workEnterpriseId.trim();
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year == null ? null : year.trim();
+    }
+
+    public Integer getWinbidNum() {
+        return winbidNum;
+    }
+
+    public void setWinbidNum(Integer winbidNum) {
+        this.winbidNum = winbidNum;
+    }
+
+    public Integer getRewardNum() {
+        return rewardNum;
+    }
+
+    public void setRewardNum(Integer rewardNum) {
+        this.rewardNum = rewardNum;
+    }
+
+    public Integer getPunishNum() {
+        return punishNum;
+    }
+
+    public void setPunishNum(Integer punishNum) {
+        this.punishNum = punishNum;
+    }
+
+    public String getJoinAssessFlag() {
+        return joinAssessFlag;
+    }
+
+    public void setJoinAssessFlag(String joinAssessFlag) {
+        this.joinAssessFlag = joinAssessFlag == null ? null : joinAssessFlag.trim();
+    }
+
+
+    public double getAssessScore() {
+        return assessScore;
+    }
+
+    public void setAssessScore(double assessScore) {
+        this.assessScore = assessScore;
+    }
+
+    public Integer getScoreRank() {
+        return scoreRank;
+    }
+
+    public void setScoreRank(Integer scoreRank) {
+        this.scoreRank = scoreRank;
+    }
+
+    public String getAssessResult() {
+        return assessResult;
+    }
+
+    public void setAssessResult(String assessResult) {
+        this.assessResult = assessResult == null ? null : assessResult.trim();
+    }
+
+    public String getRukuStatus() {
+        return rukuStatus;
+    }
+
+    public void setRukuStatus(String rukuStatus) {
+        this.rukuStatus = rukuStatus == null ? null : rukuStatus.trim();
+    }
+
+    public String getYaohaoGrade() {
+        return yaohaoGrade;
+    }
+
+    public void setYaohaoGrade(String yaohaoGrade) {
+        this.yaohaoGrade = yaohaoGrade == null ? null : yaohaoGrade.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getRater() {
+        return rater;
+    }
+
+    public void setRater(String rater) {
+        this.rater = rater == null ? null : rater.trim();
+    }
+
+    public String getCreater() {
+        return creater;
+    }
+
+    public void setCreater(String creater) {
+        this.creater = creater == null ? null : creater.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+}

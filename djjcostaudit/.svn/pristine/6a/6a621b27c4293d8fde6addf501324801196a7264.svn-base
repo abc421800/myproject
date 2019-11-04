@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.springframework.org/schema/context 
+http://www.springframework.org/schema/context/spring-context-3.0.xsd 
+http://www.springframework.org/schema/mvc 
+http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+http://www.springframework.org/schema/aop 
+http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+
+
+	<bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor" />
+
+	<!-- 登录认证和操作授权 -->
+	<bean id="authcRealm" class="com.cost168.costaudit.shiro.AuthcRealm">
+		<property name="credentialsMatcher" ref="myCredentialsMatcher" />
+	</bean>
+
+	<!-- 凭证匹配器校验密码 -->
+	<bean id="myCredentialsMatcher" class="com.cost168.costaudit.shiro.MyCredentialsMatcher" />
+
+	<!-- securityManager安全管理器 -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<property name="realm" ref="authcRealm" />
+	</bean>
+
+	<!-- 自定义的注销拦截器 -->
+	<bean id="shiroLogoutFilter" class="com.cost168.costaudit.shiro.SystemLogoutFilter" />
+
+	<!-- Shiro 的Web过滤器 -->
+	<bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<property name="securityManager" ref="securityManager" />
+		<!-- loginUrl认证提交地址，如果没有认证将会请求此地址进行认证，请求此地址将由formAuthenticationFilter进行表单认证 -->
+		<property name="loginUrl" value="/toLogin" />
+		<!-- 没有权限跳转的地址 -->
+		<property name="unauthorizedUrl" value="/ajaxLogin.do" />
+		<property name="successUrl" value="/home" />
+		<property name="filters">
+			<map>
+				<!--退出过滤器 -->
+				<entry key="logout" value-ref="shiroLogoutFilter" />
+				<!-- ajax过滤器 -->
+				<entry key="authc">  
+                    <bean class="com.cost168.costaudit.shiro.ShiroLoginFilter" />   
+                </entry> 
+			</map>
+		</property>
+		<property name="filterChainDefinitions">
+			<value>
+				<!-- 静态资源可以直接访问 -->
+				/login = anon
+				/randomCode =anon
+				/res/** = anon
+				<!-- 对退出的配置 -->
+				/logout = logout
+				<!-- 不拦截含有wechat关键字的URL -->
+				/**/*overTime*/** = anon
+				/**/*uploadSC*/** = anon
+				/**/*noAuthority*/** = anon
+				<!-- 其余的要登录认证才可访问 -->
+				/**=authc
+			</value>
+		</property>
+	</bean>
+	
+</beans>

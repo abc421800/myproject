@@ -1,0 +1,57 @@
+package com.cost168.costaudit.controller.yaohao;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidate;
+import com.cost168.costaudit.service.yaohao.YaohaoCandidateService;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.JsonUtils;
+
+/**
+ * 
+ * ClassName: YaohaoCandidateController 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-7-8上午10:53:04
+ * @Company  广东华联软件科技有限公司
+ */
+@Controller
+@RequestMapping("/yaohaoCandidate")
+public class YaohaoCandidateController {
+	
+	
+	@Autowired
+	private YaohaoCandidateService yaohaoCandidateService;
+	
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,YaohaoCandidate yaohaoCandidate, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		Map<String,Object> selectMap=JsonUtils.object2Map(yaohaoCandidate);
+		try {
+			map.putAll(selectMap);
+		    List<YaohaoCandidate> list= yaohaoCandidateService.selectListByMap(map);
+		    int total= yaohaoCandidateService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	
+	
+
+}

@@ -1,0 +1,49 @@
+package com.cost168.costaudit.service.sys.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.sys.SysRolePermissionMapper;
+import com.cost168.costaudit.pojo.sys.SysRolePermissionExample;
+import com.cost168.costaudit.pojo.sys.SysRolePermissionExample.Criteria;
+import com.cost168.costaudit.pojo.sys.SysRolePermissionKey;
+import com.cost168.costaudit.service.sys.SysRolePermissionService;
+
+@Service
+public class SysRolePermissionServiceImpl implements SysRolePermissionService {
+	
+	@Autowired
+	private SysRolePermissionMapper sysRolePermissionMapper;
+
+	@Override
+	public List<SysRolePermissionKey> selectByExample(SysRolePermissionExample example) {
+		return sysRolePermissionMapper.selectByExample(example);
+	}
+
+	@Override
+	public int insertSelective(SysRolePermissionKey record) {
+		return sysRolePermissionMapper.insertSelective(record);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(SysRolePermissionKey key) {
+		return sysRolePermissionMapper.deleteByPrimaryKey(key);
+	}
+
+	@Override
+	public String selectPermissionByRoleId(String roleId) {
+		return sysRolePermissionMapper.selectPermissionByRoleId(roleId);
+	}
+
+	@Override
+	public int deleteRolePerByRoleId(String roleId) {
+		SysRolePermissionExample example=new SysRolePermissionExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andRoleIdEqualTo(roleId);
+		return sysRolePermissionMapper.deleteByExample(example);
+	}
+
+
+}

@@ -1,0 +1,15 @@
+package com.cost168.costaudit.controller.work;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+/**
+ * @description: 考勤企业台账控制器
+ * @author: ZYL
+ * @create: 2019-05-24
+ */
+@Controller
+@RequestMapping("/workAttendanceEnterprise")
+public class WorkAttendanceEnterpriseController {
+
+}

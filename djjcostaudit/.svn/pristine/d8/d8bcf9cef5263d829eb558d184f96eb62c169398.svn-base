@@ -1,0 +1,623 @@
+package com.cost168.costaudit.pojo.work.vo;
+
+
+public class WorkRegisterVo {
+	
+	private String id;
+    private String name;
+    private String enterpriseName;
+    private String enterpriseId;
+    private String morningOrAfternoon;
+    private String morning_1;
+    private String afternoon_1;
+    private String morning_2;
+    private String afternoon_2;
+    private String morning_3;
+    private String afternoon_3;
+    private String morning_4;
+    private String afternoon_4;
+    private String morning_5;
+    private String afternoon_5;
+    private String morning_6;
+    private String afternoon_6;
+    private String morning_7;
+    private String afternoon_7;
+    private String morning_8;
+    private String afternoon_8;
+    private String morning_9;
+    private String afternoon_9;
+    private String morning_10;
+    private String afternoon_10;
+    private String morning_11;
+    private String afternoon_11;
+    private String morning_12;
+    private String afternoon_12;
+    private String morning_13;
+    private String afternoon_13;
+    private String morning_14;
+    private String afternoon_14;
+    private String morning_15;
+    private String afternoon_15;
+    private String morning_16;
+    private String afternoon_16;
+    private String morning_17;
+    private String afternoon_17;
+    private String morning_18;
+    private String afternoon_18;
+    private String morning_19;
+    private String afternoon_19;
+    private String morning_20;
+    private String afternoon_20;
+    private String morning_21;
+    private String afternoon_21;
+    private String morning_22;
+    private String afternoon_22;
+    private String morning_23;
+    private String afternoon_23;
+    private String morning_24;
+    private String afternoon_24;
+    private String morning_25;
+    private String afternoon_25;
+    private String morning_26;
+    private String afternoon_26;
+    private String morning_27;
+    private String afternoon_27;
+    private String morning_28;
+    private String afternoon_28;
+    private String morning_29;
+    private String afternoon_29;
+    private String morning_30;
+    private String afternoon_30;
+    private String morning_31;
+    private String afternoon_31;
+    private String sb;
+    private String nxj;
+    private String tqj;
+    private String sj;
+    private String syj;
+    private String jsj;
+    private String bj;
+    private String hj;
+    private String sangj;
+    private String lgxx;
+    private String cc;
+    private String kg;
+    private String jb;
+    private String xx;
+    private String qt;
+    
+    private String kxnj;//可休年假
+    private String yxnj;//已休年假
+    private String reg_remark;
+    private String reg_creater;
+    private String regYearMonth;
+    
+	public String getId() {
+		return id;
+	}
+	public void setId(String id) {
+		this.id = id;
+	}
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+	public String getMorning_1() {
+		return morning_1;
+	}
+	public void setMorning_1(String morning_1) {
+		this.morning_1 = morning_1;
+	}
+	public String getAfternoon_1() {
+		return afternoon_1;
+	}
+	public void setAfternoon_1(String afternoon_1) {
+		this.afternoon_1 = afternoon_1;
+	}
+	public String getMorning_2() {
+		return morning_2;
+	}
+	public void setMorning_2(String morning_2) {
+		this.morning_2 = morning_2;
+	}
+	public String getAfternoon_2() {
+		return afternoon_2;
+	}
+	public void setAfternoon_2(String afternoon_2) {
+		this.afternoon_2 = afternoon_2;
+	}
+	public String getMorning_3() {
+		return morning_3;
+	}
+	public void setMorning_3(String morning_3) {
+		this.morning_3 = morning_3;
+	}
+	public String getAfternoon_3() {
+		return afternoon_3;
+	}
+	public void setAfternoon_3(String afternoon_3) {
+		this.afternoon_3 = afternoon_3;
+	}
+	public String getMorning_4() {
+		return morning_4;
+	}
+	public void setMorning_4(String morning_4) {
+		this.morning_4 = morning_4;
+	}
+	public String getAfternoon_4() {
+		return afternoon_4;
+	}
+	public void setAfternoon_4(String afternoon_4) {
+		this.afternoon_4 = afternoon_4;
+	}
+	public String getMorning_5() {
+		return morning_5;
+	}
+	public void setMorning_5(String morning_5) {
+		this.morning_5 = morning_5;
+	}
+	public String getAfternoon_5() {
+		return afternoon_5;
+	}
+	public void setAfternoon_5(String afternoon_5) {
+		this.afternoon_5 = afternoon_5;
+	}
+	public String getMorning_6() {
+		return morning_6;
+	}
+	public void setMorning_6(String morning_6) {
+		this.morning_6 = morning_6;
+	}
+	public String getAfternoon_6() {
+		return afternoon_6;
+	}
+	public void setAfternoon_6(String afternoon_6) {
+		this.afternoon_6 = afternoon_6;
+	}
+	public String getMorning_7() {
+		return morning_7;
+	}
+	public void setMorning_7(String morning_7) {
+		this.morning_7 = morning_7;
+	}
+	public String getAfternoon_7() {
+		return afternoon_7;
+	}
+	public void setAfternoon_7(String afternoon_7) {
+		this.afternoon_7 = afternoon_7;
+	}
+	public String getMorning_8() {
+		return morning_8;
+	}
+	public void setMorning_8(String morning_8) {
+		this.morning_8 = morning_8;
+	}
+	public String getAfternoon_8() {
+		return afternoon_8;
+	}
+	public void setAfternoon_8(String afternoon_8) {
+		this.afternoon_8 = afternoon_8;
+	}
+	public String getMorning_9() {
+		return morning_9;
+	}
+	public void setMorning_9(String morning_9) {
+		this.morning_9 = morning_9;
+	}
+	public String getAfternoon_9() {
+		return afternoon_9;
+	}
+	public void setAfternoon_9(String afternoon_9) {
+		this.afternoon_9 = afternoon_9;
+	}
+	public String getMorning_10() {
+		return morning_10;
+	}
+	public void setMorning_10(String morning_10) {
+		this.morning_10 = morning_10;
+	}
+	public String getAfternoon_10() {
+		return afternoon_10;
+	}
+	public void setAfternoon_10(String afternoon_10) {
+		this.afternoon_10 = afternoon_10;
+	}
+	public String getMorning_11() {
+		return morning_11;
+	}
+	public void setMorning_11(String morning_11) {
+		this.morning_11 = morning_11;
+	}
+	public String getAfternoon_11() {
+		return afternoon_11;
+	}
+	public void setAfternoon_11(String afternoon_11) {
+		this.afternoon_11 = afternoon_11;
+	}
+	public String getMorning_12() {
+		return morning_12;
+	}
+	public void setMorning_12(String morning_12) {
+		this.morning_12 = morning_12;
+	}
+	public String getAfternoon_12() {
+		return afternoon_12;
+	}
+	public void setAfternoon_12(String afternoon_12) {
+		this.afternoon_12 = afternoon_12;
+	}
+	public String getMorning_13() {
+		return morning_13;
+	}
+	public void setMorning_13(String morning_13) {
+		this.morning_13 = morning_13;
+	}
+	public String getAfternoon_13() {
+		return afternoon_13;
+	}
+	public void setAfternoon_13(String afternoon_13) {
+		this.afternoon_13 = afternoon_13;
+	}
+	public String getMorning_14() {
+		return morning_14;
+	}
+	public void setMorning_14(String morning_14) {
+		this.morning_14 = morning_14;
+	}
+	public String getAfternoon_14() {
+		return afternoon_14;
+	}
+	public void setAfternoon_14(String afternoon_14) {
+		this.afternoon_14 = afternoon_14;
+	}
+	public String getMorning_15() {
+		return morning_15;
+	}
+	public void setMorning_15(String morning_15) {
+		this.morning_15 = morning_15;
+	}
+	public String getAfternoon_15() {
+		return afternoon_15;
+	}
+	public void setAfternoon_15(String afternoon_15) {
+		this.afternoon_15 = afternoon_15;
+	}
+	public String getMorning_16() {
+		return morning_16;
+	}
+	public void setMorning_16(String morning_16) {
+		this.morning_16 = morning_16;
+	}
+	public String getAfternoon_16() {
+		return afternoon_16;
+	}
+	public void setAfternoon_16(String afternoon_16) {
+		this.afternoon_16 = afternoon_16;
+	}
+	public String getMorning_17() {
+		return morning_17;
+	}
+	public void setMorning_17(String morning_17) {
+		this.morning_17 = morning_17;
+	}
+	public String getAfternoon_17() {
+		return afternoon_17;
+	}
+	public void setAfternoon_17(String afternoon_17) {
+		this.afternoon_17 = afternoon_17;
+	}
+	public String getMorning_18() {
+		return morning_18;
+	}
+	public void setMorning_18(String morning_18) {
+		this.morning_18 = morning_18;
+	}
+	public String getAfternoon_18() {
+		return afternoon_18;
+	}
+	public void setAfternoon_18(String afternoon_18) {
+		this.afternoon_18 = afternoon_18;
+	}
+	public String getMorning_19() {
+		return morning_19;
+	}
+	public void setMorning_19(String morning_19) {
+		this.morning_19 = morning_19;
+	}
+	public String getAfternoon_19() {
+		return afternoon_19;
+	}
+	public void setAfternoon_19(String afternoon_19) {
+		this.afternoon_19 = afternoon_19;
+	}
+	public String getMorning_20() {
+		return morning_20;
+	}
+	public void setMorning_20(String morning_20) {
+		this.morning_20 = morning_20;
+	}
+	public String getAfternoon_20() {
+		return afternoon_20;
+	}
+	public void setAfternoon_20(String afternoon_20) {
+		this.afternoon_20 = afternoon_20;
+	}
+	public String getMorning_21() {
+		return morning_21;
+	}
+	public void setMorning_21(String morning_21) {
+		this.morning_21 = morning_21;
+	}
+	public String getAfternoon_21() {
+		return afternoon_21;
+	}
+	public void setAfternoon_21(String afternoon_21) {
+		this.afternoon_21 = afternoon_21;
+	}
+	public String getMorning_22() {
+		return morning_22;
+	}
+	public void setMorning_22(String morning_22) {
+		this.morning_22 = morning_22;
+	}
+	public String getAfternoon_22() {
+		return afternoon_22;
+	}
+	public void setAfternoon_22(String afternoon_22) {
+		this.afternoon_22 = afternoon_22;
+	}
+	public String getMorning_23() {
+		return morning_23;
+	}
+	public void setMorning_23(String morning_23) {
+		this.morning_23 = morning_23;
+	}
+	public String getAfternoon_23() {
+		return afternoon_23;
+	}
+	public void setAfternoon_23(String afternoon_23) {
+		this.afternoon_23 = afternoon_23;
+	}
+	public String getMorning_24() {
+		return morning_24;
+	}
+	public void setMorning_24(String morning_24) {
+		this.morning_24 = morning_24;
+	}
+	public String getAfternoon_24() {
+		return afternoon_24;
+	}
+	public void setAfternoon_24(String afternoon_24) {
+		this.afternoon_24 = afternoon_24;
+	}
+	public String getMorning_25() {
+		return morning_25;
+	}
+	public void setMorning_25(String morning_25) {
+		this.morning_25 = morning_25;
+	}
+	public String getAfternoon_25() {
+		return afternoon_25;
+	}
+	public void setAfternoon_25(String afternoon_25) {
+		this.afternoon_25 = afternoon_25;
+	}
+	public String getMorning_26() {
+		return morning_26;
+	}
+	public void setMorning_26(String morning_26) {
+		this.morning_26 = morning_26;
+	}
+	public String getAfternoon_26() {
+		return afternoon_26;
+	}
+	public void setAfternoon_26(String afternoon_26) {
+		this.afternoon_26 = afternoon_26;
+	}
+	public String getMorning_27() {
+		return morning_27;
+	}
+	public void setMorning_27(String morning_27) {
+		this.morning_27 = morning_27;
+	}
+	public String getAfternoon_27() {
+		return afternoon_27;
+	}
+	public void setAfternoon_27(String afternoon_27) {
+		this.afternoon_27 = afternoon_27;
+	}
+	public String getMorning_28() {
+		return morning_28;
+	}
+	public void setMorning_28(String morning_28) {
+		this.morning_28 = morning_28;
+	}
+	public String getAfternoon_28() {
+		return afternoon_28;
+	}
+	public void setAfternoon_28(String afternoon_28) {
+		this.afternoon_28 = afternoon_28;
+	}
+	public String getMorning_29() {
+		return morning_29;
+	}
+	public void setMorning_29(String morning_29) {
+		this.morning_29 = morning_29;
+	}
+	public String getAfternoon_29() {
+		return afternoon_29;
+	}
+	public void setAfternoon_29(String afternoon_29) {
+		this.afternoon_29 = afternoon_29;
+	}
+	public String getMorning_30() {
+		return morning_30;
+	}
+	public void setMorning_30(String morning_30) {
+		this.morning_30 = morning_30;
+	}
+	public String getAfternoon_30() {
+		return afternoon_30;
+	}
+	public void setAfternoon_30(String afternoon_30) {
+		this.afternoon_30 = afternoon_30;
+	}
+	public String getMorning_31() {
+		return morning_31;
+	}
+	public void setMorning_31(String morning_31) {
+		this.morning_31 = morning_31;
+	}
+	public String getAfternoon_31() {
+		return afternoon_31;
+	}
+	public void setAfternoon_31(String afternoon_31) {
+		this.afternoon_31 = afternoon_31;
+	}
+	
+	
+	public String getSb() {
+		return sb.replace(".0", "");
+	}
+	public void setSb(String sb) {
+		this.sb = sb;
+	}
+	public String getNxj() {
+		return nxj.replace(".0", "");
+	}
+	public void setNxj(String nxj) {
+		this.nxj = nxj;
+	}
+	public String getTqj() {
+		return tqj.replace(".0", "");
+	}
+	public void setTqj(String tqj) {
+		this.tqj = tqj;
+	}
+	public String getSj() {
+		return sj.replace(".0", "");
+	}
+	public void setSj(String sj) {
+		this.sj = sj;
+	}
+	public String getSyj() {
+		return syj.replace(".0", "");
+	}
+	public void setSyj(String syj) {
+		this.syj = syj;
+	}
+	public String getJsj() {
+		return jsj.replace(".0", "");
+	}
+	public void setJsj(String jsj) {
+		this.jsj = jsj;
+	}
+	public String getBj() {
+		return bj.replace(".0", "");
+	}
+	public void setBj(String bj) {
+		this.bj = bj;
+	}
+	public String getHj() {
+		return hj.replace(".0", "");
+	}
+	public void setHj(String hj) {
+		this.hj = hj;
+	}
+	public String getSangj() {
+		return sangj.replace(".0", "");
+	}
+	public void setSangj(String sangj) {
+		this.sangj = sangj;
+	}
+	public String getLgxx() {
+		return lgxx.replace(".0", "");
+	}
+	public void setLgxx(String lgxx) {
+		this.lgxx = lgxx;
+	}
+	public String getCc() {
+		return cc.replace(".0", "");
+	}
+	public void setCc(String cc) {
+		this.cc = cc;
+	}
+	public String getKg() {
+		return kg.replace(".0", "");
+	}
+	public void setKg(String kg) {
+		this.kg = kg;
+	}
+	public String getJb() {
+		return jb.replace(".0", "");
+	}
+	public void setJb(String jb) {
+		this.jb = jb;
+	}
+	public String getXx() {
+		return xx.replace(".0", "");
+	}
+	public void setXx(String xx) {
+		this.xx = xx;
+	}
+	public String getQt() {
+		return qt.replace(".0", "");
+	}
+	public void setQt(String qt) {
+		this.qt = qt;
+	}
+	public String getKxnj() {
+		return kxnj;
+	}
+	public void setKxnj(String kxnj) {
+		this.kxnj = kxnj;
+	}
+	public String getReg_remark() {
+		return reg_remark;
+	}
+	public void setReg_remark(String reg_remark) {
+		this.reg_remark = reg_remark;
+	}
+	public String getReg_creater() {
+		return reg_creater;
+	}
+	public void setReg_creator(String reg_creater) {
+		this.reg_creater = reg_creater;
+	}
+	public String getEnterpriseName() {
+		return enterpriseName;
+	}
+	public void setEnterpriseName(String enterpriseName) {
+		this.enterpriseName = enterpriseName;
+	}
+	public String getMorningOrAfternoon() {
+		return morningOrAfternoon;
+	}
+	public void setMorningOrAfternoon(String morningOrAfternoon) {
+		this.morningOrAfternoon = morningOrAfternoon;
+	}
+	public String getRegYearMonth() {
+		return regYearMonth;
+	}
+	public void setRegYearMonth(String regYearMonth) {
+		this.regYearMonth = regYearMonth;
+	}
+	public String getYxnj() {
+		return yxnj;
+	}
+	public void setYxnj(String yxnj) {
+		this.yxnj = yxnj;
+	}
+	public String getEnterpriseId() {
+		return enterpriseId;
+	}
+	public void setEnterpriseId(String enterpriseId) {
+		this.enterpriseId = enterpriseId;
+	}
+
+   
+
+
+}

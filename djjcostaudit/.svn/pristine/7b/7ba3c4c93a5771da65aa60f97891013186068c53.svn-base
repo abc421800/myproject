@@ -1,0 +1,1142 @@
+$(function () {
+
+    var bool = false;
+    $(".switchBtn").on('click', function () {
+        $(".filter").toggle();
+        if (!bool) {
+            $(this).addClass("active");
+            $('#recordManager').datagrid('resize', {
+                height: $(window).height() - 60
+            });
+            bool = true;
+        } else {
+            $(this).removeClass("active");
+            bool = false;
+            $('#recordManager').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+    $('#recordManager').datagrid({
+        url: '/workRegister/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        rownumbers: true,
+        height: tableHeight(),
+        fitColumns: false,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 10,
+        singleSelect: false,
+        queryParams:{
+        	regYearMonth:currentYearMonth,
+        },
+        frozenColumns:[[
+            {
+                field: 'id',
+                title : '单选框',
+                checkbox: true
+            }, {
+                field: 'manager',
+                title: '管理',
+                width: 80,
+                align: 'center',
+                sortable: false,
+                formatter: function (value, rowData, index) {
+                    return "<a href='javascript:void(0)' class='btn btn-outline-info' onclick='getPersonnalDialog(\"" + rowData.id + "\")'>登记</a>";
+                }
+            }, {
+                field: 'name',
+                title: '姓名',
+                width: 100,
+                align: 'center',
+                sortable: false,
+                formatter: function (value, rowData, index) {
+                    return "<a href='javascript:void()' title='"+value+"' style='color:#549de3;padding-left:2px;display: inline-block;' onclick='addPersonTab(\"" + rowData.id + "\")'>"+value+"</a>";
+                }
+            }
+            , {
+                field: 'enterpriseName',
+                title: '驻场企业名称',
+                width: 150,
+                align: 'left',
+                sortable: false,
+                formatter: function (value, rowData, index) {
+                 	  if(value!=null){
+                          return "<a href=\"javascript:void()\" title="+value+" style=\"color:#549de3;padding-left:2px;" +
+                          		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+                          		"max-width: 100%;vertical-align: middle;\" onclick=\"editInfo('"+rowData.id+"')\">"+value+"</a>";
+                      }else{
+                          return ""
+                      }
+                }
+            }
+        ]],
+        columns: [
+            [
+                {
+                    title: '1号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '2号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '3号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '4号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '5号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '6号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '7号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '8号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '9号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '10号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '11号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '12号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '13号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '14号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '15号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '16号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '17号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '18号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '19号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '20号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '21号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '22号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '23号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '24号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '25号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '26号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '27号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '28号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '29号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '30号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                {
+                    title: '31号',
+                    align: 'center',
+                    width: 80,
+                    sortable: false,
+                    colspan: 2
+
+                },
+                 {
+                title: '出 勤 情 况 累 总（天）',
+                align: 'center',
+                width: 825,
+                sortable: false,
+                colspan: 15
+
+            },  {
+                field: 'kxnj',
+                title: '结余可休年假（天）',
+                width: 120,
+                align: 'center',
+                sortable: false,
+                rowspan:2
+            },{
+                field: 'reg_remark',
+                title: '备注',
+                width: 200,
+                align: 'left',
+                sortable: false,
+                rowspan:2,
+                formatter: function (value, rowData, index) {
+                	if(value!=null){
+                        return "<span title="+value+" style=\"padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;\">"+value+"</span>";
+                	}else{
+                		return ""
+                	}
+                }
+            }, {
+                field: 'reg_creater',
+                title: '登记人',
+                width: 120,
+                align: 'left',
+                sortable: false,
+                rowspan:2,
+                formatter: function (value, rowData, index) {
+                	if(value!=null){
+                        return "<span title="+value+" style=\"padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;\">"+value+"</span>";
+                	}else{
+                		return ""
+                	}
+                }
+            }],[
+                {
+                    field: 'morning_1',
+                    title:'上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                            return value;
+                    }
+
+                },
+                {
+                    field: 'afternoon_1',
+                    title:'下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+
+                },
+                {
+                    field: 'morning_2',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                            return value;
+                    }
+                }, {
+                    field: 'afternoon_2',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	  return value;
+                    }
+                },{
+                    field: 'morning_3',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_3',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_4',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_4',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_5',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_5',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_6',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_6',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_7',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_7',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_8',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_8',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_9',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_9',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_10',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_10',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_11',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_11',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_12',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_12',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_13',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_13',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_14',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_14',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_15',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_15',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_16',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_16',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_17',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_17',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_18',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_18',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_19',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_19',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_20',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_20',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_21',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_21',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_22',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_22',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_23',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_23',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_24',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_24',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_25',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_25',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_26',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_26',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_27',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_27',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_28',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_28',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_29',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_29',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_30',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'afternoon_30',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },{
+                    field: 'morning_31',
+                    title: '上午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },
+                {
+                    field: 'afternoon_31',
+                    title: '下午',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                    formatter:function (value,rowData,Index){
+                    	 return value;
+                    }
+                },
+                {
+                    field: 'sb',
+                    title: '上班',
+                    width: 55,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'nxj',
+                    title: '年休假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'tqj',
+                    title: '探亲假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'sj',
+                    title: '事假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'syj',
+                    title: '生育假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'jsj',
+                    title: '计生假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+
+                },{
+                    field: 'bj',
+                    title: '病假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'hj',
+                    title: '婚假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'sangj',
+                    title: '丧假',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'lgxx',
+                    title: '离岗学习',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'cc',
+                    title: '出差',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'kg',
+                    title: '旷工',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'qt',
+                    title: '其他',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'jb',
+                    title: '加班',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'xx',
+                    title: '休息',
+                    width: 55,
+                    align: 'center',
+                    sortable: false
+                }
+
+            ]
+        ],
+        toolbar: '#tit1',
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#recordManager').datagrid('loadData', {total: 1, rows: [{name: "未找到相关信息！"}]});
+            }
+        },
+    });
+    $(window).resize(function () {
+        $('#recordManager').datagrid('resize', {
+            height: tableHeight()
+        });
+    });
+
+});
+function getBatchDialog() {
+    selections = $('#recordManager').datagrid('getSelections');
+    if (selections.length == 0) {
+
+        $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+        // $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+        return;
+    }
+    var ids = "";
+	for(var i = 0;i<selections.length;i++){
+		ids+=selections[i].id+",";
+	}
+	ids = ids.substring(0,ids.length-1);
+    var regYear=$("#regYear").val();
+	var regMonth=$("#regMonth").val();
+	var days=getDaysInYearMonth(regYear,regMonth);
+	var minDate=regYear+"-"+regMonth+"-"+"01";
+	var maxDate=regYear+"-"+regMonth+"-"+days;
+    $('#dlg').dialog({
+        title: '考勤批量登记单',
+        width: 800,
+        height:400,
+        closed: false,
+        cache: false,
+        top: 100,
+        content:"<iframe name=\"fileFrame\" frameborder=\"0\" src="+'/workRegister/toRegisterBatchDialog?personIds='+ids+"&minDate="+minDate+"&maxDate="+maxDate+" scrolling=\"no\" style=\"width:100%;height:100%;\"></iframe>",
+        modal: true
+    });
+}
+function getPersonnalDialog(id) {
+	var regYear=$("#regYear").val();
+	var regMonth=$("#regMonth").val();
+	var days=getDaysInYearMonth(regYear,regMonth);
+	var minDate=regYear+"-"+regMonth+"-"+"01";
+	var maxDate=regYear+"-"+regMonth+"-"+days;
+    $('#personalDlg').dialog({
+        title: '个人考勤登记单',
+        width: 800,
+        height:450,
+        closed: false,
+        cache: false,
+        top: 50,
+        // href: 'personalDialog.html',
+        content:"<iframe name=\"fileFrame\" frameborder=\"0\" src="+'/workRegister/toRegisterDialog?personId='+id+"&minDate="+minDate+"&maxDate="+maxDate+" scrolling=\"no\" style=\"width:100%;height:100%;\"></iframe>",
+        modal: true
+    });
+}
+//某年某月有几天
+function getDaysInYearMonth(year, month){
+	if(year=="" || month==""){
+		var curDate = new Date();
+		return curDate.getDate();
+	}else{
+		var curDate = new Date(year+"-"+month);
+		/* 获取当前月份 */
+		var curMonth = curDate.getMonth();
+		/* 生成实际的月份: 由于curMonth会比实际月份小1, 故需加1 */
+		curDate.setMonth(curMonth + 1);
+		/* 将日期设置为0 */
+		curDate.setDate(0);
+		/* 返回当月的天数 */
+		return curDate.getDate();
+	}
+}
+
+function addPersonTab(id) {
+    top.addTabGrid('驻场人员详情', '/workRegister/toPersonEdit?id='+id);
+}
+function editInfo(id) {
+    var href = "/workEnterprise/toEdit?id="+id;
+    var title = "驻场企业修改";
+    top.addTabGrid(title, href);
+}
+//查询
+function searchReg(){
+	var name = $("#name").val().trim();
+	var enterpriseName = $("#enterpriseName").val().trim();
+	var morningOrAfternoon = $("#morningOrAfternoon").val().trim();
+	var regYear=$("#regYear").val();
+	var regMonth=$("#regMonth").val();
+	
+    $('#recordManager').datagrid({
+		queryParams: {
+			name:name,
+			enterpriseName:enterpriseName,
+			morningOrAfternoon:morningOrAfternoon,
+			regYearMonth:regYear+regMonth
+		}
+	}); 
+}
+//重置
+function refresh() {
+	var json1={tabTitle:'考勤管理',url:'/workRegister/tolist'};
+	window.parent.refreshTab(json1); 
+}
+

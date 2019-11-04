@@ -1,0 +1,61 @@
+package com.cost168.costaudit.service.work.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.work.WorkProcessApplyMapper;
+import com.cost168.costaudit.pojo.work.WorkProcessApply;
+import com.cost168.costaudit.pojo.work.WorkProcessApplyExample;
+import com.cost168.costaudit.service.work.WorkProcessApplyService;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class WorkProcessApplyServiceImpl implements WorkProcessApplyService{
+
+	
+	
+	@Autowired
+	private WorkProcessApplyMapper workProcessApplyMapper;
+
+	
+	
+	@Override
+	public List<WorkProcessApply> selectByExample(WorkProcessApplyExample example) {
+		return workProcessApplyMapper.selectByExample(example);
+	}
+
+	@Override
+	public WorkProcessApply selectByPrimaryKey(String id) {
+		return workProcessApplyMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(WorkProcessApply record) {
+		return workProcessApplyMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(WorkProcessApply workProcessApply) {
+		return workProcessApplyMapper.updateByPrimaryKeySelective(workProcessApply);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return workProcessApplyMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<WorkProcessApply> selectListByMap(Map<String, Object> map) {
+		return workProcessApplyMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return workProcessApplyMapper.selectCountByMap(map);
+	}
+
+}

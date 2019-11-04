@@ -1,0 +1,39 @@
+package com.cost168.costaudit.service.cost;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.cost168.costaudit.pojo.cost.CostContract;
+import com.cost168.costaudit.pojo.cost.CostContractExample;
+
+public interface CostContractService {
+	
+	List<CostContract> selectByExample(CostContractExample example);
+	
+	int deleteByPrimaryKey(String id);
+	
+	int insertSelective(CostContract record);
+	
+	CostContract selectByPrimaryKey(String id);
+	
+	int updateByPrimaryKeySelective(CostContract record);
+	
+    List<CostContract> selectListByMap(Map<String,Object> map);
+    
+    int selectCountByMap(Map<String,Object> map);
+    
+    public List<CostContract>  importContract(HttpServletRequest request);
+    
+	public CostContract selectByContractCode(String code);
+	
+	List<CostContract> selectChildrenListByMap(Map<String,Object> map);
+
+	List<CostContract> importContract2(HttpServletRequest request);
+	
+	CostContract selectByContractName(String name);
+		
+	
+
+}

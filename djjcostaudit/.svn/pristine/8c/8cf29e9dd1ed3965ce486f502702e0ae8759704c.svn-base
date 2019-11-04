@@ -1,0 +1,56 @@
+package com.cost168.costaudit.pojo.yaohao.param;
+
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+
+/**
+ * @description: 综合考核页面需要的参数
+ * @author: ZYL
+ * @created: 2019-07-08
+ */
+public class YaohaoAssessParam extends YaohaoAssess{
+    //入库企业id
+    private String workEnterpriseId;
+    //入库企业名字
+    private String enterpriseName;
+    //企业简称
+    private String simpleName;
+    //入库状态
+    private String effectiveFlag;
+
+    @Override
+    public String getWorkEnterpriseId() {
+        return workEnterpriseId;
+    }
+
+    @Override
+    public void setWorkEnterpriseId(String workEnterpriseId) {
+        this.workEnterpriseId = workEnterpriseId;
+
+    }
+
+    public String getSimpleName() {
+        return simpleName;
+    }
+
+    public String getEffectiveFlag() {
+        return effectiveFlag;
+    }
+
+    public void setSimpleName(String simpleName) {
+
+        this.simpleName = simpleName;
+    }
+
+    public void setEffectiveFlag(String effectiveFlag) {
+        this.effectiveFlag = effectiveFlag;
+    }
+
+    public String getEnterpriseName() {
+        return enterpriseName;
+    }
+
+    public void setEnterpriseName(String enterpriseName) {
+
+        this.enterpriseName = enterpriseName;
+    }
+}

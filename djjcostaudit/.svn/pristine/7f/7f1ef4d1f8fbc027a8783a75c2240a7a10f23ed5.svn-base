@@ -1,0 +1,263 @@
+$(function () {
+    var bool = false;
+    $(".switchBtn").on('click', function () {
+        $(".filter").toggle();
+        if (!bool) {
+            $(this).addClass("active");
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+            bool = true;
+        } else {
+            $(this).removeClass("active");
+            bool = false;
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+
+    $('#comprehensiveAssessment').datagrid({
+        url: '/assess/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: true,
+        rownumbers: true,
+        height: tableHeight(),
+        fitColumns: true,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 50,
+        singleSelect: false,
+        queryParams: {
+            year: $("#year").val(),
+        },
+        columns: [
+            [
+                {
+                    field: 'id',
+                    title: '单选框',
+                    checkbox: true
+                }, {
+                field: 'enterpriseName',
+                title: '入库企业名称',
+                width: 250,
+                align: 'left',
+                sortable: false,
+                formatter: function (value, rowData, index) {
+                    if (rowData.id == undefined) {
+                        return "未找到相关信息！";
+                    } else (value != null)
+                    {
+                        return "<a href='javascript:void(0)' title='" + value + "' style='color:#549de3;padding-left:2px;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;max-width: 100%;vertical-align: middle;' onclick='companyDetail(\"" + rowData.id + "\",\"" + rowData.scoreRankStr + "\")'>" + value + "</a>";
+                    }
+                }
+            }, {
+                field: 'rukuStatus',
+                title: '入库状态',
+                width: 120,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'year',
+                title: '考核年份',
+                align: 'center',
+                width: 150,
+                sortable: false
+
+            }, {
+                field: 'assessScore',
+                title: '综合考核得分',
+                width: 120,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'scoreRankStr',
+                title: '综考得分排名',
+                width: 100,
+                align: 'center',
+                sortable: false
+
+            }, {
+                field: 'assessResult',
+                title: '本年度综评',
+                width: 150,
+                align: 'center',
+                sortable: false,
+                formatter: function (value, rowData, index){
+                	if(rowData.id){
+	                	if(value!=null){
+	                		return value;
+	                	}else{
+	                		return "未评定";
+	                	}
+                	}
+                }
+            }, {
+                field: 'yaohaoGrade',
+                title: '下一年摇号档次',
+                align: 'center',
+                width: 100,
+                sortable: false,
+
+            }, {
+                field: 'createTime',
+                title: '评分时间',
+                align: 'center',
+                width: 100,
+                sortable: false,
+                formatter: function (value) {
+                    return formatterdate(value);
+                }
+            }, {
+                field: 'creater',
+                title: '登记人',
+                width: 120,
+                align: 'center',
+                sortable: false
+            }
+            ]
+        ],
+        toolbar: '#tit1',
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#comprehensiveAssessment').datagrid('loadData', {total: 1, rows: [{enterpriseName: "未找到相关信息！"}]});
+            }
+            $.ajax({
+                url: '/assess/addYaohaoNameBtnShow',
+                dataType: "json",
+                type: "post",
+                async: false,
+                data: {'startTime': $("#year").val()},
+                success: function (result) {
+                    if (result.status == 200) {
+                        $("#addYaohao").show();
+                    } else {
+                        $("#addYaohao").hide();
+                    }
+                }
+            });
+        },
+    });
+    $(window).resize(function () {
+        if (bool) {
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+        } else {
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+
+});
+
+//跳转综合考核单详情修改页
+function companyDetail(id, scoreRankStr) {
+    top.addTabGrid('综合考核单修改', '/assess/toEdit?id=' + id + '&scoreRankStr=' + scoreRankStr);
+}
+
+function deleteHandler() {
+    var selections = $('#comprehensiveAssessment').datagrid('getSelections');
+    var row = $('#comprehensiveAssessment').datagrid('getSelected');
+    if (selections.length == 0) {
+        $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+        return;
+    }
+    if (row.length != 0) {
+        if (row.length = 1 && row.enterpriseName == '未找到相关信息！') {
+            $.messager.alert('提示信息', '此信息无效！', 'warn');
+            return;
+        }
+    }
+    $.messager.confirm('提示信息', '确认要删除这' + selections.length + '条记录吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        $.messager.progress();
+        var ids = '';
+        for (var i in selections) {
+            ids = ids + ',' + selections[i].id;
+        }
+        $.ajax({
+            url: '/assess/delete',
+            type: 'POST',
+            data: {'ids': ids},
+            traditional: true,
+            success: function (result) {
+                $.messager.progress('close');
+                if (result.status == 200) {
+                    $('#comprehensiveAssessment').datagrid('reload');
+                    window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+                } else {
+                    $.messager.alert('温馨提示', '操作异常,请联系管理员！', 'error');
+                }
+            }
+        });
+    });
+}
+
+//按照查询条件查询
+function search() {
+    var enterpriseName = $("#enterpriseName").val();
+    var rukuStatus = $("#rukuStatus").val();
+    var year = $("#year").val();
+    var assessResult = $("#assessResult").val();
+    var yaohaoGrade = $("#yaohaoGrade").val();
+    var startTime = $("#startTime").val();
+    var endTime = $("#endTime").val();
+    $("#comprehensiveAssessment").datagrid({
+        queryParams: {
+            enterpriseName: enterpriseName,
+            rukuStatus: rukuStatus,
+            year: year,
+            assessResult: assessResult,
+            yaohaoGrade: yaohaoGrade,
+            startTime: startTime,
+            endTime: endTime
+        }
+    });
+}
+
+//重置刷新
+function refresh() {
+    top.addTabGrid('综合考核', '/assess/toList');
+}
+
+//导出excel
+function exportExcel() {
+    var year = $("#year").val();
+    var selections = $('#comprehensiveAssessment').datagrid('getSelections');
+    var costEnterpriseIds = "";
+    var scoreRankStrs = "";
+    if (selections.length != 0) {
+        for (var i = 0; i < selections.length; i++) {
+            costEnterpriseIds += selections[i].costEnterpriseId + ",";
+            scoreRankStrs += selections[i].scoreRankStr + ",";
+        }
+        costEnterpriseIds = costEnterpriseIds.substring(0, costEnterpriseIds.length - 1);
+        scoreRankStrs = scoreRankStrs.substring(0, scoreRankStrs.length - 1);
+        window.location.href = "/assess/exportExcel?year=" + year + "&costEnterpriseIds=" + costEnterpriseIds + "&scoreRankStrs=" + scoreRankStrs;
+    } else {
+        window.location.href = "/assess/exportExcel?year=" + year;
+    }
+}
+
+//生成摇号名单
+function addYaohaoName() {
+    $.ajax({
+        url: '/assess/addYaohaoName',
+        dataType: "json",
+        type: "post",
+        async: false,
+        data: {'startTime': $("#year").val()},
+        success: function (result) {
+            if (result.status == 200) {
+                window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+            } else {
+                $.messager.alert('温馨提示', '操作异常,请联系管理员！', 'error');
+            }
+        }
+    });
+}

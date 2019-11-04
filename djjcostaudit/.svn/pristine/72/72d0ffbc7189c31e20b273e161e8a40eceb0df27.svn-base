@@ -1,0 +1,477 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>来往文件添加</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+
+	<style type="text/css">
+	.datagrid-cell-c2-name{
+	    overflow: hidden;
+	    text-overflow:ellipsis;
+	    white-space: nowrap!important;
+	}
+	.datagrid-cell-c2-contractName{
+	    overflow: hidden;
+	    text-overflow:ellipsis;
+	    white-space: nowrap!important;
+	}
+    .combo-panel{overflow:auto;}
+	</style>
+	<script type="text/javascript">
+	 projectId="${obj.projectId}";
+	</script>
+</head>
+<body class="easyui-layout">
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+	<div data-options="region:'center',border:0" class="wrap_center">
+    <form action="" id="formId">
+    	<c:if test="${!empty obj.id}">
+	    	<input type="hidden" value="${obj.id}" name="id" id="documentId">
+    	</c:if>
+        <table class="table_edit" id="table_edit" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <td class="bgcolor"><strong>*</strong>文件标题：</td>
+                        <td colspan="5">
+                            <input type="text" id="name" name="name"  value="${obj.name}" placeholder="请输入文件标题" style="width:100%;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor" style="width:14%;"><strong>*</strong>文号：</td>
+                        <td style="width:18%">
+                            <input type="text" id="symbol" name="symbol"  value="${obj.symbol}" placeholder="请输入“收文编号” 或 “退审文号”" style="width:100%;">
+                        </td>
+                        <td class="bgcolor" style="width:14%;"><strong>*</strong>往来：</td>
+                        <td style="text-align: center;width: 15%">
+                            <select name="comeGoFlag" id="comeGoFlag" class="custom-select">
+                                <c:forTokens items="请选择,来,往" delims="," var="i">
+                                	<option <c:if test="${i eq obj.comeGoFlag }">selected = "selected"</c:if>  value="${i}">${i}</option>
+                                </c:forTokens>
+                            </select>
+                        </td>
+                        <td class="bgcolor" style="width:14%;"><strong>*</strong>文件日期：</td>
+                        <td style="width:15%;">
+                            <input placeholder="文件日期" class="Wdate search_text_form" id="documentTimeStr" name="documentTimeStr" value="${fn:substring(obj.documentTimeStr, 0, 10)}" type="text" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>*</strong>往来单位：</td>
+                        <td colspan="3">
+                        	<input type="text" id="comeGoUnitId" name="comeGoUnit" style="margin-top:5px;width:80%;" value="${obj.comeGoUnit}" placeholder="请选择往来单位" style="width:80%;"/>
+								<a href="javascript:void(0)" class="fr" style="margin-top:5px;" onclick="agreeToOrg();">
+									<img src="${pageContext.request.contextPath}/res/images/pagecommon/project.png" alt="" width="19"height="19">
+				                </a>
+                        </td>
+                        <td class="bgcolor"><strong>*</strong>份数：</td>
+                        <td style="width:18%">
+                            <input type="text" id="number" name="number"  value="${obj.number}" placeholder="请输入份数，允许填入文字" style="width:100%;">
+                        </td>
+                        <%--
+                        <td class="bgcolor"><strong>&nbsp;</strong>负责人：</td>
+                        <td>
+                        	<input type="text" id="personLiableId" name="personLiable" style="margin-top:5px;width:80%;" value="${obj.personLiable}" placeholder="请输入负责人" style="width:80%;" readonly/>
+                         	<a href="javascript:void(0)" class="fr" style="margin-top:5px;" onclick="person();">
+                    		<img src="${pageContext.request.contextPath}/res/images/pagecommon/project.png" alt="" width="19"height="19">
+                        </td>
+                    	--%>
+                    </tr>
+                    
+                    <tr>
+                        <td class="bgcolor"><strong>*</strong>登记人：</td>
+                        <td>
+                            <input type="text" id="registrant" name="registrant" readonly="readonly"  value="${obj.registrant}" placeholder="请输入登记人" style="width:100%;">
+                        </td>
+                        <td class="bgcolor"><strong>*</strong>是否审价：</td>
+                        <td>
+                            <select name="auditPriceFlag" id="auditPriceFlag" class="custom-select">
+                                <c:forTokens items="请选择,是,否" delims="," var="i">
+                                	<option <c:if test="${i eq obj.auditPriceFlag }">selected = "selected"</c:if>  value="${i}">${i}</option>
+                                </c:forTokens>
+                            </select>
+                        </td>
+                        <td class="bgcolor"><strong>*</strong>登记日期：</td>
+                        <td>
+                            <input class="Wdate search_text_form" id="registrantTimeStr" readonly="readonly"  name="registrantTimeStr" value="${fn:substring(obj.registrantTimeStr, 0, 16)}" type="text" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd HH:mm'})">
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td class="bgcolor"><strong>&nbsp;</strong>文件摘要：</td>
+                        <td colspan="5">
+                            <textarea name="description"  cols="5" rows="2">${obj.description}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>&nbsp;</strong>处置意见：</td>
+                        <td colspan="5">
+                            <textarea name="opinion" cols="5" rows="2">${obj.opinion}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td class="bgcolor"><strong>*</strong>包含项目：</td>
+                        <td colspan="5">
+                            <input type="text"  value="${obj.projectName}" title ="${obj.projectName}" readonly="readonly" placeholder="请选择所属项目" id="containProjectShowName" style="width:90%;margin-top:5px;overflow: hidden;text-overflow: ellipsis;white-space: nowrap;color:#549de3;cursor:pointer;">
+	           		 		<input type="hidden"  value="${obj.projectId}"  id="containProjectId" name="projectId" style="width:80%;margin-top:5px;">
+	            			<input type="hidden"  value="${obj.projectName}"  id="containProjectName" name="projectName" style="width:80%;margin-top:5px;">
+                            <a href="javascript:void(0)" onclick="agreeToProject()" class="fr" style="margin-top:5px;">
+                            	<img src="${pageContext.request.contextPath}/res/images/pagecommon/project.png" alt="" width="19"height="19">
+                            </a>
+                        	<input type="hidden" value=""  style="width:100%;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong></strong>包含合同：</td>
+                        <td colspan="5">
+                            <input type="text"   value="${obj.contractName}" readonly="readonly" placeholder="请选择所属合同" id="containContractShowName" style="width:80%;margin-top:5px;color:#549de3;cursor:pointer;">
+	           		 		<input type="hidden"  value="${obj.contractId}"  id="containContractId" name="contractId" style="width:80%;margin-top:5px;">
+	            			<input type="hidden"  value="${obj.contractName}"  id="containContractName" name="contractName" style="width:80%;margin-top:5px;">
+	            			<a href="javascript:void(0)" class="fr" style="margin-top:5px;" onclick="clearContract();">
+		                    	<img src="${pageContext.request.contextPath}/res/images/pagecommon/remove.png" alt="" width="19"height="19">
+		                    </a>
+                            <a href="javascript:void(0)" onclick="agreeToContract()" class="fr" style="margin-top:5px;">
+                            	<img src="${pageContext.request.contextPath}/res/images/pagecommon/contract.png" alt="" width="19"height="19">&nbsp;&nbsp;
+                            </a>
+                        </td>
+                    </tr>
+                    <c:if test="${(param.editFlag eq 'y' and user.name eq obj.registrant) or (param.editFlag eq 'y' and fn:contains(obj.personLiable,user.name)) or dataUpdate eq true}">
+                    <tr style="height:40px">
+                        <td colspan="6" style="text-align: center">
+                            <input type="button" id="save" class="btn btn-primary"  value="保存">&nbsp;&nbsp;
+                            <input type="button" class="btn btn-success" onclick="top.closeWindow('往来文件添加');top.closeWindow('往来文件修改')" value="取消">
+                        </td>
+                    </tr>
+                    </c:if>
+                </tbody>
+            </table>
+
+    </form>
+    <div id="tt" style="width:100%;">
+        <div title="附件" class="subWrap" >
+
+            <table id="fujian" style="width: 100%">
+            </table>
+			<c:if test="${(param.editFlag eq 'y' and user.name eq obj.registrant) or (param.editFlag eq 'y' and fn:contains(obj.personLiable,user.name)) or dataUpdate eq true}">
+	            <div id="tit1" >
+	                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="getDialog()">添加文件夹</a>
+	                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="false" onclick="getEditDialog();">修改文件夹名称</a>
+	                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="delFile()">删除</a>
+	                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-upload" plain="false" onclick="uploadFile()">上传附件</a>
+	                <span style="color:#969696;font-size: 14px">（右键表格表头设置显示隐藏列）</span>
+	            </div>
+			</c:if>
+        </div>
+        <div title="关联信息" class="subWrap">
+            <table id="linkInfo" style="width: 100%">
+            </table>
+            <%--<c:if test="${(param.editFlag eq 'y' and user.name eq obj.registrant) or (param.editFlag eq 'y' and fn:contains(obj.personLiable,user.name))}">
+	            <div id="tit3" >
+	                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="addInfoTabs()">添加</a>
+	                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="false" onclick="editInfoTabs()">修改</a>
+	                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="delProCon()">删除</a>
+	            </div>
+            </c:if>
+        	--%>
+        </div>
+        <div title="审价任务" class="subWrap">
+            <table id="sjTask" style="width: 100%">
+            </table>
+            <div id="tit2">
+                <div class="row">
+                	<form action="">
+                    <div class="filter" style="margin-bottom:0px">
+                        <div class="form-inline">
+                            <div class="form-group">
+                                <label for="">审价编号：</label>
+                                <input type="text" id="task_code" value="" placeholder="请输入关键字" class="form-control input-sm">
+                            </div>
+                            <div class="form-group">
+                                <label for="">审价任务名称：</label>
+                                <input type="text" id="task_name" value="" placeholder="请输入关键字" class="form-control input-sm">
+                            </div>
+                            <div class="form-group">
+                                <label for="">审价类型：</label>
+                                <select id="auditPriceType"  class="custom-select" style="width: 200px"></select>
+                                <!-- <select id="task_auditPriceTypecn" onchange="searchTask()" class="form-control input-sm">
+                                    <option value="">请选择</option>
+                                    <option value="估概预结" >估概预结</option>
+                                    <option value="合同变更" >合同变更</option>
+                                    <option value="单价审核" >单价审核</option>
+                                </select> -->
+                            </div>
+
+                            <div class="form-group">
+                                <label for="">审价任务负责人：</label>
+                                <input type="text" id="task_personLiable" value="" placeholder="请输入关键字" class="form-control input-sm">
+                            </div>
+                            <div class="form-group">
+                                <label for="">审价单位：</label>
+                                <input type="text" id="task_auditPriceUnit" value="" placeholder="请输入关键字" class="form-control input-sm">
+                            </div>
+                            <div class="form-group">
+                                <label for="">当前状态：</label>
+                                <select id="task_status" onchange="searchTask()" class="form-control input-sm" style="width: 100px">
+                                    <option value="">请选择</option>
+				                    <option value="新建" >新建</option>
+				                    <option value="办内审核中" >办内审核中</option>
+				                    <option value="办内审核完" >办内审核完</option>
+				                    <option value="退审" >退审</option>
+				                    <option value="审结" >审结</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="">定案文号：</label>
+                                <input type="text" id="task_finalizeNumber" value="" placeholder="请输入关键字" class="form-control input-sm">
+                            </div>
+                            <div class="form-group">
+                                <label for="">协调：</label>
+                                <select class="form-control input-sm" onchange="searchTask()" id="coordinateFlag" style="width: 100px">
+                                    <option value="">请选择</option>
+                                    <option value="是" >是</option>
+                                    <option value="否" >否</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <input type="button" name="Submit11" value="查询" class="btn btn-primary" onclick="searchTask()">&nbsp;
+                                <input type="reset" name="reset" value="重置" class="btn btn btn-success" >&nbsp;
+                                <input type="button" name="reset" value="导出" class="btn btn-danger" onclick="exportDate();">&nbsp;
+                            </div>
+                        </div>
+                    </div>
+                    <a href="javascript:void(0);" class="switchBtn"></a>
+                    </form>
+                </div>
+            </div>
+        </div>
+       
+    </div>
+    </div>
+<div id="taskDialog" style="background: #f4f8fb"></div>
+<div id="dlg"></div>
+<div id="info_add"></div>
+<div id="dialog"></div>
+<div id="person"></div>
+<div id="editDialog"></div>
+<div id="project"></div>
+<div id="contract"></div>
+<div id="agreeToOrg"></div>
+<script src="${pageContext.request.contextPath}/res/js/cost/document/wlfile_add.js"></script>
+<script src="${pageContext.request.contextPath}/res/js/cost/document/attachment.js"></script>
+<script src="${pageContext.request.contextPath}/res/js/cost/document/relation_project.js"></script>
+<script src="${pageContext.request.contextPath}/res/js/cost/document/relation_task.js"></script>
+<script src="${pageContext.request.contextPath}/res/js/cost/contract/taskType.js"></script>
+<script>
+	var add_edit="${add_edit}";
+	var documentId=$("#documentId").val();
+	var projectId="${obj.projectId}";
+	var taskTypeId="";
+	var url="${url}";
+    <!-- 禁用所有Form表单 -->
+    function disableForm(formId,isDisabled) {
+        var attr="disable";
+        if(!isDisabled){
+            attr="enable";
+        }
+        $("form[id='"+formId+"'] :text").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] textarea").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] select").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :radio").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :checkbox").attr("readonly",isDisabled);
+    }
+    var editFlag="${param.editFlag}";
+	$(function(){
+		
+		if(editFlag=="n"){
+			disableForm("formId",true);
+		}
+		$("#save").click(function(){
+			
+			var name=$("#name").val();
+	    	var symbol=$("#symbol").val();
+	    	var documentTimeStr=$("#documentTimeStr").val();
+	    	var comeGoUnit=$("#comeGoUnit").val();
+	    	var number=$("#number").val();
+	    	var registrant=$("#registrant").val();
+	    	var registrantTimeStr=$("#registrantTimeStr").val();
+	    	
+	    	var comeGoFlag=$("#comeGoFlag").val();
+	    	var auditPriceFlag=$("#auditPriceFlag").val();
+	    	if(name==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写文件标题！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(symbol==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写文号！', icon: 'error', top:100});
+	          	return;
+		    }
+		    if(comeGoFlag=="请选择"){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写往来！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(documentTimeStr==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写文件日期！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(comeGoUnit==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写往来单位！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(number==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写份数！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(registrant==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写登记人！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(auditPriceFlag=="请选择"){
+	          	$.messager.alert({title:'温馨提示', msg:'请填是否审价！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(registrantTimeStr==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写登记日期！', icon: 'error', top:100});
+	          	return;
+		    }
+			$.ajax({
+				  url: url,
+				  dataType: "json",
+				  type:"post",
+				  async: false,
+				  data: $("#formId").serialize(),
+				  success: function(result){
+					  if(result.status==200){
+						  url="/costDocument/upd";
+						  var json1={tabTitle:'往来文件',url:'/forward_document_list'};
+						  window.parent.refreshTab(json1);
+					  	  window.parent.showMessager("温馨提示", "<b>保存成功!</b>", 5000, "slide");
+					  	  if(add_edit=='add'){
+						  	  $.messager.confirm('提示信息', '确认要添加任务？', function (isOk) {
+						          if (!isOk) {
+						              return;
+						          }
+						          $.ajax({
+									  url: "/costDocument/getDpctRelationId",
+									  dataType: "json",
+									  type:"post",
+									  async: false,
+									  data: $("#formId").serialize(),
+									  success: function(result){
+										  if(result.status==200){
+											  var dpctRelationId=result.data.id;
+								          	  taskDialog(dpctRelationId);
+								          	  add_edit=="edit";
+										  }else{
+											  $.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+										  }
+									  }
+								});
+						      });
+					  	  }
+					  }else if(result.status==300){
+						  $.messager.alert("温馨提示","文号不能重复!", "error");
+					  }else{
+						  $.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+					  }
+				  }
+			});
+		});
+		
+		//查看项目详情
+		$("#containProjectShowName").off().click(function(){
+			var projectId=$("#containProjectId").val();
+			top.addTabGrid("项目修改", "/costProject/editProject?editFlag=y&projId="+projectId);
+		});
+		//
+		$("#containContractShowName").off().click(function(){
+			var contractId=$("#containContractId").val();
+			top.addTabGrid("合同修改", "/costContract/toEdit?editFlag=y&id="+contractId);
+		});
+		
+	});
+   
+	 //关联项目
+    function agreeToProject() {
+        $('#project').dialog({
+            title: '关联项目',
+            width: 805,
+            height: 520,
+            closed: false,
+            cache: false,
+            top:50,
+            content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_document_containProject'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+            modal: true
+        });
+    }
+    //关联合同
+    function agreeToContract() {
+    	var projectId=$("#containProjectId").val();
+    	if(projectId){
+	        $('#contract').dialog({
+	            title: '关联合同',
+	            width: 805,
+	            height: 520,
+	            closed: false,
+	            cache: false,
+	            top:50,
+	            content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_document_containContract?projectId='+projectId+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+	            modal: true
+	        });
+    	}else{
+    		$.messager.alert("温馨提示","请先选择所属项目!", "error");
+    	}
+    }
+    //关联部门
+    function agreeToOrg() {
+	    $('#agreeToOrg').dialog({
+	        title: '机构部门',
+	        width: 805,
+	        height: 520,
+	        closed: false,
+	        cache: false,
+	        top:50,
+	        content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_document_containOrg'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+	        modal: true
+	    });
+	}
+	
+  //项目负责人
+  function person() {
+      $('#person').dialog({
+          title: '系统用户',
+          width: 805,
+          height: 520,
+          closed: false,
+          cache: false,
+          top:50,
+          content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_project_person'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+          modal: true
+      });
+  }
+  
+  	//导出
+	function exportDate(){
+   	window.location.href = "${path}/costContract/exportTask.do";
+   }
+  	function clearContract(){
+  		$("#containContractId").val("");
+  		$("#containContractName").val("");
+  		$("#containContractShowName").val("");
+  	}
+</script>
+</body>
+</html>

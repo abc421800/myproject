@@ -1,0 +1,55 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoCandidateMapper;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidate;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidateExample;
+import com.cost168.costaudit.service.yaohao.YaohaoCandidateService;
+
+@Service
+public class YaohaoCandidateServiceImpl implements YaohaoCandidateService {
+	
+	@Autowired
+	private YaohaoCandidateMapper yaohaoCandidateMapper;
+
+	@Override
+	public List<YaohaoCandidate> selectByExample(YaohaoCandidateExample example) {
+		return yaohaoCandidateMapper.selectByExample(example);
+	}
+
+	@Override
+	public YaohaoCandidate selectByPrimaryKey(String id) {
+		return yaohaoCandidateMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(YaohaoCandidate record) {
+		return yaohaoCandidateMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoCandidate yaohaoCandidate) {
+		return yaohaoCandidateMapper.updateByPrimaryKeySelective(yaohaoCandidate);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoCandidateMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<YaohaoCandidate> selectListByMap(Map<String, Object> map) {
+		return yaohaoCandidateMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoCandidateMapper.selectCountByMap(map);
+	}
+
+}

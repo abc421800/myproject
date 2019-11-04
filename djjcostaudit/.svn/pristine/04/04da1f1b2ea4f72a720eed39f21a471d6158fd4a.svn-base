@@ -1,0 +1,608 @@
+var congId = new Array()
+$(function () {
+    var bool = false;
+    $(".switchBtn").on('click', function () {
+        $(".filter").toggle();
+        if (!bool) {
+            $(this).addClass("active");
+            $('#contractAccounts').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+            bool = true;
+        } else {
+            $(this).removeClass("active");
+            bool = false;
+            $('#contractAccounts').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+    
+    
+    $('#contractAccounts').datagrid({
+        url: '/costContract/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        rownumbers: false,
+        height: tableHeight(),
+        fitColumns: false,
+        striped: true,
+        collapsilble: true,
+        remoteSort:false,
+        pagination: true, //分页控件
+        pageSize: 10,
+        pageList:[10,50,100,500],
+        singleSelect: false,
+        queryParams:{
+        	mainFlag:"主合同",
+        },
+        view:detailview,//注意1
+        columns: [[
+	        {
+               field: 'id',
+               title : '单选框',
+               checkbox: true
+	
+	        },{
+                field: 'priority',
+                title: '序号',
+                width: 80,
+                align: 'center',
+                sortable: false
+
+            }, {
+               field: 'code',
+               title: '合同编号',
+               width: 130,
+               align: 'center',
+               sortable: true,
+               formatter: function (value, rowData, index) {
+	               	if(value!=null){
+	                       return "<span title="+value+" style=\"padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;\">"+value+"</span>";
+	               	}else{
+	               		return ""
+	               	}
+               }
+	        }, {
+               field: 'name',
+               title: '合同名称',
+               width: 230,
+               halign:'left',
+               align: 'left',
+               sortable: true,
+               formatter: function (value, rowData, index) {
+               	 if(value!=null){
+	               		 if(rowData.containCong=='是'){
+	               			 return "<a href=\"javascript:void(0)\" title="+value+" style=\"color:#246aad;padding-left:2px;" +
+	                 		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+	                 		"max-width: 100%;vertical-align: middle;\" onclick=\"editInfo('"+rowData.id+"')\">"+value+"</a>";
+	               		 }else{
+	               			 return "<a href=\"javascript:void(0)\" title="+value+" style=\"color:#549de3;padding-left:2px;" +
+	                 		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+	                 		"max-width: 100%;vertical-align: middle;\" onclick=\"editInfo('"+rowData.id+"')\">"+value+"</a>";
+	               		 }
+	                }else{
+	                    return ""
+	                }
+               }
+	        },{
+                field: 'contractType',
+                title: '合同类型',
+                width: 120,
+                align: 'center',
+                sortable: false
+
+            }, {
+                field: 'projectNameShow',
+                title: '所属项目',
+                width: 220,
+                halign:'center',
+                align: 'left',
+                sortable: true,
+                formatter: function (value, rowData, index) {
+                	if(value!=null){
+                        return "<span title="+value+" style=\"padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;\">"+value+"</span>";
+                	}else{
+                		return ""
+                	}
+                }
+
+            }, {
+                field: 'contractAmount',
+                title: '合同金额（元）',
+                width: 150,
+                halign:'center',
+                align: 'right',
+                sortable: true,
+                sorter:function(a,b){
+                    return(a>b?1:-1)
+                },
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return addQianFenFu(String(value))
+                	}else{
+                		return ""
+                	}
+                }
+                
+            }, {
+                field: 'changeAmount',
+                title: '变更金额（元）',
+                halign:'center',
+                align: 'right',
+                width: 150,
+                sortable: true,
+                sorter:function(a,b){
+                    return(a>b?1:-1)
+                },
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return addQianFenFu(String(value))
+                	}else{
+                		return ""
+                	}
+                }
+            }, {
+                field: 'settlementAmount',
+                title: '结算金额（元）',
+                halign:'center',
+                align: 'right',
+                width: 150,
+                sortable: true,
+                sorter:function(a,b){
+                    return(a>b?1:-1)
+                },
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return addQianFenFu(String(value))
+                	}else{
+                		return ""
+                	}
+                }
+            
+            }, {
+                field: 'partyB',
+                title: '合同乙方',
+                width: 180,
+                halign:'center',
+                align: 'left',
+                sortable: false,
+                formatter: function (value, rowData, index) {
+                	if(value!=null){
+                		return "<span title="+value+" style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:100%;vertical-align: middle;\">"+value+"</span>";
+                	}else{
+                		return ""
+                	}
+                }
+
+            }, {
+                field: 'department',
+                title: '合同执行部门',
+                width: 150,
+                halign:'center',
+                align: 'center',
+                sortable: false,
+                formatter: function (value, rowData, index) {
+                	if(value!=null){
+                		return "<span title="+value+" style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:100%;vertical-align: middle;\">"+value+"</span>";
+                	}else{
+                		return ""
+                	}
+                }
+
+            }, {
+                field: 'creater',
+                title: '创建人',
+                width: 100,
+                align: 'center',
+                sortable: false
+                
+            }, {
+                field: 'personLiable',
+                title: '合同负责人',
+                width: 180,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'signingTimeStr',
+                title: '签订时间',
+                width: 120,
+                align: 'center',
+                sortable: false
+            }
+            ]
+        ],
+        detailFormatter: function (index, row) {//注意2
+            return '<div style="padding:2px 0"><table id="ddv-' + index + '"></table></div>';
+        },
+        onExpandRow: function (index, row) {//注意3
+        	  $('#ddv-' + index).datagrid({
+                  url: '/costContract/listContractCong?parentId='+row.id,
+                  fitColumns: true,
+                  singleSelect: false,
+                  nowrap: false,
+                  striped: false,
+                  collapsilble: true,
+                  loadMsg: '数据加载中,请稍候...',
+                  height: 'auto',
+                  //pagination: true, //分页控件
+                  //pageSize: 10,
+                  scrollbarSize:0,
+                  queryParams:{
+                  	mainFlag:"从合同",
+                  },
+                  showHeader:false,
+                  columns: [[
+                      {
+                          field: 'id',
+                          title : '单选框',
+                          checkbox: true
+
+                      },
+                      {
+                          field: 'priority',
+                          title: '序号',
+                          width: 80,
+                          halign:'center',
+                          align:'center',
+                          sortable: false,
+                          formatter: function (value, rowData, index) {
+                        	  if(value){
+                        		  var parentNum=row.priority;
+                        		  return parentNum+"."+value;
+                        	  }else{
+                        		  return "";
+                        	  }
+                          }
+                      },
+                      {
+                          field: 'code',
+                          title: '合同编号',
+                          width: 130,
+                          align: 'center',
+                          sortable: true,
+                          formatter: function (value, rowData, index) {
+                              if(value!=null){
+                                  return "<span title="+value+" style=\"padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;\">"+value+"</span>";
+                              }else{
+                                  return ""
+                              }
+                          }
+                      }, {
+                          field: 'name',
+                          title: '合同名称',
+                          width: 230,
+                          halign:'left',
+                          align: 'left',
+                          sortable: false,
+                          formatter: function (value, rowData, index) {
+                              if(value!=null){
+                                  return "<a href=\"javascript:void(0)\" title="+value+" style=\"color:#549de3;padding-left:2px;" +
+                                      "overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+                                      "max-width: 100%;vertical-align: middle;\" onclick=\"editInfo2('"+rowData.id+"','"+rowData.parentId+"')\">"+value+"</a>";
+                              }else{
+                                  return ""
+                              }
+                          }
+                      },
+                      {
+                          field: 'contractType',
+                          title: '合同类型',
+                          width: 120,
+                          align: 'center',
+                          sortable: false
+
+                      }, {
+                          field: 'projectNameShow',
+                          title: '所属项目',
+                          width: 220,
+                          halign:'center',
+                          align: 'left',
+                          sortable: false,
+                          formatter: function (value, rowData, index) {
+                              if(value!=null){
+                                  return "<span title="+value+" style=\"padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;\">"+value+"</span>";
+                              }else{
+                                  return ""
+                              }
+                          }
+
+                      }, {
+                          field: 'contractAmount',
+                          title: '合同金额（元）',
+                          width: 150,
+                          halign:'center',
+                          align: 'right',
+                          sortable: true,
+                          sorter:function(a,b){
+                              return(a>b?1:-1)
+                          },
+                          formatter:function(value,rowData,index){
+                              if(value!=null){
+                                  return addQianFenFu(String(value))
+                              }else{
+                                  return ""
+                              }
+                          }
+
+                      }, {
+                          field: 'changeAmountSum',
+                          title: '变更金额（元）',
+                          halign:'center',
+                          align: 'right',
+                          width: 150,
+                          sortable: true,
+                          sorter:function(a,b){
+                              return(a>b?1:-1)
+                          },
+                          formatter:function(value,rowData,index){
+                              if(value!=null){
+                                  return addQianFenFu(String(value))
+                              }else{
+                                  return ""
+                              }
+                          }
+                      }, {
+                          field: 'settlementAmount',
+                          title: '结算金额（元）',
+                          halign:'center',
+                          align: 'right',
+                          width: 150,
+                          sortable: true,
+                          sorter:function(a,b){
+                              return(a>b?1:-1)
+                          },
+                          formatter:function(value,rowData,index){
+                              if(value!=null){
+                                  return addQianFenFu(String(value))
+                              }else{
+                                  return ""
+                              }
+                          }
+
+                      }, {
+                          field: 'partyB',
+                          title: '合同乙方',
+                          width: 180,
+                          halign:'center',
+                          align: 'left',
+                          sortable: false,
+                          formatter: function (value, rowData, index) {
+                              if(value!=null){
+                                  return "<span title="+value+" style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:100%;vertical-align: middle;\">"+value+"</span>";
+                              }else{
+                                  return ""
+                              }
+                          }
+
+                      }, {
+                          field: 'department',
+                          title: '合同执行部门',
+                          width: 150,
+                          halign:'center',
+                          align: 'center',
+                          sortable: false,
+                          formatter: function (value, rowData, index) {
+                          	if(value!=null){
+                          		return "<span title="+value+" style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:100%;vertical-align: middle;\">"+value+"</span>";
+                          	}else{
+                          		return ""
+                          	}
+                          }
+
+                      }, {
+                          field: 'creater',
+                          title: '创建人',
+                          width: 100,
+                          align: 'center',
+                          sortable: false
+
+                      }, {
+                          field: 'personLiable',
+                          title: '合同负责人',
+                          width: 180,
+                          align: 'center',
+                          sortable: false
+                      }, {
+                          field: 'signingTimeStr',
+                          title: '签订时间',
+                          width: 120,
+                          align: 'center',
+                          sortable: true
+                      }
+                  ]],
+                  onSelect:function(index,row){
+                	  congId.push(row);
+                  },
+                  onUnselect:function(index,row){
+                	  congId=$.grep(congId,function(n,i){
+              			return (n!=row);
+              		  });
+                  },
+                  onResize: function () {
+                      $('#contractAccounts').datagrid('fixDetailRowHeight', index);
+                  },
+                  onLoadSuccess: function (data) {
+                      setTimeout(function () {
+                          $('#contractAccounts').datagrid('fixDetailRowHeight', index);
+                      }, 0);
+                      if (data.total == 0) {
+                          $("#ddv-" + index).datagrid('loadData', {total: 1, rows: [{code: "未找到相关信息！"}]});
+                      }
+                  }
+              });
+              $('#contractAccounts').datagrid('fixDetailRowHeight', index);
+        	
+        },
+        toolbar: '#tit1',
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#contractAccounts').datagrid('loadData', {total: 1, rows: [{code: "未找到相关信息！"}]});
+            }
+        }
+    });
+    $(window).resize(function () {
+        $('#contractAccounts').datagrid('resize', {
+            height: tableHeight()
+        });
+    });
+});
+
+function addTab() {
+    window.parent.addTabGrid('合同台账详情', 'page/contractAccounts/contractAccountsDetails.html')
+}
+function edit() {
+    var rows = $('#contractAccounts').datagrid('getSelections');
+    if (rows == undefined || rows == null || rows.length == 0) {
+        $.messager.alert('提示信息', '请选择一条记录', 'warn');
+        return;
+    }
+    if (rows.length > 1) {
+        $.messager.alert('提示信息', '只能选择一条记录', 'warn');
+        return;
+    }
+    editInfo(rows[0].id);
+
+}
+//修改合同
+function editInfo(zjkClId) {
+    var href = "/costContract/toEdit?editFlag=y&id="+zjkClId;
+    var title = "合同修改";
+    top.addTabGrid(title, href);
+}
+//修改合同
+function editInfo2(zjkClId,pid) {
+    var href = "/costContract/toEditChildren?editFlag=y&id="+zjkClId+"&pid="+pid;
+    var title = "补充协议修改";
+    top.addTabGrid(title, href);
+}
+//合同详情
+function showInfo(zjkClId) {
+    var href = "/costContract/toEdit?editFlag=n&id="+zjkClId;
+    var title = "合同详情";
+    top.addTabGrid(title, href);
+}
+//添加合同
+function add() {
+    var href = "/costContract/toEdit?editFlag=y";
+    var title = "合同添加";
+    top.addTabGrid(title, href);
+}
+//添加补充协议合同
+function add2() {
+	 var selections = $('#contractAccounts').datagrid('getSelections');
+	    if (selections.length != 1) {
+	        $.messager.alert('提示信息', '请选择一条主合同', 'warn');
+	        return;
+	    }
+    var href = "/costContract/toEditChildren?editFlag=y&pid="+selections[0].id+"&projectId="+selections[0].projectId;
+    var title = "补充协议添加";
+    top.addTabGrid(title, href);
+}
+//降为从合同合同
+function add3() {
+	 var selections = $('#contractAccounts').datagrid('getSelections');
+     if (selections.length != 1) {
+        $.messager.alert('提示信息', '请选择一条主合同', 'warn');
+        return;
+     }
+     
+	  $('#contract').dialog({
+          title: '主合同列表',
+          id:'contract',
+          width: 805,
+          height: 550,
+          closed: false,
+          cache: false,
+          top:50,
+          content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_contract_containContract?contractId='+selections[0].id+'&projectId='+selections[0].projectId+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+          modal: true
+      });
+
+	  $('#contract').width('auto');
+}
+function deleteHandler() {
+	var selections = $('#contractAccounts').datagrid('getSelections');
+	if(selections==""){
+		selections=congId;
+	}else{
+		if (selections.length == 0) {
+			$.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+			return;
+		}
+	}
+    $.messager.confirm('提示信息', '确认要删除这' + selections.length + '条记录吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        var ids = '';
+    	for (var i in selections) {
+    		ids+=selections[i].id+",";
+    		if(currentUser!=selections[i].creater && dataUpdate=="false"){
+    			$.messager.alert('提示信息', '抱歉！您没权限删除该条数据：'+selections[i].name, 'warn');
+    			return;
+    		}
+    	}
+        ids = ids.substring(0,ids.length-1);
+        congId.length=0;
+        $.ajax({
+            url: '/costContract/deleteProject.do',
+            type: 'POST',
+            data: {'ids': ids},
+            traditional: true,
+        	success: function(result){
+				  if(result.status==200){
+				  	window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+				  	$('#contractAccounts').datagrid('reload');
+				  }else{
+					$.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+				  }
+			  }
+        });
+    });
+}
+//提交合同查询条件
+function searchCon(){
+	var name = $("#name").val().trim();
+	var code = $("#code").val().trim();
+	var contractType = $("#contractType").val();
+	var projectName = $("#projectName").val();
+	var personLiable = $("#personLiable").val();
+	var status = $("#status").val();
+	var startTime = $("#startTime").val();
+	var endTime = $("#endTime").val();
+	var orgId = $("#orgCombotreeSelect").combotree("getValues");
+	var dep = orgId.join(",");
+	var settlement = $("#settlement").val();
+	var partyB = $("#partyB").val();
+	if(dep==-1){
+		dep="";
+	}
+    $('#contractAccounts').datagrid({
+		queryParams: {
+			name:name,
+			code:code,
+			contractType:contractType,
+			projectName:projectName,
+			personLiable:personLiable,
+			status:status,
+			startTime:startTime,
+			endTime:endTime,
+			orgId:dep,
+			settlement:settlement,
+			partyB:partyB,
+			mainFlag:"主合同"
+		}
+	}); 
+}
+function addQianFenFu(s){
+    if(/[^[+-]?0-9\.]/.test(s)) return "invalid value";
+    s=s.replace(/^(\d*)$/,"$1.");
+    s=(s+"00").replace(/(\d*\.\d\d)\d*/,"$1");
+    s=s.replace(".",",");
+    var re=/(\d)(\d{3},)/;
+    while(re.test(s))
+            s=s.replace(re,"$1,$2");
+    s=s.replace(/,(\d\d)$/,".$1");
+    return s.replace(/^\./,"0.")
+}

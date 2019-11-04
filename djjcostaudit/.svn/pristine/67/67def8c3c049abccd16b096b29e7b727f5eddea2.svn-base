@@ -1,0 +1,65 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoWinbidMapper;
+import com.cost168.costaudit.pojo.yaohao.YaohaoWinbid;
+import com.cost168.costaudit.pojo.yaohao.YaohaoWinbidExample;
+import com.cost168.costaudit.service.yaohao.YaohaoWinbidService;
+
+@Service
+public class YaohaoWinbidServiceImpl implements YaohaoWinbidService {
+	
+	@Autowired
+	private YaohaoWinbidMapper yaohaoWinbidMapper;
+
+	@Override
+	public List<YaohaoWinbid> selectByExample(YaohaoWinbidExample example) {
+		return yaohaoWinbidMapper.selectByExample(example);
+	}
+
+	@Override
+	public YaohaoWinbid selectByPrimaryKey(String id) {
+		return yaohaoWinbidMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(YaohaoWinbid record) {
+		return yaohaoWinbidMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoWinbid yaohaoWinbid) {
+		return yaohaoWinbidMapper.updateByPrimaryKeySelective(yaohaoWinbid);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoWinbidMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<YaohaoWinbid> selectListByMap(Map<String, Object> map) {
+		return yaohaoWinbidMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoWinbidMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public List<YaohaoWinbid> selectListByOrderCode(String code) {
+		return yaohaoWinbidMapper.selectListByOrderCode(code);
+	}
+
+	@Override
+	public int deleteByOrderCode(String orderCode) {
+		return yaohaoWinbidMapper.deleteByOrderCode(orderCode);
+	}
+
+}

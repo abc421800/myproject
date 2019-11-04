@@ -1,0 +1,489 @@
+package com.cost168.costaudit.service.cost.impl;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import com.cost168.costaudit.mapper.cost.CostContractMapper;
+import com.cost168.costaudit.mapper.sys.SysOrgMapper;
+import com.cost168.costaudit.pojo.cost.CostContract;
+import com.cost168.costaudit.pojo.cost.CostContractExample;
+import com.cost168.costaudit.pojo.cost.CostContractExample.Criteria;
+import com.cost168.costaudit.pojo.cost.CostProject;
+import com.cost168.costaudit.pojo.sys.SysOrg;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.service.cost.CostContractService;
+import com.cost168.costaudit.service.cost.CostProjectService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.ExcelUtil;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class CostContractServiceImpl implements CostContractService{
+	
+	@Autowired
+	private CostContractMapper costContractMapper;
+	@Autowired
+	private SysOrgMapper sysOrgMapper;
+	@Autowired
+	private CostProjectService costProjectService;
+
+	@Override
+	public List<CostContract> selectByExample(CostContractExample example) {
+		return costContractMapper.selectByExample(example);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return costContractMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(CostContract record) {
+		return costContractMapper.insertSelective(record);
+	}
+
+	@Override
+	public CostContract selectByPrimaryKey(String id) {
+		return costContractMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(CostContract record) {
+		return costContractMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public List<CostContract> selectListByMap(Map<String, Object> map) {
+		List<CostContract> list=costContractMapper.selectListByMap(map);
+		Object p= map.get("page");
+		Object r= map.get("pageSize");
+		if(null!=p && null!=r){
+			int page=Integer.parseInt(p.toString());
+			int rows=Integer.parseInt(r.toString());
+			int i = (page-1)*rows+1;
+			for(CostContract c:list){
+				if(containCong(c.getId())){
+					c.setContainCong("是");
+				}else{
+					c.setContainCong("否");
+				}
+				c.setPriority(i+"");
+				i++;
+			}
+		}
+		return list;
+	}
+
+	public Boolean containCong(String id) {
+		Boolean flag=false;
+		Map<String, Object> map=new HashMap<String, Object>();
+		map.put("parentId", id);
+		List<CostContract> costContractList = costContractMapper.selectListByMap(map);
+		if(null!=costContractList && costContractList.size()>0){
+			flag=true;
+		}
+		return flag;
+	}
+	
+	
+	
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return costContractMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public List<CostContract> importContract(HttpServletRequest request) {
+		List<CostContract> list=new ArrayList<CostContract>();
+		try{
+			 SysUser currentUser=shiroUtil.getInstance().currentUser();
+			 MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+			 List<MultipartFile> files=multipartRequest.getFiles("file");
+				if(files.size()>0){
+					MultipartFile file=files.get(0);
+					String fileName = file.getOriginalFilename();
+					SimpleDateFormat fmt=new SimpleDateFormat("yyyy-MM-dd");
+					String nowDate=fmt.format(new Date());
+					Properties props = new Properties();
+					props.load(this.getClass().getResourceAsStream("/resource/resource.properties"));
+					String path=(String) props.get("fileupload");
+					path=path+"contract/"+nowDate+"/";
+					File filePath=new File(path+fileName);
+					if (!filePath.exists()) {    
+						filePath.mkdirs();    
+					}
+					file.transferTo(filePath); 
+					String suffix=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+					Workbook wb = null;
+					InputStream stream = new FileInputStream(filePath);
+					if (suffix.equals("xls")) {
+						POIFSFileSystem fs = new POIFSFileSystem(stream);
+						wb = new HSSFWorkbook(fs);
+					} else if (suffix.equals("xlsx")) {
+						wb = new XSSFWorkbook(stream);
+					}
+					Sheet sheet = wb.getSheetAt(1);
+					if(sheet!=null){
+						int num = sheet.getLastRowNum();
+						CostContract p =null;
+						CostContract resut=null;
+						for (int i = 1; i <= num; i++) {
+							Row row = sheet.getRow(i);
+							if(row!=null){
+								 Cell cell0=row.getCell(0);
+								 if(null!=cell0){
+									 CostProject proj = costProjectService.selectByCode(row.getCell(0).toString());
+									 resut=new CostContract();
+									 if(null!=proj){
+										 try {
+												CostContract c=selectByContractCode(row.getCell(1).toString());
+												if(null!=c){
+													c.setProjectId(proj.getId());
+										    		c.setProjectName(proj.getName());
+												    Cell cell1 =row.getCell(1);
+												    Cell cell5_mainFlag =row.getCell(5);
+												    if (cell1 != null && !"".equals(cell1.toString())) { 
+												    	if("主合同".equals(cell5_mainFlag.toString())){
+												    		c.setCode(row.getCell(1).toString());
+												    	}else if("从合同".equals(cell5_mainFlag.toString())){
+												    		c.setCode(row.getCell(1).toString());
+												    		if(null!=row.getCell(2)){
+												    			CostContract contract=selectByContractCode(row.getCell(2).toString());
+												    			if(null!=contract){
+												    				c.setParentId(contract.getId());
+												    				
+												    			}
+												    		}
+												    	}else{
+												    		c.setCode(row.getCell(1).toString());
+												    	}
+												    }
+												    c.setName(null!=row.getCell(3)?row.getCell(3).toString():null);
+												    c.setContractType(null!=row.getCell(4)?row.getCell(4).toString():null);
+												    c.setMainFlag(null!=cell5_mainFlag?cell5_mainFlag.toString():null);
+												    Cell cell6 =row.getCell(6);
+												    if (cell6 != null && !"".equals(cell6.toString())) {
+												    	if (cell6.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell6)) {
+												    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+												    		Date date = HSSFDateUtil.getJavaDate(cell6.getNumericCellValue());
+												    		String value = sdf.format(date); 
+												    		c.setSigningTime(sdf.parse(value));
+												    	} 
+												    }
+												    c.setStatus(null!=row.getCell(7)?row.getCell(7).toString():null);
+												    c.setSettlement(null!=row.getCell(8)?row.getCell(8).toString():null);
+												    c.setAuditPriceUnit(null!=row.getCell(9)?row.getCell(9).toString():null);
+												    c.setPartyB(null!=row.getCell(10)?row.getCell(10).toString():null);
+												    c.setPartyBContacts(null!=row.getCell(11)?row.getCell(11).toString():null);
+												    Cell cell12=row.getCell(12);
+												    if(null!=cell12 && !"".equals(cell12)){
+												    	cell12.setCellType(HSSFCell.CELL_TYPE_STRING);  
+												    	String content = cell12.getStringCellValue();
+												    	c.setPartyBPhone(content);
+												    }
+												    c.setPersonLiable(null!=row.getCell(13)?row.getCell(13).toString():null);
+													if(null!=row.getCell(14) && !"".equals(row.getCell(14))){
+														 Double contractAmount = ExcelUtil.getValue(row.getCell(14));
+														BigDecimal bdContractAmount=new BigDecimal(contractAmount); 
+														bdContractAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
+														c.setContractAmount(bdContractAmount);
+													}
+													 
+												    if(row.getCell(15)!=null && !"".equals(row.getCell(15).toString())){
+												    	Double changeAmount = ExcelUtil.getValue(row.getCell(15));
+												    	c.setChangeAmount(new BigDecimal(changeAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
+												    }
+												    if(row.getCell(16)!=null && !"".equals(row.getCell(16).toString())){
+												    	Double settlementAmount = ExcelUtil.getValue(row.getCell(16));
+												    	c.setSettlementAmount(new BigDecimal(settlementAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
+												    }
+												    if(null!= row.getCell(17) && null!=row.getCell(17).toString() && !"".equals(row.getCell(17).toString())){
+												    	Map<String,Object> map = new HashMap<String, Object>();
+												    	map.put("name", row.getCell(17).toString());
+												    	List<SysOrg> orgList = sysOrgMapper.selectListByMap(map);
+												    	if(orgList.size()>0 && orgList.get(0).getId()!=null){
+												    		c.setExecutiveDepartment(orgList.get(0).getId());
+												    	}
+												    	else{
+												    		c.setExecutiveDepartment("");
+												    	}
+												    }else{
+												    	c.setExecutiveDepartment("");
+												    }
+												    c.setOperator(null!=row.getCell(18)?row.getCell(18).toString():null);
+												    Cell cell19=row.getCell(19);
+												    if(null!=cell19 && !"".equals(cell19)){
+												    	cell19.setCellType(HSSFCell.CELL_TYPE_STRING);  
+												    	String content = cell19.getStringCellValue();
+												    	c.setOperatorPhone(content);
+												    }
+												    c.setDescription(null!=row.getCell(20)?row.getCell(20).toString():null);
+												    c.setRemark(null!=row.getCell(21)?row.getCell(21).toString():null);
+												    c.setCreater(currentUser.getName());
+												    c.setCreateTime(new Date());
+												    costContractMapper.updateByPrimaryKeySelective(c);
+													 /*resut.setCode(row.getCell(1).toString());
+													 resut.setName(row.getCell(3).toString());
+													 list.add(resut);*/
+													continue;
+												}
+												p = new CostContract();
+											    
+											    String conId = UUID.randomUUID().toString().replace("-", "");
+											    p.setId(conId);
+									    		p.setProjectId(proj.getId());
+									    		p.setProjectName(proj.getName());
+											    	
+											    Cell cell1 =row.getCell(1);
+											    Cell cell5_mainFlag =row.getCell(5);
+											    if (cell1 != null && !"".equals(cell1.toString())) { 
+											    	if("主合同".equals(cell5_mainFlag.toString())){
+											    		p.setCode(row.getCell(1).toString());
+											    	}else if("从合同".equals(cell5_mainFlag.toString())){
+											    		p.setCode(row.getCell(1).toString());
+											    		if(null!=row.getCell(2)){
+											    			CostContract contract=selectByContractCode(row.getCell(2).toString());
+											    			if(null!=contract){
+											    				p.setParentId(contract.getId());
+											    				
+											    			}
+											    		}
+											    	}else{
+											    		p.setCode(row.getCell(1).toString());
+											    	}
+											    }
+											    p.setName(null!=row.getCell(3)?row.getCell(3).toString():null);
+											    p.setContractType(null!=row.getCell(4)?row.getCell(4).toString():null);
+											    p.setMainFlag(null!=cell5_mainFlag?cell5_mainFlag.toString():null);
+											    Cell cell6 =row.getCell(6);
+											    if (cell6 != null && !"".equals(cell6.toString())) { 
+											    	if (cell6.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell6)) {
+											    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+											    		Date date = HSSFDateUtil.getJavaDate(cell6.getNumericCellValue());
+											    		String value = sdf.format(date); 
+											    		p.setSigningTime(sdf.parse(value));
+											    	} 
+											    }
+											    p.setStatus(null!=row.getCell(7)?row.getCell(7).toString():null);
+											    p.setSettlement(null!=row.getCell(8)?row.getCell(8).toString():null);
+											    p.setAuditPriceUnit(null!=row.getCell(9)?row.getCell(9).toString():null);
+											    p.setPartyB(null!=row.getCell(10)?row.getCell(10).toString():null);
+											    p.setPartyBContacts(null!=row.getCell(11)?row.getCell(11).toString():null);
+											    Cell cell12=row.getCell(12);
+											    if(null!=cell12 && !"".equals(cell12)){
+											    	cell12.setCellType(HSSFCell.CELL_TYPE_STRING);  
+											    	String content = cell12.getStringCellValue();
+											    	p.setPartyBPhone(content);
+											    }
+											    p.setPersonLiable(null!=row.getCell(13)?row.getCell(13).toString():null);
+												if(null!=row.getCell(14) && !"".equals(row.getCell(14))){
+													 Double contractAmount = ExcelUtil.getValue(row.getCell(14));
+													BigDecimal bdContractAmount=new BigDecimal(contractAmount); 
+													bdContractAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
+													p.setContractAmount(bdContractAmount);
+												}
+												 
+											    if(row.getCell(15)!=null && !"".equals(row.getCell(15).toString())){
+											    	Double changeAmount = ExcelUtil.getValue(row.getCell(15));
+											    	p.setChangeAmount(new BigDecimal(changeAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
+											    }
+											    if(row.getCell(16)!=null && !"".equals(row.getCell(16).toString())){
+											    	Double settlementAmount = ExcelUtil.getValue(row.getCell(16));
+											    	p.setSettlementAmount(new BigDecimal(settlementAmount).setScale(2, BigDecimal.ROUND_HALF_UP));
+											    }
+											    if(null!= row.getCell(17) && null!=row.getCell(17).toString() && !"".equals(row.getCell(17).toString())){
+											    	Map<String,Object> map = new HashMap<String, Object>();
+											    	map.put("name", row.getCell(17).toString());
+											    	List<SysOrg> orgList = sysOrgMapper.selectListByMap(map);
+											    	if(orgList.size()>0 && orgList.get(0).getId()!=null){
+											    		p.setExecutiveDepartment(orgList.get(0).getId());
+											    	}
+											    	else{
+											    		p.setExecutiveDepartment("");
+											    	}
+											    }else{
+											    	p.setExecutiveDepartment("");
+											    }
+											    p.setOperator(null!=row.getCell(18)?row.getCell(18).toString():null);
+											    Cell cell19=row.getCell(19);
+											    if(null!=cell19 && !"".equals(cell19)){
+											    	cell19.setCellType(HSSFCell.CELL_TYPE_STRING);  
+											    	String content = cell19.getStringCellValue();
+											    	p.setOperatorPhone(content);
+											    }
+											    p.setDescription(null!=row.getCell(20)?row.getCell(20).toString():null);
+											    p.setRemark(null!=row.getCell(21)?row.getCell(21).toString():null);
+											    p.setCreater(currentUser.getName());
+											    p.setCreateTime(new Date());
+											    costContractMapper.insertSelective(p);
+											} catch (Exception e) {
+												resut.setCode(row.getCell(1).toString());
+												resut.setName(row.getCell(3).toString());
+												list.add(resut);
+											}
+									 }else{
+										 resut.setCode(row.getCell(1).toString());
+										 resut.setName(row.getCell(3).toString());
+										 list.add(resut);
+									 }
+									
+								}
+							}
+						}
+					}
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			return list;
+		}
+
+	
+	@Override
+	public List<CostContract> importContract2(HttpServletRequest request) {
+		List<CostContract> list=new ArrayList<CostContract>();
+		try{
+			 SysUser currentUser=shiroUtil.getInstance().currentUser();
+			 MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+			 List<MultipartFile> files=multipartRequest.getFiles("file");
+				if(files.size()>0){
+					MultipartFile file=files.get(0);
+					String fileName = file.getOriginalFilename();
+					SimpleDateFormat fmt=new SimpleDateFormat("yyyy-MM-dd");
+					String nowDate=fmt.format(new Date());
+					Properties props = new Properties();
+					props.load(this.getClass().getResourceAsStream("/resource/resource.properties"));
+					String path=(String) props.get("fileupload");
+					path=path+"contract/"+nowDate+"/";
+					File filePath=new File(path+fileName);
+					if (!filePath.exists()) {    
+						filePath.mkdirs();    
+					}
+					file.transferTo(filePath); 
+					String suffix=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+					Workbook wb = null;
+					InputStream stream = new FileInputStream(filePath);
+					if (suffix.equals("xls")) {
+						POIFSFileSystem fs = new POIFSFileSystem(stream);
+						wb = new HSSFWorkbook(fs);
+					} else if (suffix.equals("xlsx")) {
+						wb = new XSSFWorkbook(stream);
+					}
+					Sheet sheet = wb.getSheetAt(2);
+					if(sheet!=null){
+						int num = sheet.getLastRowNum();
+						CostContract p =null;
+						CostContract resut=null;
+						for (int i = 1; i <= num; i++) {
+							Row row = sheet.getRow(i);
+							if(row!=null){
+								 Cell cell0=row.getCell(0);
+								 resut=new CostContract();
+								 if(null!=cell0){
+									 CostContract con=  costContractMapper.selectByPrimaryKey(row.getCell(0).toString());
+									if(null!=con){
+										con.setName(null!=row.getCell(1)?row.getCell(1).toString():null);
+										con.setContractType(null!=row.getCell(2)?row.getCell(2).toString():null);
+										con.setPartyB(null!=row.getCell(3)?row.getCell(3).toString():null);
+										Cell cell4 =row.getCell(4);
+									    if (cell4 != null && !"".equals(cell4.toString())) { 
+									    	if (cell4.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell4)) {
+									    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+									    		Date date = HSSFDateUtil.getJavaDate(cell4.getNumericCellValue());
+									    		String value = sdf.format(date); 
+									    		con.setSigningTime(sdf.parse(value));
+									    	} 
+									    }
+									    if(null!=row.getCell(5) && !"".equals(row.getCell(5))){
+											 Double contractAmount = ExcelUtil.getValue(row.getCell(5));
+											BigDecimal bdContractAmount=new BigDecimal(contractAmount); 
+											bdContractAmount.setScale(2, BigDecimal.ROUND_HALF_UP);
+											con.setContractAmount(bdContractAmount);
+										}   
+									    con.setExecutiveDepartment(null!=row.getCell(6)?row.getCell(6).toString():null);
+									    costContractMapper.updateByPrimaryKeySelective(con);
+									}else{
+										resut.setCode(row.getCell(0).toString());
+										list.add(resut);
+									}
+								}
+							}
+						}
+					}
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			return list;
+		}
+
+	
+	
+	
+	
+	
+	@Override
+	public CostContract selectByContractCode(String code) {
+		CostContractExample example=new CostContractExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andCodeEqualTo(code);
+		List<CostContract> cList=costContractMapper.selectByExample(example);
+		if(null!=cList && cList.size()>0){
+			return cList.get(0);
+		}else{
+			return null;
+		}
+	}
+	
+	@Override
+	public CostContract selectByContractName(String name) {
+		CostContractExample example=new CostContractExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andNameEqualTo(name);
+		List<CostContract> userList=costContractMapper.selectByExample(example);
+		if(null!=userList && userList.size()>0){
+			return userList.get(0);
+		}else{
+			return null;
+		}
+	}
+
+	@Override
+	public List<CostContract> selectTask() {
+		return costContractMapper.selectTask();
+	}
+
+	@Override
+	public List<CostContract> selectChildrenListByMap(Map<String, Object> map) {
+		return costContractMapper.selectChildrenListByMap(map);
+	}
+	
+}

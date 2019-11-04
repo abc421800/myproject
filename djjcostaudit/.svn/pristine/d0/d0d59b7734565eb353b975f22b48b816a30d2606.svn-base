@@ -1,0 +1,596 @@
+package com.cost168.costaudit.pojo.work.vo;
+
+/**
+ * @description: 考勤人员台账需要的参数
+ * @author: ZYL
+ * @created: 2019-05-30
+ */
+public class WorkAttendanceParam {
+    //年份
+    private String year;
+    //人员姓名
+    private String name;
+    //人员id
+    private String id;
+    //所属企业
+    private String enterpriseName;
+    //出勤情况
+    private String attendanceSituation;
+    //是否有效
+    private String status;
+    //考勤开始时间
+    private String attStarttime;
+    //考勤结束时间
+    private String attEndtime;
+    //可休年假
+    private int annual;
+    //出勤率
+    private String attendanceRate;
+    //个人年度上班天数
+    private int yearOfWork;
+    //年休息天数
+    private int yearOfRest;
+    //年请假天数
+    private int yearOfLeave;
+    //年加班天数
+    private int yearOvertime;
+    //名次
+    private String raking;
+    //1月上班天数
+    private int monthOfWorkday1;
+    //1月休息天数
+    private int monthOfRestday1;
+    //1月请假天数
+    private int monthOfLeave1;
+    //1月加班天数
+    private int monthOfOvertime1;
+    private int monthOfWorkday2;
+    private int monthOfRestday2;
+    private int monthOfLeave2;
+    private int monthOfOvertime2;
+    private int monthOfWorkday3;
+    private int monthOfRestday3;
+    private int monthOfLeave3;
+    private int monthOfOvertime3;
+    private int monthOfWorkday4;
+    private int monthOfRestday4;
+    private int monthOfLeave4;
+    private int monthOfOvertime4;
+    private int monthOfWorkday5;
+    private int monthOfRestday5;
+    private int monthOfLeave5;
+    private int monthOfOvertime5;
+    private int monthOfWorkday6;
+    private int monthOfRestday6;
+    private int monthOfLeave6;
+    private int monthOfOvertime6;
+    private int monthOfWorkday7;
+    private int monthOfRestday7;
+    private int monthOfLeave7;
+    private int monthOfOvertime7;
+    private int monthOfWorkday8;
+    private int monthOfRestday8;
+    private int monthOfLeave8;
+    private int monthOfOvertime8;
+    private int monthOfWorkday9;
+    private int monthOfRestday9;
+    private int monthOfLeave9;
+    private int monthOfOvertime9;
+    private int monthOfWorkday10;
+    private int monthOfRestday10;
+    private int monthOfLeave10;
+    private int monthOfOvertime10;
+    private int monthOfWorkday11;
+    private int monthOfRestday11;
+    private int monthOfLeave11;
+    private int monthOfOvertime11;
+    private int monthOfWorkday12;
+    private int monthOfRestday12;
+    private int monthOfLeave12;
+    private int monthOfOvertime12;
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getRaking() {
+        return raking;
+    }
+
+    public void setRaking(String raking) {
+        this.raking = raking;
+    }
+
+    public void setEnterpriseName(String enterpriseName) {
+        this.enterpriseName = enterpriseName;
+    }
+
+    public void setAttendanceSituation(String attendanceSituation) {
+        this.attendanceSituation = attendanceSituation;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public void setAttStarttime(String attStarttime) {
+        this.attStarttime = attStarttime;
+    }
+
+    public void setAttEndtime(String attEndtime) {
+        this.attEndtime = attEndtime;
+    }
+
+    public String getEnterpriseName() {
+        return enterpriseName;
+    }
+
+    public String getAttendanceSituation() {
+        return attendanceSituation;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public String getAttStarttime() {
+        return attStarttime;
+    }
+
+    public String getAttEndtime() {
+        return attEndtime;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAnnual() {
+        return annual;
+    }
+
+    public int getYearOfWork() {
+        return yearOfWork;
+    }
+
+    public int getYearOfRest() {
+        return yearOfRest;
+    }
+
+    public int getYearOfLeave() {
+        return yearOfLeave;
+    }
+
+    public int getYearOvertime() {
+        return yearOvertime;
+    }
+
+    public String getAttendanceRate() {
+        return attendanceRate;
+    }
+
+    public int getMonthOfWorkday1() {
+        return monthOfWorkday1;
+    }
+
+    public int getMonthOfRestday1() {
+        return monthOfRestday1;
+    }
+
+    public int getMonthOfLeave1() {
+        return monthOfLeave1;
+    }
+
+    public int getMonthOfOvertime1() {
+        return monthOfOvertime1;
+    }
+
+    public int getMonthOfWorkday2() {
+        return monthOfWorkday2;
+    }
+
+    public int getMonthOfRestday2() {
+        return monthOfRestday2;
+    }
+
+    public int getMonthOfLeave2() {
+        return monthOfLeave2;
+    }
+
+    public int getMonthOfOvertime2() {
+        return monthOfOvertime2;
+    }
+
+    public int getMonthOfWorkday3() {
+        return monthOfWorkday3;
+    }
+
+    public int getMonthOfRestday3() {
+        return monthOfRestday3;
+    }
+
+    public int getMonthOfLeave3() {
+        return monthOfLeave3;
+    }
+
+    public int getMonthOfOvertime3() {
+        return monthOfOvertime3;
+    }
+
+    public int getMonthOfWorkday4() {
+        return monthOfWorkday4;
+    }
+
+    public int getMonthOfRestday4() {
+        return monthOfRestday4;
+    }
+
+    public int getMonthOfLeave4() {
+        return monthOfLeave4;
+    }
+
+    public int getMonthOfOvertime4() {
+        return monthOfOvertime4;
+    }
+
+    public int getMonthOfWorkday5() {
+        return monthOfWorkday5;
+    }
+
+    public int getMonthOfRestday5() {
+        return monthOfRestday5;
+    }
+
+    public int getMonthOfLeave5() {
+        return monthOfLeave5;
+    }
+
+    public int getMonthOfOvertime5() {
+        return monthOfOvertime5;
+    }
+
+    public int getMonthOfWorkday6() {
+        return monthOfWorkday6;
+    }
+
+    public int getMonthOfRestday6() {
+        return monthOfRestday6;
+    }
+
+    public int getMonthOfLeave6() {
+        return monthOfLeave6;
+    }
+
+    public int getMonthOfOvertime6() {
+        return monthOfOvertime6;
+    }
+
+    public int getMonthOfWorkday7() {
+        return monthOfWorkday7;
+    }
+
+    public int getMonthOfRestday7() {
+        return monthOfRestday7;
+    }
+
+    public int getMonthOfLeave7() {
+        return monthOfLeave7;
+    }
+
+    public int getMonthOfOvertime7() {
+        return monthOfOvertime7;
+    }
+
+    public int getMonthOfWorkday8() {
+        return monthOfWorkday8;
+    }
+
+    public int getMonthOfRestday8() {
+        return monthOfRestday8;
+    }
+
+    public int getMonthOfLeave8() {
+        return monthOfLeave8;
+    }
+
+    public int getMonthOfOvertime8() {
+        return monthOfOvertime8;
+    }
+
+    public int getMonthOfWorkday9() {
+        return monthOfWorkday9;
+    }
+
+    public int getMonthOfRestday9() {
+        return monthOfRestday9;
+    }
+
+    public int getMonthOfLeave9() {
+        return monthOfLeave9;
+    }
+
+    public int getMonthOfOvertime9() {
+        return monthOfOvertime9;
+    }
+
+    public int getMonthOfWorkday10() {
+        return monthOfWorkday10;
+    }
+
+    public int getMonthOfRestday10() {
+        return monthOfRestday10;
+    }
+
+    public int getMonthOfLeave10() {
+        return monthOfLeave10;
+    }
+
+    public int getMonthOfOvertime10() {
+        return monthOfOvertime10;
+    }
+
+    public int getMonthOfWorkday11() {
+        return monthOfWorkday11;
+    }
+
+    public int getMonthOfRestday11() {
+        return monthOfRestday11;
+    }
+
+    public int getMonthOfLeave11() {
+        return monthOfLeave11;
+    }
+
+    public int getMonthOfOvertime11() {
+        return monthOfOvertime11;
+    }
+
+    public int getMonthOfWorkday12() {
+        return monthOfWorkday12;
+    }
+
+    public int getMonthOfRestday12() {
+        return monthOfRestday12;
+    }
+
+    public int getMonthOfLeave12() {
+        return monthOfLeave12;
+    }
+
+    public int getMonthOfOvertime12() {
+        return monthOfOvertime12;
+    }
+
+    public void setYear(String year) {
+
+        this.year = year;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAnnual(int annual) {
+        this.annual = annual;
+    }
+
+    public void setYearOfWork(int yearOfWork) {
+        this.yearOfWork = yearOfWork;
+    }
+
+    public void setYearOfRest(int yearOfRest) {
+        this.yearOfRest = yearOfRest;
+    }
+
+    public void setYearOfLeave(int yearOfLeave) {
+        this.yearOfLeave = yearOfLeave;
+    }
+
+    public void setYearOvertime(int yearOvertime) {
+        this.yearOvertime = yearOvertime;
+    }
+
+    public void setAttendanceRate(String attendanceRate) {
+        this.attendanceRate = attendanceRate;
+    }
+
+    public void setMonthOfWorkday1(int monthOfWorkday1) {
+        this.monthOfWorkday1 = monthOfWorkday1;
+    }
+
+    public void setMonthOfRestday1(int monthOfRestday1) {
+        this.monthOfRestday1 = monthOfRestday1;
+    }
+
+    public void setMonthOfLeave1(int monthOfLeave1) {
+        this.monthOfLeave1 = monthOfLeave1;
+    }
+
+    public void setMonthOfOvertime1(int monthOfOvertime1) {
+        this.monthOfOvertime1 = monthOfOvertime1;
+    }
+
+    public void setMonthOfWorkday2(int monthOfWorkday2) {
+        this.monthOfWorkday2 = monthOfWorkday2;
+    }
+
+    public void setMonthOfRestday2(int monthOfRestday2) {
+        this.monthOfRestday2 = monthOfRestday2;
+    }
+
+    public void setMonthOfLeave2(int monthOfLeave2) {
+        this.monthOfLeave2 = monthOfLeave2;
+    }
+
+    public void setMonthOfOvertime2(int monthOfOvertime2) {
+        this.monthOfOvertime2 = monthOfOvertime2;
+    }
+
+    public void setMonthOfWorkday3(int monthOfWorkday3) {
+        this.monthOfWorkday3 = monthOfWorkday3;
+    }
+
+    public void setMonthOfRestday3(int monthOfRestday3) {
+        this.monthOfRestday3 = monthOfRestday3;
+    }
+
+    public void setMonthOfLeave3(int monthOfLeave3) {
+        this.monthOfLeave3 = monthOfLeave3;
+    }
+
+    public void setMonthOfOvertime3(int monthOfOvertime3) {
+        this.monthOfOvertime3 = monthOfOvertime3;
+    }
+
+    public void setMonthOfWorkday4(int monthOfWorkday4) {
+        this.monthOfWorkday4 = monthOfWorkday4;
+    }
+
+    public void setMonthOfRestday4(int monthOfRestday4) {
+        this.monthOfRestday4 = monthOfRestday4;
+    }
+
+    public void setMonthOfLeave4(int monthOfLeave4) {
+        this.monthOfLeave4 = monthOfLeave4;
+    }
+
+    public void setMonthOfOvertime4(int monthOfOvertime4) {
+        this.monthOfOvertime4 = monthOfOvertime4;
+    }
+
+    public void setMonthOfWorkday5(int monthOfWorkday5) {
+        this.monthOfWorkday5 = monthOfWorkday5;
+    }
+
+    public void setMonthOfRestday5(int monthOfRestday5) {
+        this.monthOfRestday5 = monthOfRestday5;
+    }
+
+    public void setMonthOfLeave5(int monthOfLeave5) {
+        this.monthOfLeave5 = monthOfLeave5;
+    }
+
+    public void setMonthOfOvertime5(int monthOfOvertime5) {
+        this.monthOfOvertime5 = monthOfOvertime5;
+    }
+
+    public void setMonthOfWorkday6(int monthOfWorkday6) {
+        this.monthOfWorkday6 = monthOfWorkday6;
+    }
+
+    public void setMonthOfRestday6(int monthOfRestday6) {
+        this.monthOfRestday6 = monthOfRestday6;
+    }
+
+    public void setMonthOfLeave6(int monthOfLeave6) {
+        this.monthOfLeave6 = monthOfLeave6;
+    }
+
+    public void setMonthOfOvertime6(int monthOfOvertime6) {
+        this.monthOfOvertime6 = monthOfOvertime6;
+    }
+
+    public void setMonthOfWorkday7(int monthOfWorkday7) {
+        this.monthOfWorkday7 = monthOfWorkday7;
+    }
+
+    public void setMonthOfRestday7(int monthOfRestday7) {
+        this.monthOfRestday7 = monthOfRestday7;
+    }
+
+    public void setMonthOfLeave7(int monthOfLeave7) {
+        this.monthOfLeave7 = monthOfLeave7;
+    }
+
+    public void setMonthOfOvertime7(int monthOfOvertime7) {
+        this.monthOfOvertime7 = monthOfOvertime7;
+    }
+
+    public void setMonthOfWorkday8(int monthOfWorkday8) {
+        this.monthOfWorkday8 = monthOfWorkday8;
+    }
+
+    public void setMonthOfRestday8(int monthOfRestday8) {
+        this.monthOfRestday8 = monthOfRestday8;
+    }
+
+    public void setMonthOfLeave8(int monthOfLeave8) {
+        this.monthOfLeave8 = monthOfLeave8;
+    }
+
+    public void setMonthOfOvertime8(int monthOfOvertime8) {
+        this.monthOfOvertime8 = monthOfOvertime8;
+    }
+
+    public void setMonthOfWorkday9(int monthOfWorkday9) {
+        this.monthOfWorkday9 = monthOfWorkday9;
+    }
+
+    public void setMonthOfRestday9(int monthOfRestday9) {
+        this.monthOfRestday9 = monthOfRestday9;
+    }
+
+    public void setMonthOfLeave9(int monthOfLeave9) {
+        this.monthOfLeave9 = monthOfLeave9;
+    }
+
+    public void setMonthOfOvertime9(int monthOfOvertime9) {
+        this.monthOfOvertime9 = monthOfOvertime9;
+    }
+
+    public void setMonthOfWorkday10(int monthOfWorkday10) {
+        this.monthOfWorkday10 = monthOfWorkday10;
+    }
+
+    public void setMonthOfRestday10(int monthOfRestday10) {
+        this.monthOfRestday10 = monthOfRestday10;
+    }
+
+    public void setMonthOfLeave10(int monthOfLeave10) {
+        this.monthOfLeave10 = monthOfLeave10;
+    }
+
+    public void setMonthOfOvertime10(int monthOfOvertime10) {
+        this.monthOfOvertime10 = monthOfOvertime10;
+    }
+
+    public void setMonthOfWorkday11(int monthOfWorkday11) {
+        this.monthOfWorkday11 = monthOfWorkday11;
+    }
+
+    public void setMonthOfRestday11(int monthOfRestday11) {
+        this.monthOfRestday11 = monthOfRestday11;
+    }
+
+    public void setMonthOfLeave11(int monthOfLeave11) {
+        this.monthOfLeave11 = monthOfLeave11;
+    }
+
+    public void setMonthOfOvertime11(int monthOfOvertime11) {
+        this.monthOfOvertime11 = monthOfOvertime11;
+    }
+
+    public void setMonthOfWorkday12(int monthOfWorkday12) {
+        this.monthOfWorkday12 = monthOfWorkday12;
+    }
+
+    public void setMonthOfRestday12(int monthOfRestday12) {
+        this.monthOfRestday12 = monthOfRestday12;
+    }
+
+    public void setMonthOfLeave12(int monthOfLeave12) {
+        this.monthOfLeave12 = monthOfLeave12;
+    }
+
+    public void setMonthOfOvertime12(int monthOfOvertime12) {
+        this.monthOfOvertime12 = monthOfOvertime12;
+    }
+}

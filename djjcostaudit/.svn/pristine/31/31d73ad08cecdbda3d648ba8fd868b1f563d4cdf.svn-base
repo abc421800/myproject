@@ -1,0 +1,66 @@
+package com.cost168.costaudit.service.work.impl;
+
+import com.cost168.costaudit.mapper.work.WorkPersonMapper;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.WorkPersonExample;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+
+@Service
+public class WorkPersonServiceImpl implements WorkPersonService {
+    @Autowired
+    private WorkPersonMapper workPersonMapper;
+
+    @Override
+    public List<WorkPerson> selectByExample(WorkPersonExample example) {
+        return workPersonMapper.selectByExample(example);
+    }
+
+    @Override
+    public WorkPerson selectByPrimaryKey(String id) {
+        return workPersonMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int insertSelective(WorkPerson record) {
+        return workPersonMapper.insertSelective(record);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(WorkPerson workPerson) {
+        return workPersonMapper.updateByPrimaryKeySelective(workPerson);
+    }
+
+    @Override
+    public int deleteByPrimaryKey(String id) {
+        return workPersonMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public List<WorkPerson> selectListByMap(Map<String, Object> map) {
+        return workPersonMapper.selectListByMap(map);
+    }
+
+    @Override
+    public int selectCountByMap(Map<String, Object> map) {
+        return workPersonMapper.selectCountByMap(map);
+    }
+
+	@Override
+	public WorkPerson selectByAccount(String account) {
+		Map<String, Object> map=new HashMap<String, Object>();
+		map.put("account", account);
+		WorkPerson wp=null;
+		List<WorkPerson> wpList=workPersonMapper.selectListByMap(map);
+		if(null!=wpList&&wpList.size()>0){
+			wp=wpList.get(0);
+		}
+		return wp;
+	}
+}

@@ -1,0 +1,12 @@
+package com.cost168.costaudit.service.work.impl;
+
+import org.springframework.stereotype.Service;
+
+/**
+ * @description: 考勤企业台账实现层
+ * @author: ZYL
+ * @create: 2019-05-24
+ */
+@Service
+public class WorkAttendanceEnterpriseServiceImpl {
+}

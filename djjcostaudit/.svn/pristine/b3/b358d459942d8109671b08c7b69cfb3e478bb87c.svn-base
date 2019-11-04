@@ -1,0 +1,292 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>项目台账</title>
+      <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+    <!-- 审批新建页面样式 -->
+
+</head>
+<style>
+.panel-body {
+
+    overflow: auto;
+
+}
+.datagrid-cell-c1-name{
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap!important;
+}
+.datagrid-cell-c1-projectOwner{
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap!important;
+}
+.datagrid-cell-c1-projectOwner{
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap!important;
+}
+.datagrid-cell-c1-settlementAgreement{
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap!important;
+}
+.datagrid-cell-c1-settlementReivewMethod{
+    overflow: hidden;
+    text-overflow:ellipsis;
+    white-space: nowrap!important;
+}
+ .menu-text{
+     overflow:hidden;text-overflow: ellipsis;white-space: nowrap;width:140px;
+ }
+</style>
+<body>
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+<div class="row">
+	<form method="post" action="">
+    <div class="filter">
+        <div class="form-inline">
+            <div class="form-group">
+                <label for="">项目名称：</label>
+                <input type="text" id="name" value="" placeholder="请输入关键字" class="form-control input-sm">
+            </div>
+            <div class="form-group">
+                <label for="">项目编号：</label>
+                <input type="text" id="code" value="" placeholder="请输入关键字" class="form-control input-sm">
+            </div>
+            <div class="form-group">
+                <label for="">管理协议签订：</label>
+                <select onchange="selectSubmit();" id="projectManagementAgreement" class="form-control input-sm" style="width: 100px">
+                    <option value="">请选择</option>
+                    <option value="未签" >未签</option>
+                    <option value="已签" >已签</option>
+                    <option value="无需签订" >无需签订</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">项目负责人：</label>
+                <input type="text" name="" id="personLiableId" class="form-control input-sm" placeholder="请输入项目负责人" />
+                <%--<select id="personLiableId"  style="width:160px;" class="form-control input-sm">
+                </select>
+            --%></div>
+            <div class="form-group">
+                <label for="">项目分类：</label>
+                <select id="projectClassificationId"  style="width:160px;" class="form-control input-sm">
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">项目所在地点：</label>
+                <input type="text" id="projectLocation" value="" placeholder="请输入关键字" class="form-control input-sm">
+            </div>
+            <div class="form-group">
+                <label for="">当前节点：</label>
+                <select onchange="selectSubmit();" id="projectNode" class="form-control input-sm" style="width: 100px">
+                    <option value="">请选择</option>
+               </select>
+            </div>
+            <div class="form-group">
+                <label for="">创建时间：</label>
+                <input id="startTime" class="Wdate form-control input-sm" type="text" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+                <label for="">至</label>
+                <input id="endTime" class="Wdate form-control input-sm" type="text" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+            </div>
+            <!--<br>-->
+            <!--<div class="form-group">-->
+                <!--<label for="">节点控制日期：</label>-->
+                <!--<input id="contractSigningTime" class="Wdate form-control input-sm" type="text" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">-->
+                <!--<label for="">至</label>-->
+                <!--<input id="contractSigningTimeEnd" class="Wdate form-control input-sm" type="text" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">-->
+            <!--</div>-->
+            <div class="form-group">
+                <input type="button" name="Submit11" value="查询" class="btn btn-primary" onclick="selectSubmit();">&nbsp;
+                <input type="button" name="reset" value="重置" class="btn btn btn-success" onclick="reset1();">&nbsp;
+                <input type="button" name="aa" value="导出" class="btn btn-danger" onclick="exportDate();">&nbsp;
+                <!--<input type="button" value="导入" class="btn btn-warning" onclick="importProject();">&nbsp;-->
+            </div>
+            
+        </div>
+    </div>
+    </form>
+    <a href="javascript:void(0);" class="switchBtn"></a>
+</div>
+<div class="row">
+    <table id="projectAccounts" style="width: 100%;">
+    </table>
+    <div id="tit1">
+    	<shiro:hasPermission name="project:add">
+        	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="top.addTabGrid('项目添加', '/forward_project_projAdd');">添加</a>
+        </shiro:hasPermission>
+       
+        <shiro:hasPermission name="project:delete">
+        	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="deleteHandler()">删除</a>
+        </shiro:hasPermission>
+         <shiro:hasPermission name="project:update">
+        	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="" plain="false" onclick="updateShowFlagDialog();">合同台账统计是否显示</a>
+             <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="" plain="false"
+                onclick="updateShowFlagDialog2();">结算台账是否显示</a>
+        </shiro:hasPermission>
+        <span style="color:#969696;font-size: 14px">（右键表格表头设置显示隐藏列）</span>
+        
+    </div>
+</div>
+<div id="importProject"></div>
+	<div id="dlg"  title="批量修改状态"  style="display:none" class="dialog-file">
+		   <div class="tabox table-responsive float-table">
+            <table class="table table-condensed table-bordered">
+                <tbody>
+                <tr>
+                    <th><strong style="color:red">*</strong>是否显示：</th>
+                    <td>
+                        <input onclick="" name="currentNode" type="radio" checked value="是">是&nbsp;&nbsp;
+                        <input onclick="" name="currentNode" type="radio" value="否">否
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="form-group text-center">
+            <input type="button" value="保存" class="btn btn-primary" onclick="updateShowFlag();" />
+            <input type="button" name="Submit22" class="btn btn-danger" value="取消" onclick="$('#dlg').dialog('close');" />
+        </div>
+	</div>
+<div id="dlg2" title="批量修改状态" style="display:none" class="dialog-file">
+    <div class="tabox table-responsive float-table">
+        <table class="table table-condensed table-bordered">
+            <tbody>
+            <tr>
+                <th><strong style="color:red">*</strong>是否显示：</th>
+                <td>
+                    <input onclick="" name="currentNode2" type="radio" checked value="是">是&nbsp;&nbsp;
+                    <input onclick="" name="currentNode2" type="radio" value="否">否
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div class="form-group text-center">
+        <input type="button" value="保存" class="btn btn-primary" onclick="updateShowFlag2();"/>
+        <input type="button" name="Submit23" class="btn btn-danger" value="取消" onclick="$('#dlg2').dialog('close');"/>
+    </div>
+</div>
+<script src="${pageContext.request.contextPath}/res/js/cost/project/category-combotree.js"></script>
+<script src="${pageContext.request.contextPath}/res/js/cost/project/projectAccounts.js"></script>
+<script>
+	var currentUser="${user.name}";
+	var dataUpdate="${dataUpdate}";
+    function updateShowFlagDialog(){
+      var selections = $('#projectAccounts').datagrid('getSelections');
+        if (selections.length == 0) {
+            $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+            return;
+        }
+        $("#dlg").show();
+        $("#dlg").dialog({
+            width:450,
+            top:200
+        });
+        $('input:radio[name="currentNode"][value="是"]').prop('checked', true);
+    }
+
+    function updateShowFlagDialog2() {
+        var selections = $('#projectAccounts').datagrid('getSelections');
+        if (selections.length == 0) {
+            $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+            return;
+        }
+        $("#dlg2").show();
+        $("#dlg2").dialog({
+            width: 450,
+            top: 200
+        });
+        $('input:radio[name="currentNode2"][value="是"]').prop('checked', true);
+    }
+
+function exportDate(){
+	 /*var frozenColumns =  $('#projectAccounts').datagrid("options").frozenColumns;  // 得到frozenColumns对象
+	    var columns =  $('#projectAccounts').datagrid("options").columns;  // 得到Columns对象
+	    columns = (frozenColumns[0] || []).concat(columns[0] || []).concat(columns[1] || []);
+	    var rows =  $('#projectAccounts').datagrid("getRows");
+	    var title ="";
+	    var col = "";
+	    //列名
+	    $.map(columns, function (a) {
+	        if (!a.hidden && a.field) {
+	        	if("id"!=a.field){
+	        		col=col+","+a.field;
+	        		title=title+","+a.title;
+	        	}
+	            //tmp.push(a.field);
+	        }
+	    });
+	    col= col.substring(1, col.length+1);
+	    title= encodeURI(encodeURI(title.substring(1, title.length+1)));
+	    console.log(title);
+	   // data.push(tmp);
+	 //console.log(data);
+   	window.location.href = "${path}/costProject/exportProjectList.do?column="+col+"&columnTitle="+title;
+   	var name=$("#name").val();
+  	var projectManagementAgreement=$("#projectManagementAgreement option:selected").val();	
+	var personLiableId=$("#personLiableId").val();	  
+  	var projectCategoryId=$('#projectCategoryId option:selected').val();
+  	var projectClassificationId=$("#projectClassificationId option:selected").val();
+  	var projectLocation=$("#projectLocation").val();
+  	var projectNode=$("#projectNode option:selected").val();*/
+  	var selections = $('#projectAccounts').datagrid('getSelections');
+		var ids = "";
+		if (selections.length != 0) {
+			for(var i = 0;i<selections.length;i++){
+	    		ids+=selections[i].id+",";
+	    	}
+	    	ids = ids.substring(0,ids.length-1);
+	    }
+   		window.location.href = "${path}/costProject/exportProject?ids="+ids;
+   	//window.location.href = "${path}/costProject/exportProject.do";
+   }
+   $(function(){
+	   $.post("/costProjectNode/getData",function(result){
+   		for(var i in result){
+   			var v=result[i].name;
+   			console.log(v);
+   			var div="<option value="+v+">"+v+"</option>";
+   			$("#projectNode").append(div);
+   		}		
+   }, "json");
+	   
+   });
+   function importProject(){
+		var url = "/forward_project_importProject";
+		$("#importProject").dialog({
+		title: "选择文件",
+		iconCls:'icon-info',
+	    minimizable:false,
+	    content:"<iframe name=\"fileFrame\" frameborder=\"0\" src="+url+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+	    //content:"<iframe id=\"editFrame\" name=\"editFrame\" frameborder=\"0\" src=\"${dataInit['sitePath']}commonUploadPage.action?fileType=1&type=xls\" scrolling=\"auto\" style=\"width:100%;height:100%;\"></iframe>",
+	    width:600,
+	    height:500,
+	    iconCls: 'icon-edit-lx',
+	    modal: true,
+	    buttons:[{
+			text:'关闭',
+			iconCls:'icon-info',
+			handler:function(data){
+				$("#projectAccounts").datagrid('reload');
+				$("#importProject").dialog("close");
+			}
+		}]
+		});
+	}
+</script>
+</body>
+</html>

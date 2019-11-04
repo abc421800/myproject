@@ -1,0 +1,58 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoAssessMapper;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+import com.cost168.costaudit.service.yaohao.YaohaoAssessService;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @description: 综合考核服务层
+ * @author: ZYL
+ * @created: 2019-07-08
+ */
+@Service
+public class YaohaoAssessServiceImpl implements YaohaoAssessService {
+    @Autowired
+    private YaohaoAssessMapper assessMapper;
+
+    @Override
+    public YaohaoAssess selectByPrimaryKey(String id) {
+        return assessMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int deleteByPrimaryKey(String id) {
+        return assessMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public int selectCountByMap(Map<String, Object> map) {
+        return assessMapper.selectCountByMap(map);
+    }
+
+    @Override
+    public int insert(YaohaoAssess assess) {
+        return assessMapper.insert(assess);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(YaohaoAssess assess) {
+        return assessMapper.updateByPrimaryKey(assess);
+    }
+
+    @Override
+    public EUDataGridResult selectListByMap(HttpServletRequest request, int page, int rows, Map<String, Object> map) {
+        EUDataGridResult result = new EUDataGridResult();
+        List<YaohaoAssess> list = assessMapper.selectListByMap(page, rows, map);
+        int total=assessMapper.selectCountByMap(map);
+        result.setRows(list);
+        result.setTotal(total);
+        return result;
+    }
+}

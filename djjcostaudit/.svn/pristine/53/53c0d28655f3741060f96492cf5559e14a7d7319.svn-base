@@ -1,0 +1,27 @@
+package com.cost168.costaudit.service.cost;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cost168.costaudit.pojo.cost.CostEnterpriseRecord;
+import com.cost168.costaudit.pojo.cost.CostEnterpriseRecordExample;
+
+public interface CostEnterpriseRecordService {
+	
+	List<CostEnterpriseRecord> selectByExample(CostEnterpriseRecordExample example);
+
+	CostEnterpriseRecord selectByPrimaryKey(String id);
+
+    int insertSelective(CostEnterpriseRecord record);
+
+    int updateByPrimaryKeySelective(CostEnterpriseRecord costEnterpriseRecord);
+
+    int deleteByPrimaryKey(String id);
+
+    List<CostEnterpriseRecord> selectListByMap(Map<String,Object> map);
+
+    int selectCountByMap(Map<String,Object> map);
+
+	void testBug();
+
+}

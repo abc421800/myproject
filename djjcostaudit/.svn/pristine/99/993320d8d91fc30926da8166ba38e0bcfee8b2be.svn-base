@@ -1,0 +1,396 @@
+package com.cost168.costaudit.controller.work;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cost168.costaudit.pojo.sys.SysOrg;
+import com.cost168.costaudit.pojo.sys.SysRole;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.sys.SysUserOrgKey;
+import com.cost168.costaudit.pojo.sys.SysUserRoleKey;
+import com.cost168.costaudit.pojo.work.WorkCalendar;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.service.sys.SysOrgService;
+import com.cost168.costaudit.service.sys.SysRoleService;
+import com.cost168.costaudit.service.sys.SysUserOrgService;
+import com.cost168.costaudit.service.sys.SysUserRoleService;
+import com.cost168.costaudit.service.sys.SysUserService;
+import com.cost168.costaudit.service.work.WorkCalendarService;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.ExcelUtil;
+import com.cost168.costaudit.utils.Global;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.JsonUtils;
+import com.cost168.costaudit.utils.OrderUtil;
+
+@Controller
+@RequestMapping("/workPerson")
+public class WorkPersonController {
+	
+	@Autowired
+	private WorkPersonService workPersonService;
+	@Autowired
+	private WorkEnterpriseService workEnterpriseService;
+	@Autowired
+	private SysUserService sysUserService;
+	@Autowired
+	private SysUserOrgService sysUserOrgService;
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
+	@Autowired
+	private SysRoleService sysRoleService;
+	@Autowired
+	private SysOrgService sysOrgService;
+	@Autowired
+	private WorkCalendarService workCalendarService;
+	@Autowired
+	private WorkRegisterService workRegisterService;
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,WorkPerson workPerson, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		Map<String,Object> selectMap=JsonUtils.object2Map(workPerson);
+		try {
+			String shenTime =request.getParameter("shenTime");
+			String startTime =request.getParameter("startTime");
+			String endTime =request.getParameter("endTime");
+			if(null!=startTime && !"".equals(startTime)){
+				map.put("startTime", startTime+" 00:00:00");
+			}
+			if(null!=endTime && !"".equals(endTime)){
+				map.put("endTime", endTime+" 24:00:00");
+			}
+			map.put("shenTime", shenTime);
+			map.putAll(selectMap);
+		    List<WorkPerson> list= workPersonService.selectListByMap(map);
+		    Global.PER_EXPORT_LIST=list;
+		    int total= workPersonService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toEdit")
+	public String toEdit(HttpServletRequest request){
+		String url="";
+		String id=request.getParameter("id");
+		if(null!=id && !"".equals(id)) {
+			url="/workPerson/upd";
+			WorkPerson workPerson = workPersonService.selectByPrimaryKey(id);
+			WorkEnterprise workEnterprise=workEnterpriseService.selectByPrimaryKey(workPerson.getEnterpriseId());
+			workPerson.setEnterpriseName(workEnterprise.getName());
+			request.setAttribute("obj", workPerson);
+		}else{
+			String enterpriseId=request.getParameter("enterpriseId");
+			WorkEnterprise workEnterprise=workEnterpriseService.selectByPrimaryKey(enterpriseId);
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			String pId = UUID.randomUUID().toString().replace("-", "");
+			url="/workPerson/save";
+			WorkPerson workPerson=new WorkPerson();
+			workPerson.setCreater(currentUser.getName());
+			workPerson.setId(pId);
+			if(null!=workEnterprise){
+				workPerson.setEnterpriseId(enterpriseId);
+				workPerson.setEnterpriseName(workEnterprise.getName());
+			}
+			request.setAttribute("obj", workPerson);
+		}
+		request.setAttribute("url", url);
+		return "workEnterprise/addPerson";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,WorkPerson workPerson){
+		GlobalResult result=new GlobalResult();
+		try {
+			String account=workPerson.getAccount();
+			SysUser su=sysUserService.selectByUserAccount(account);
+			WorkPerson wp=workPersonService.selectByAccount(account);
+			WorkPerson wpName=workPersonService.selectByName(workPerson.getName());
+			if(null==wpName){
+			if(null==wp){
+				SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+				if(null!=workPerson.getPlanStartTimeStr() && !"".equals(workPerson.getPlanStartTimeStr())){
+					workPerson.setPlanStartTime(sdf.parse(workPerson.getPlanStartTimeStr()));
+				}
+				if(null!=workPerson.getPlanEndTimeStr() && !"".equals(workPerson.getPlanEndTimeStr())){
+					workPerson.setPlanEndTime(sdf.parse(workPerson.getPlanEndTimeStr()));
+				}
+				if(null!=workPerson.getActualStartTimeStr() && !"".equals(workPerson.getActualStartTimeStr())){
+					workPerson.setActualStartTime(sdf.parse(workPerson.getActualStartTimeStr()));
+				}
+				if(null!=workPerson.getActualEndTimeStr() && !"".equals(workPerson.getActualEndTimeStr())){
+					workPerson.setActualEndTime(sdf.parse(workPerson.getActualEndTimeStr()));
+				}
+				if(null!=workPerson.getAnnualLeaveStartTimeStr() && !"".equals(workPerson.getAnnualLeaveStartTimeStr())){
+					workPerson.setAnnualLeaveStartTime(sdf.parse(workPerson.getAnnualLeaveStartTimeStr()));
+				}
+				if(null!=workPerson.getAnnualLeaveEndTimeStr() && !"".equals(workPerson.getAnnualLeaveEndTimeStr())){
+					workPerson.setAnnualLeaveEndTime(sdf.parse(workPerson.getAnnualLeaveEndTimeStr()));
+				}
+				SysUser user= shiroUtil.getInstance().currentUser();
+				workPerson.setCreateTime(new Date());
+				workPerson.setCreater(user.getName());
+				workPersonService.insertSelective(workPerson);
+				String uid = UUID.randomUUID().toString().replace("-", "");
+				if(null==su){
+					SysUser u=new SysUser();
+					//插入user表
+					u.setId(uid);
+					u.setAccount(workPerson.getAccount());
+					u.setName(workPerson.getName());
+					u.setEmail(workPerson.getEmail());
+					u.setWechat(workPerson.getWechat());
+					u.setPassword(DigestUtils.md5Hex("000000"));
+					u.setPhone(workPerson.getPhone());
+					if(workPerson.getEffectiveFlag()=="有效"){
+						u.setStatus("可用");
+					}else{
+						u.setStatus("禁用");
+					}
+					u.setCreateTime(new Date());
+					u.setSex(workPerson.getSex());
+					sysUserService.insertSelective(u, null);
+					//插入关联表user_role
+					SysRole role=sysRoleService.selectByRoleName("驻场人员");
+					if(null!=role){
+						SysUserRoleKey userRole=new SysUserRoleKey();
+						userRole.setUserId(uid);
+						userRole.setRoleId(role.getId());
+						sysUserRoleService.insertSelective(userRole);
+					}
+					//插入user_org
+					SysOrg org=sysOrgService.selectByOrgName("造价审核部");
+					if(null!=org){
+						SysUserOrgKey userOrg=new SysUserOrgKey();
+						userOrg.setUserId(uid);
+						userOrg.setOrgId(org.getId());
+						sysUserOrgService.insertSelective(userOrg);
+					}
+				}else{
+					su.setAccount(workPerson.getAccount());
+					su.setName(workPerson.getName());
+					su.setEmail(workPerson.getEmail());
+					su.setWechat(workPerson.getWechat());
+					su.setPassword(DigestUtils.md5Hex("000000"));
+					su.setPhone(workPerson.getPhone());
+					su.setSex(workPerson.getSex());
+					if(workPerson.getEffectiveFlag()=="有效"){
+						su.setStatus("可用");
+					}else{
+						su.setStatus("禁用");
+					}
+					sysUserService.updateByPrimaryKeySelective(su, null);
+				}
+				//插入当月的登记表
+				String currentDate= sdf.format(new Date());
+				String regYear=currentDate.substring(0,4);
+				String regMonth=currentDate.substring(5,7).replace("0", "");
+				int days=OrderUtil.getYearMonthDays(Integer.parseInt(regYear), Integer.parseInt(regMonth));
+				WorkRegister register=null;
+				String temDate="";
+				List<String> excepdays=new ArrayList<String>();
+				WorkCalendar wc=workCalendarService.selectByPrimaryKey(regYear);
+				if(null!=wc && null!=wc.getExcepdays()){
+					excepdays=Arrays.asList(wc.getExcepdays().replaceAll(" ","").split(","));
+				}
+				for(int i=1;i<=days;i++){
+					register=new WorkRegister();
+					String id=UUID.randomUUID().toString().replace("-", "");
+					register.setId(id);
+					register.setPersonId(workPerson.getAccount());
+					register.setEnterpriseId(workPerson.getEnterpriseId());
+					register.setRegYearMonth(regYear+regMonth);
+					register.setRegYear(regYear);
+					register.setRegMonth(regMonth);
+					register.setRegDay(i+"");
+					//查日历表是否有节假日
+					if(i<10){
+						temDate=regYear+"-"+currentDate.substring(5,7)+"-0"+i+"";
+					}else{
+						temDate=regYear+"-"+currentDate.substring(5,7)+"-"+i+"";
+					}
+					if(excepdays.contains(temDate)){
+						register.setMorning("休息");
+						register.setAfternoon("休息");
+					}
+					register.setCreateTime(new Date());
+					String registerTimeStr=regYear+"-"+currentDate.substring(5,7)+"-"+i+"";
+					register.setRegisterTime(sdf.parse(registerTimeStr));
+					workRegisterService.insertSelective(register);
+				}
+				result.setStatus(200);
+			}else{
+				result.setStatus(300);
+			}
+		}else{
+			result.setStatus(400);
+		}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/upd")
+	public GlobalResult upd(HttpServletRequest request,WorkPerson workPerson){
+		GlobalResult result=new GlobalResult();
+		try {
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			if(null!=workPerson.getPlanStartTimeStr() && !"".equals(workPerson.getPlanStartTimeStr())){
+				workPerson.setPlanStartTime(sdf.parse(workPerson.getPlanStartTimeStr()));
+			}
+			if(null!=workPerson.getPlanEndTimeStr() && !"".equals(workPerson.getPlanEndTimeStr())){
+				workPerson.setPlanEndTime(sdf.parse(workPerson.getPlanEndTimeStr()));
+			}
+			if(null!=workPerson.getActualStartTimeStr() && !"".equals(workPerson.getActualStartTimeStr())){
+				workPerson.setActualStartTime(sdf.parse(workPerson.getActualStartTimeStr()));
+			}
+			if(null!=workPerson.getActualEndTimeStr() && !"".equals(workPerson.getActualEndTimeStr())){
+				workPerson.setActualEndTime(sdf.parse(workPerson.getActualEndTimeStr()));
+			}
+			if(null!=workPerson.getAnnualLeaveStartTimeStr() && !"".equals(workPerson.getAnnualLeaveStartTimeStr())){
+				workPerson.setAnnualLeaveStartTime(sdf.parse(workPerson.getAnnualLeaveStartTimeStr()));
+			}
+			if(null!=workPerson.getAnnualLeaveEndTimeStr() && !"".equals(workPerson.getAnnualLeaveEndTimeStr())){
+				workPerson.setAnnualLeaveEndTime(sdf.parse(workPerson.getAnnualLeaveEndTimeStr()));
+			}
+			workPerson.setCreateTime(new Date());
+			workPersonService.updateByPrimaryKeySelective(workPerson);
+			SysUser su=sysUserService.selectByUserAccount(workPerson.getAccount());
+			if(null!=su){
+				su.setAccount(workPerson.getAccount());
+				su.setName(workPerson.getName());
+				su.setEmail(workPerson.getEmail());
+				su.setWechat(workPerson.getWechat());
+				su.setPassword(DigestUtils.md5Hex("000000"));
+				su.setPhone(workPerson.getPhone());
+				su.setSex(workPerson.getSex());
+				if(workPerson.getEffectiveFlag()=="有效"){
+					su.setStatus("可用");
+				}else{
+					su.setStatus("禁用");
+				}
+				sysUserService.updateByPrimaryKeySelective(su, null);
+			}
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/del")
+	public GlobalResult del(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		String ids=request.getParameter("ids");
+		String arr[]=ids.split(",");
+		try {
+			for(String i:arr){
+				if(i!=null && !"".equals(i)){
+					workPersonService.deleteByPrimaryKey(i);
+				}
+			}
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	//导出
+	@ResponseBody
+	@RequestMapping("/exportPerson")
+	public void exportPerson(HttpServletRequest request,WorkPerson person,HttpServletResponse response){
+		try {
+			List<WorkPerson> list = Global.PER_EXPORT_LIST;
+			String path=request.getSession().getServletContext().getRealPath("/template/report/驻场企业人员.xlsx");
+			String newPath=request.getSession().getServletContext().getRealPath("/template/temp/驻场企业人员.xlsx");
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			Map<String,List<List<String>>>  date=new HashMap<String, List<List<String>>>();
+			List<List<String>> rowList=new ArrayList<List<String>>(); 
+			List<String> cellList=new ArrayList<String>();
+			for(WorkPerson l:list){
+				cellList =new ArrayList<String>();
+				cellList.add(l.getName());
+				cellList.add(l.getSex());
+				cellList.add(l.getJob());
+				cellList.add(l.getPhone());
+				cellList.add(l.getEmail());
+				cellList.add(l.getWechat());
+				cellList.add(l.getPlanStartTime()!=null?formatter.format(l.getPlanStartTime()):"");
+				cellList.add(l.getPlanEndTime()!=null?formatter.format(l.getPlanEndTime()):"");
+				cellList.add(l.getActualStartTime()!=null?formatter.format(l.getActualStartTime()):"");
+				cellList.add(l.getActualEndTime()!=null?formatter.format(l.getActualEndTime()):"");
+				cellList.add(l.getEffectiveFlag());
+				cellList.add(l.getRemark());
+				cellList.add(l.getAnnualLeaveStartTime()!=null?formatter.format(l.getAnnualLeaveStartTime()):"");
+				cellList.add(l.getAnnualLeaveEndTime()!=null?formatter.format(l.getAnnualLeaveEndTime()):"");
+				cellList.add(l.getAnnualLeaveTotal());
+				rowList.add(cellList);
+			}
+			date.put("驻场企业人员", rowList);
+			try {
+				ExcelUtil.copyExcel(1,date,path,newPath,request,response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//导入
+		@ResponseBody
+		@RequestMapping("/importPerson")
+		public GlobalResult importPerson(HttpServletRequest request){
+			GlobalResult result=new GlobalResult();
+			try {
+				List<WorkPerson> taskList = workPersonService.importPerson(request);
+				if(null!=taskList && taskList.size()>0){
+					result.setData(taskList);
+					result.setStatus(300);
+				}else{
+					result.setStatus(200);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				result.setStatus(500);
+			}
+			return result;
+		}
+	
+
+}

@@ -1,0 +1,179 @@
+package com.cost168.costaudit.controller.yaohao;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cost168.costaudit.pojo.cost.CostEnterprise;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAutocode;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidate;
+import com.cost168.costaudit.service.cost.CostEnterpriseService;
+import com.cost168.costaudit.service.yaohao.YaohaoAutocodeService;
+import com.cost168.costaudit.service.yaohao.YaohaoCandidateService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.JsonUtils;
+import com.cost168.costaudit.utils.OrderUtil;
+
+/**
+ * 
+ * ClassName: YaohaoCandidateController 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-7-8上午10:53:04
+ * @Company  广东华联软件科技有限公司
+ */
+@Controller
+@RequestMapping("/yaohaoCandidate")
+public class YaohaoCandidateController {
+	
+	
+	@Autowired
+	private YaohaoCandidateService yaohaoCandidateService;
+	@Autowired
+	private YaohaoAutocodeService yaohaoAutocodeService;
+	@Autowired
+	private CostEnterpriseService costEnterpriseService;
+	
+	
+	@RequestMapping("/toNameList")
+	public String toEdit(HttpServletRequest request){
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		    String currentDate = sdf.format(new Date());
+		    String currentYear = currentDate.substring(0, 4);
+			Map<String,Object> map=new HashMap<String,Object>();
+			YaohaoAutocode code=yaohaoAutocodeService.getCodeAorB();
+			List<YaohaoCandidate> cList= yaohaoCandidateService.selectListByMap(null);
+			if(null!=cList && cList.size()==0){
+				map.put("effectiveFlag", "在库");
+				List<CostEnterprise> eList= costEnterpriseService.selectListByMap(map);
+				YaohaoCandidate can=null;
+				for(CostEnterprise e:eList){
+					can=new YaohaoCandidate();
+					can.setId(OrderUtil.buildOrderId(""));
+					can.setCreater("admin");
+					can.setEnterpriseCode(e.getCode());
+					can.setCreateTime(new Date());
+					can.setYaohaoYear(currentYear);
+					can.setYaohaoGrade("第二档");
+					can.setRoundNum(code.getLunNumB());
+					yaohaoCandidateService.insertSelective(can);
+				}
+			}
+			request.setAttribute("code", code);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "yaohao/yaohaoMng/nameList";
+	}
+	
+	
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,YaohaoCandidate yaohaoCandidate, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			Map<String,Object> selectMap=JsonUtils.object2Map(yaohaoCandidate);
+			map.putAll(selectMap);
+			map.put("bidFlagNull", "bidFlagNull");
+			map.put("isPage", true);
+		    map.put("curPage", rows*(page-1));
+		    map.put("pageSize", rows);
+		    List<YaohaoCandidate> list= yaohaoCandidateService.selectListByMap(map);
+		    int total= yaohaoCandidateService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request){
+		GlobalResult result=new GlobalResult();
+		try {
+			String ids=request.getParameter("ids");
+			String yaohaoGradeFlag=request.getParameter("yaohaoGradeFlag");
+			YaohaoAutocode code=yaohaoAutocodeService.getCodeAorB();
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+		    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	        String currentDate = sdf.format(new Date());
+	        String currentYear = currentDate.substring(0, 4);
+	        List<YaohaoCandidate> list=null;
+			if(null!=ids&&!"".equals(ids)){
+				if("B".equals(yaohaoGradeFlag)){
+					list=yaohaoCandidateService.selectCandidateCurrentYaohaoGrade(currentYear, "第二档");
+				}else{
+					list=yaohaoCandidateService.selectCandidateCurrentYaohaoGrade(currentYear, "第一档");
+				}
+				List<String> strList=new ArrayList<String>();
+				for(YaohaoCandidate y:list){
+					strList.add(y.getEnterpriseCode());
+				}
+				List<String> arrList=Arrays.asList(ids.split(","));
+				YaohaoCandidate can=null;
+				for(String id:arrList){
+					if(strList.contains(id)){
+						continue;
+					}else{
+						can=new YaohaoCandidate();
+						can.setId(OrderUtil.buildOrderId(""));
+						can.setCreater(currentUser.getName());
+						can.setEnterpriseCode(id);
+						can.setCreateTime(new Date());
+						can.setYaohaoYear(currentYear);
+						if("B".equals(yaohaoGradeFlag)){
+							can.setYaohaoGrade("第二档");
+							can.setRoundNum(code.getLunNumB());
+						}else{
+							can.setYaohaoGrade("第一档");
+							can.setRoundNum(code.getLunNumA());
+						}
+						yaohaoCandidateService.insertSelective(can);
+					}
+				}
+			}
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/del")
+	public GlobalResult del(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		try {
+			String ids=request.getParameter("ids");
+			String arr[]=ids.split(",");
+			for(String i:arr){
+				yaohaoCandidateService.deleteByPrimaryKey(i);
+			}
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+}

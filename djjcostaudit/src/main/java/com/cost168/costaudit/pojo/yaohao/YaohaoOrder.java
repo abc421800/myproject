@@ -1,0 +1,211 @@
+package com.cost168.costaudit.pojo.yaohao;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class YaohaoOrder {
+    private String id;
+
+    private String code;
+
+    private Date yaohaoTime;
+    private String yaohaoTimeStr;
+
+    private String yaohaoYear;
+
+    private String yaohaoGrade;
+
+    private Integer enterpriseNum;
+
+    private Integer winbidNum;
+
+    private BigDecimal serviceAmountTotal;
+
+    private BigDecimal decideAmountTotal;
+
+    private String creater;
+
+    private Date createTime;
+    private String createTimeStr;
+
+    private String workingPerson;
+
+    private Integer lunNumber;
+
+    private Integer ciNumber;
+    
+    private String address;
+
+    private String remark;
+    
+    //数据库没有字段
+    private String serviceAmountTotalStr;
+    
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code == null ? null : code.trim();
+    }
+
+    public Date getYaohaoTime() {
+        return yaohaoTime;
+    }
+
+    public void setYaohaoTime(Date yaohaoTime) {
+        this.yaohaoTime = yaohaoTime;
+    }
+
+    public String getYaohaoYear() {
+        return yaohaoYear;
+    }
+
+    public void setYaohaoYear(String yaohaoYear) {
+        this.yaohaoYear = yaohaoYear == null ? null : yaohaoYear.trim();
+    }
+
+    public String getYaohaoGrade() {
+        return yaohaoGrade;
+    }
+
+    public void setYaohaoGrade(String yaohaoGrade) {
+        this.yaohaoGrade = yaohaoGrade == null ? null : yaohaoGrade.trim();
+    }
+
+    public Integer getEnterpriseNum() {
+        return enterpriseNum;
+    }
+
+    public void setEnterpriseNum(Integer enterpriseNum) {
+        this.enterpriseNum = enterpriseNum;
+    }
+
+    public Integer getWinbidNum() {
+        return winbidNum;
+    }
+
+    public void setWinbidNum(Integer winbidNum) {
+        this.winbidNum = winbidNum;
+    }
+
+    public BigDecimal getServiceAmountTotal() {
+        return serviceAmountTotal;
+    }
+
+    public void setServiceAmountTotal(BigDecimal serviceAmountTotal) {
+        this.serviceAmountTotal = serviceAmountTotal;
+    }
+
+    public BigDecimal getDecideAmountTotal() {
+        return decideAmountTotal;
+    }
+
+    public void setDecideAmountTotal(BigDecimal decideAmountTotal) {
+        this.decideAmountTotal = decideAmountTotal;
+    }
+
+    public String getCreater() {
+        return creater;
+    }
+
+    public void setCreater(String creater) {
+        this.creater = creater == null ? null : creater.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getWorkingPerson() {
+        return workingPerson;
+    }
+
+    public void setWorkingPerson(String workingPerson) {
+        this.workingPerson = workingPerson == null ? null : workingPerson.trim();
+    }
+
+    public Integer getLunNumber() {
+        return lunNumber;
+    }
+
+    public void setLunNumber(Integer lunNumber) {
+        this.lunNumber = lunNumber;
+    }
+
+    public Integer getCiNumber() {
+        return ciNumber;
+    }
+
+    public void setCiNumber(Integer ciNumber) {
+        this.ciNumber = ciNumber;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+
+	public String getYaohaoTimeStr() {
+		if(yaohaoTime==null){
+			return yaohaoTimeStr;
+		}else{
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String dateString = formatter.format(yaohaoTime);
+			return dateString;
+		}		
+	}
+
+	public void setYaohaoTimeStr(String yaohaoTimeStr) {
+		this.yaohaoTimeStr = yaohaoTimeStr;
+	}
+
+	public String getCreateTimeStr() {
+		if(createTime==null){
+			return createTimeStr;
+		}else{
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String dateString = formatter.format(createTime);
+			return dateString;
+		}	
+	}
+
+	public void setCreateTimeStr(String createTimeStr) {
+		this.createTimeStr = createTimeStr;
+	}
+
+	public String getServiceAmountTotalStr() {
+		return serviceAmountTotalStr;
+	}
+
+	public void setServiceAmountTotalStr(String serviceAmountTotalStr) {
+		this.serviceAmountTotalStr = serviceAmountTotalStr;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+    
+    
+}

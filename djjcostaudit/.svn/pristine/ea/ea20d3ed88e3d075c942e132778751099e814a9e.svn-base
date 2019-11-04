@@ -1,0 +1,62 @@
+package com.cost168.costaudit.service.work;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.cost168.costaudit.pojo.work.WorkProcessApply;
+import com.cost168.costaudit.pojo.work.WorkProcessApplyExample;
+import com.cost168.costaudit.utils.GlobalResult;
+
+/**
+ *
+ * ClassName: WorkProcessApplyService
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-5-30上午9:58:06
+ * @Company  广东华联软件科技有限公司
+ */
+public interface WorkProcessApplyService {
+
+	List<WorkProcessApply> selectByExample(WorkProcessApplyExample example);
+
+	WorkProcessApply selectByPrimaryKey(String id);
+
+	int insertSelective(WorkProcessApply record);
+
+	int updateByPrimaryKeySelective(WorkProcessApply workProcessApply);
+
+	int deleteByPrimaryKey(String id);
+
+	List<WorkProcessApply> selectListByMap(Map<String, Object> map);
+
+	int selectCountByMap(Map<String, Object> map);
+
+	void save(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void Change(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void handleTask(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void handleRepeal(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void rejectTask(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void endTask(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void relevantHandleTask(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void restartTask(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void repeal(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void handleChange(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+	void handle(HttpServletRequest request, WorkProcessApply workProcessApply, GlobalResult result)throws Exception;
+
+
+
+
+
+}

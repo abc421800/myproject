@@ -1,0 +1,80 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoAutocodeMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoCandidateMapper;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAutocode;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidate;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidateExample;
+import com.cost168.costaudit.service.yaohao.YaohaoCandidateService;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class YaohaoCandidateServiceImpl implements YaohaoCandidateService {
+	
+	@Autowired
+	private YaohaoCandidateMapper yaohaoCandidateMapper;
+	@Autowired
+	private YaohaoAutocodeMapper yaohaoAutocodeMapper;
+
+	@Override
+	public List<YaohaoCandidate> selectByExample(YaohaoCandidateExample example) {
+		return yaohaoCandidateMapper.selectByExample(example);
+	}
+
+	@Override
+	public YaohaoCandidate selectByPrimaryKey(String id) {
+		return yaohaoCandidateMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(YaohaoCandidate record) {
+		return yaohaoCandidateMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoCandidate yaohaoCandidate) {
+		return yaohaoCandidateMapper.updateByPrimaryKeySelective(yaohaoCandidate);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoCandidateMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<YaohaoCandidate> selectListByMap(Map<String, Object> map) {
+		return yaohaoCandidateMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoCandidateMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public List<YaohaoCandidate> selectCandidateCurrentYaohaoGrade(String yaohaoYear,String yaohaoGrade ) {
+			YaohaoAutocode auto =yaohaoAutocodeMapper.selectByPrimaryKey("1");
+			Map<String,Object> map=new HashMap<String, Object>();
+			map.put("yaohaoGrade",yaohaoGrade);
+			map.put("yaohaoYear", yaohaoYear);
+			if("第二档".equals(yaohaoGrade)){
+				map.put("roundNum", auto.getLunNumB());
+			}else{
+				map.put("roundNum", auto.getLunNumA());
+			}
+			//map.put("bidFlagNull", "bidFlagNull");
+			//map.put("removeFlag", "1");
+			map.put("yaohaoJoin", "cy");
+			List<YaohaoCandidate> list= yaohaoCandidateMapper.selectListByMap(map);
+		return list;
+	}
+
+}

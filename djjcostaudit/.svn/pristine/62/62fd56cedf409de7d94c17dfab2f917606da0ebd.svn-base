@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.cost.CostDocumentMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.cost.CostDocument" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="symbol" property="symbol" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="come_go_flag" property="comeGoFlag" jdbcType="VARCHAR" />
+    <result column="come_go_unit" property="comeGoUnit" jdbcType="VARCHAR" />
+    <result column="audit_price_flag" property="auditPriceFlag" jdbcType="VARCHAR" />
+    <result column="document_time" property="documentTime" jdbcType="TIMESTAMP" />
+    <result column="person_liable" property="personLiable" jdbcType="VARCHAR" />
+    <result column="registrant" property="registrant" jdbcType="VARCHAR" />
+    <result column="registrant_time" property="registrantTime" jdbcType="TIMESTAMP" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="opinion" property="opinion" jdbcType="VARCHAR" />
+    <result column="number" property="number" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, symbol, name, come_go_flag, come_go_unit, audit_price_flag, document_time, person_liable, 
+    registrant, registrant_time, description, opinion, number
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.cost.CostDocumentExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cost_document
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+    select *  from cost_document d 
+    LEFT JOIN cost_dpct_relation r ON r.document_id=d.id 
+		LEFT JOIN cost_task t ON t.id=r.task_id 
+		LEFT JOIN cost_project p ON p.id=r.project_id 
+		LEFT JOIN cost_contract c ON c.id=r.contract_id
+    <where>
+          <if test="name != null and name !='' ">
+               and d.name like concat('%',#{name},'%')
+          </if>
+          <if test="symbol != null and symbol !='' ">
+               and d.symbol like concat('%',#{symbol},'%')
+          </if>
+          <if test="comeGoFlag != null and comeGoFlag !='' ">
+               and d.come_go_flag=#{comeGoFlag}
+          </if>
+          <if test="auditPriceFlag != null and auditPriceFlag !='' ">
+               and d.audit_price_flag=#{auditPriceFlag}
+          </if>
+          <if test="comeGoUnit != null and comeGoUnit !='' ">
+               and d.come_go_unit like concat('%',#{comeGoUnit},'%')
+          </if>
+          <if test="personLiable != null and personLiable !=''" >
+     			and d.person_liable like concat('%',#{personLiable},'%')
+   		  </if>
+   		  <if test="currentPerson != null and currentPerson !=''" >
+     			and (d.person_liable=#{currentPerson} or d.registrant=#{currentPerson})
+   		  </if>
+          <if test="startTime!=null and startTime!=''">
+       		   and <![CDATA[ d.document_time>=#{startTime} ]]>
+	      </if>
+	      <if test="endTime!=null and endTime!=''">
+	       	   and <![CDATA[ d.document_time<=#{endTime} ]]>
+	      </if>
+	      <if test="codeCon!=null and codeCon!=''">
+	       	   and c.code like concat('%',#{codeCon},'%')
+	      </if>
+	      <if test="nameCon!=null and nameCon!=''">
+	       	   and c.name like concat('%',#{nameCon},'%')
+	      </if>
+    </where>
+    GROUP BY d.id
+    order by registrant_time desc
+    <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer"  parameterType="map" >
+    select count(n.did) from (
+    SELECT d.id as did FROM cost_document d 
+		LEFT JOIN cost_dpct_relation r ON r.document_id=d.id 
+		LEFT JOIN cost_task t ON t.id=r.task_id 
+		LEFT JOIN cost_project p ON p.id=r.project_id 
+		LEFT JOIN cost_contract c ON c.id=r.contract_id
+    <where>
+          <if test="name != null and name !='' ">
+             and d.name like concat('%',#{name},'%')
+          </if>
+          <if test="symbol != null and symbol !='' ">
+             and d.symbol like concat('%',#{symbol},'%')
+          </if>
+          <if test="comeGoFlag != null and comeGoFlag !='' ">
+             and d.come_go_flag=#{comeGoFlag}
+          </if>
+          <if test="auditPriceFlag != null and auditPriceFlag !='' ">
+               and d.audit_price_flag=#{auditPriceFlag}
+          </if>
+          <if test="comeGoUnit != null and comeGoUnit !='' ">
+               and d.come_go_unit like concat('%',#{comeGoUnit},'%')
+          </if>
+          <if test="personLiable != null and personLiable !=''" >
+     			and d.person_liable like concat('%',#{personLiable},'%')
+   		  </if>
+   		  <if test="currentPerson != null and currentPerson !=''" >
+     			and (d.person_liable=#{currentPerson} or d.registrant=#{currentPerson})
+   		  </if>
+          <if test="startTime!=null and startTime!=''">
+       		   and <![CDATA[ d.document_time>=#{startTime} ]]>
+	      </if>
+	      <if test="endTime!=null and endTime!=''">
+	       	   and <![CDATA[ d.document_time<=#{endTime} ]]>
+	      </if>
+	      <if test="codeCon!=null and codeCon!=''">
+	       	   and c.code like concat('%',#{codeCon},'%')
+	      </if>
+	      <if test="nameCon!=null and nameCon!=''">
+	       	   and c.name like concat('%',#{nameCon},'%')
+	      </if>
+    </where>
+    GROUP BY d.id )as n
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from cost_document
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <select id="selectRelationDocListByMap" resultMap="BaseResultMap" parameterType="map" >
+   	SELECT r.id as "dpctRelationId",t.name as "taskName",p.name as "projectName",c.name as "contractName" ,d.* FROM cost_document d 
+		LEFT JOIN cost_dpct_relation r ON r.document_id=d.id 
+		LEFT JOIN cost_task t ON t.id=r.task_id 
+		LEFT JOIN cost_project p ON p.id=r.project_id 
+		LEFT JOIN cost_contract c ON c.id=r.contract_id
+    <where>
+    	<if test="projectId != null and projectId !='' ">
+               and r.project_id =#{projectId}
+        </if>
+        <if test="taskId != null and taskId !='' ">
+               and r.task_id =#{taskId}
+        </if>
+        <if test="contractId != null and contractId !='' ">
+               and r.contract_id =#{contractId}
+        </if>
+        <if test="symbol != null and symbol !='' ">
+          	and d.symbol like concat('%',#{symbol},'%')
+        </if>
+        <if test="name != null and name !='' ">
+          	and d.name like concat('%',#{name},'%')
+        </if>
+        <if test="comeGoFlag != null and comeGoFlag !='' ">
+          	and d.come_go_flag = #{comeGoFlag}
+        </if>
+        <if test="auditPriceFlag != null and auditPriceFlag !='' ">
+          	and d.audit_price_flag = #{auditPriceFlag}
+        </if>
+        <if test="comeGoUnit != null and comeGoUnit !='' ">
+          	and d.come_go_unit like concat('%',#{comeGoUnit},'%') 
+        </if>
+        <if test="personLiable != null and personLiable !=''" >
+			and d.person_liable  like concat('%',#{personLiable},'%')
+ 	    </if>
+        <if test="startTime != null and startTime != ''">
+	 		 <![CDATA[And d.document_time >= #{startTime}]]>
+		</if>
+		<if test="endTime != null and endTime != ''">
+		  <![CDATA[And d.document_time <= #{endTime}]]>
+		</if>
+    </where>
+    	GROUP BY d.id
+    	<if test="isPage==true">
+	    	limit #{curPage},#{pageSize}
+	    </if>
+   </select>
+   <select id="selectRelationDocCountByMap" resultType="java.lang.Integer" parameterType="map" >
+   select count(n.did) from (
+    SELECT d.id as did FROM cost_document d 
+		LEFT JOIN cost_dpct_relation r ON r.document_id=d.id 
+		LEFT JOIN cost_task t ON t.id=r.task_id 
+		LEFT JOIN cost_project p ON p.id=r.project_id 
+		LEFT JOIN cost_contract c ON c.id=r.contract_id
+    <where>
+    	<if test="projectId != null and projectId !='' ">
+               and r.project_id =#{projectId}
+        </if>
+        <if test="taskId != null and taskId !='' ">
+               and r.task_id =#{taskId}
+        </if>
+        <if test="contractId != null and contractId !='' ">
+               and r.contract_id =#{contractId}
+        </if>
+        <if test="symbol != null and symbol !='' ">
+          	and d.symbol like concat('%',#{symbol},'%')
+        </if>
+        <if test="name != null and name !='' ">
+          	and d.name like concat('%',#{name},'%')
+        </if>
+        <if test="comeGoFlag != null and comeGoFlag !='' ">
+          	and d.come_go_flag = #{comeGoFlag}
+        </if>
+        <if test="auditPriceFlag != null and auditPriceFlag !='' ">
+          	and d.audit_price_flag = #{auditPriceFlag}
+        </if>
+        <if test="comeGoUnit != null and comeGoUnit !='' ">
+          	and d.come_go_unit like concat('%',#{comeGoUnit},'%') 
+        </if>
+        <if test="personLiable != null and personLiable !=''" >
+			and d.person_liable  like concat('%',#{personLiable},'%')
+ 	    </if>
+        <if test="startTime != null and startTime != ''">
+	 		 <![CDATA[And d.document_time >= #{startTime}]]>
+		</if>
+		<if test="endTime != null and endTime != ''">
+		  <![CDATA[And d.document_time <= #{endTime}]]>
+		</if>
+    </where>
+    GROUP BY d.id )as n
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from cost_document
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.cost.CostDocumentExample" >
+    delete from cost_document
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.cost.CostDocument" >
+    insert into cost_document (id, symbol, name, 
+      come_go_flag, come_go_unit, audit_price_flag, 
+      document_time, person_liable, registrant, 
+      registrant_time, description, opinion, number
+      )
+    values (#{id,jdbcType=VARCHAR}, #{symbol,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{comeGoFlag,jdbcType=VARCHAR}, #{comeGoUnit,jdbcType=VARCHAR}, #{auditPriceFlag,jdbcType=VARCHAR}, 
+      #{documentTime,jdbcType=TIMESTAMP}, #{personLiable,jdbcType=VARCHAR}, #{registrant,jdbcType=VARCHAR}, 
+      #{registrantTime,jdbcType=TIMESTAMP}, #{description,jdbcType=VARCHAR}, #{opinion,jdbcType=VARCHAR}, #{number,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.cost.CostDocument" >
+    insert into cost_document
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="symbol != null" >
+        symbol,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="comeGoFlag != null" >
+        come_go_flag,
+      </if>
+      <if test="comeGoUnit != null" >
+        come_go_unit,
+      </if>
+      <if test="auditPriceFlag != null" >
+        audit_price_flag,
+      </if>
+      <if test="documentTime != null" >
+        document_time,
+      </if>
+      <if test="personLiable != null" >
+        person_liable,
+      </if>
+      <if test="registrant != null" >
+        registrant,
+      </if>
+      <if test="registrantTime != null" >
+        registrant_time,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="opinion != null" >
+        opinion,
+      </if>
+      <if test="number != null" >
+        number,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="symbol != null" >
+        #{symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="comeGoFlag != null" >
+        #{comeGoFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="comeGoUnit != null" >
+        #{comeGoUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceFlag != null" >
+        #{auditPriceFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="documentTime != null" >
+        #{documentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="personLiable != null" >
+        #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="registrant != null" >
+        #{registrant,jdbcType=VARCHAR},
+      </if>
+      <if test="registrantTime != null" >
+        #{registrantTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="opinion != null" >
+        #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="number != null" >
+        #{number,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.cost.CostDocumentExample" resultType="java.lang.Integer" >
+    select count(*) from cost_document
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update cost_document
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.symbol != null" >
+        symbol = #{record.symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.comeGoFlag != null" >
+        come_go_flag = #{record.comeGoFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.comeGoUnit != null" >
+        come_go_unit = #{record.comeGoUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.auditPriceFlag != null" >
+        audit_price_flag = #{record.auditPriceFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.documentTime != null" >
+        document_time = #{record.documentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.personLiable != null" >
+        person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="record.registrant != null" >
+        registrant = #{record.registrant,jdbcType=VARCHAR},
+      </if>
+      <if test="record.registrantTime != null" >
+        registrant_time = #{record.registrantTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.description != null" >
+        description = #{record.description,jdbcType=VARCHAR},
+      </if>
+      <if test="record.opinion != null" >
+        opinion = #{record.opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="record.number != null" >
+        number = #{record.number,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update cost_document
+    set id = #{record.id,jdbcType=VARCHAR},
+      symbol = #{record.symbol,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      come_go_flag = #{record.comeGoFlag,jdbcType=VARCHAR},
+      come_go_unit = #{record.comeGoUnit,jdbcType=VARCHAR},
+      audit_price_flag = #{record.auditPriceFlag,jdbcType=VARCHAR},
+      document_time = #{record.documentTime,jdbcType=TIMESTAMP},
+      person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      registrant = #{record.registrant,jdbcType=VARCHAR},
+      registrant_time = #{record.registrantTime,jdbcType=TIMESTAMP},
+      description = #{record.description,jdbcType=VARCHAR},
+      opinion = #{record.opinion,jdbcType=VARCHAR},
+      number = #{record.number,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.cost.CostDocument" >
+    update cost_document
+    <set >
+      <if test="symbol != null" >
+        symbol = #{symbol,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="comeGoFlag != null" >
+        come_go_flag = #{comeGoFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="comeGoUnit != null" >
+        come_go_unit = #{comeGoUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceFlag != null" >
+        audit_price_flag = #{auditPriceFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="documentTime != null" >
+        document_time = #{documentTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="personLiable != null" >
+        person_liable = #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="registrant != null" >
+        registrant = #{registrant,jdbcType=VARCHAR},
+      </if>
+      <if test="registrantTime != null" >
+        registrant_time = #{registrantTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="opinion != null" >
+        opinion = #{opinion,jdbcType=VARCHAR},
+      </if>
+      <if test="number != null" >
+        number = #{number,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.cost.CostDocument" >
+    update cost_document
+    set symbol = #{symbol,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      come_go_flag = #{comeGoFlag,jdbcType=VARCHAR},
+      come_go_unit = #{comeGoUnit,jdbcType=VARCHAR},
+      audit_price_flag = #{auditPriceFlag,jdbcType=VARCHAR},
+      document_time = #{documentTime,jdbcType=TIMESTAMP},
+      person_liable = #{personLiable,jdbcType=VARCHAR},
+      registrant = #{registrant,jdbcType=VARCHAR},
+      registrant_time = #{registrantTime,jdbcType=TIMESTAMP},
+      description = #{description,jdbcType=VARCHAR},
+      opinion = #{opinion,jdbcType=VARCHAR},
+      number = #{number,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

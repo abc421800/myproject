@@ -1,0 +1,131 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加中签企业</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+	<style>
+        .menu-text{
+            overflow:hidden;text-overflow: ellipsis;white-space: nowrap;width:140px;
+        }
+    </style>
+</head>
+<body>
+<div class="row">
+    <div class="filter">
+        <div class="form-inline">
+            <div class="form-group">
+                <label for="">企业名称：</label>
+                <input type="text"  value="" placeholder="请输入关键字" class="form-control input-sm">
+            </div>
+
+            <div class="form-group">
+                <input type="submit" name="Submit11" value="查询" class="btn btn-primary" onclick="">&nbsp;
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <table id="addWinningCompany" style="width:100%;">
+    </table>
+</div>
+<div class="text-center" style="margin-top: 10px;">
+    <input type="button" class="btn btn-primary"  id="saveBtn" value="确定" onclick="saveHandler()">&nbsp;&nbsp;
+    <input type="button" class="btn btn-success" onclick="window.parent.$('#addWinningCompany').dialog('close');" value="取消">
+</div>
+<script src="${pageContext.request.contextPath}/res/js/yaohao/yaohaoMng/yaohaoList.js"></script>
+<script type="text/javascript">
+$(function() {
+	var noEntId="${param.noEntId}";
+	var yaohaoGrade="第二档";
+	var yaohaoGradeFlag="${param.yaohaoGradeFlag}";
+	if(yaohaoGradeFlag=="1"){
+		yaohaoGrade="第一档";
+	}
+    $('#addWinningCompany').datagrid({
+        url: '/yaohaoCandidate/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        rownumbers: true,
+        height: 300,
+        fitColumns: true,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 10,
+        singleSelect: false,
+        queryParams:{
+        	yaohaoGrade:yaohaoGrade,
+        	yaohaoYear:"${param.yaohaoYear}",
+        	noEntId:noEntId,
+        	roundNum:"${param.roundNum}"
+        },
+        columns: [
+            [
+            {
+                field: 'id',
+                title : '复选框',
+                checkbox: true
+            },{
+                field:'simpleName',
+                title:'简称',
+                width:80,
+                align:'left',
+                sortable:false
+            },{
+                field:'enterpriseName',
+                title:'企业名称',
+                width:200,
+                align:'left',
+                sortable:false
+            }, {
+                field: 'yaohaoYear',
+                title: '摇号年份',
+                width: 100,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'yaohaoGrade',
+                title: '摇号档次',
+                width: 120,
+                align: 'center',
+                sortable: false
+                
+            }
+            ]
+        ],
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#addWinningCompany').datagrid('loadData', {total: 1, rows: [{simpleName: "未找到相关信息！"}]});
+            }
+        },
+
+    });
+});
+function saveHandler() {
+    var selections = $('#addWinningCompany').datagrid('getSelections');
+    var enterpriseNames = [];
+    var ids =[];
+    var winbidIds=[];
+    for (var i in selections) {
+    	enterpriseNames[i] = selections[i].enterpriseName;
+    	ids[i] = selections[i].enterpriseId;
+    	winbidIds[i] = selections[i].id;
+    }
+    window.parent.comArr=enterpriseNames;
+    window.parent.comArrId=ids;
+    window.parent.comArrWinbidIds=winbidIds;
+    window.parent.count=selections.length;
+    window.parent.addCompanyHandler();
+    window.parent.$('#addWinningCompany').dialog('close');
+    //计算中签个数
+    var trList = window.parent.$("#data_list").children("tr").length-3;
+    window.parent.$('#winbidNum').val(trList);
+    
+}
+</script>
+</body>
+</html>

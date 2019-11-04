@@ -1,0 +1,471 @@
+package com.cost168.costaudit.controller.work;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.WorkProcessApply;
+import com.cost168.costaudit.pojo.work.WorkProcessHistory;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.service.sys.SysUserService;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.service.work.WorkProcessApplyService;
+import com.cost168.costaudit.service.work.WorkProcessHistoryService;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.JsonUtils;
+import com.cost168.costaudit.utils.OrderUtil;
+
+
+/**
+ * 
+ * ClassName: WorkProcessApplyController 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-5-30上午10:27:41
+ * @Company  广东华联软件科技有限公司
+ */
+@Controller
+@RequestMapping("/workProcessApply")
+public class WorkProcessApplyController {
+	
+	@Autowired
+	private WorkProcessApplyService workProcessApplyService;
+	@Autowired
+	private WorkProcessHistoryService workProcessHistoryService;
+	@Autowired
+	private WorkPersonService workPersonService;
+	@Autowired
+	private WorkEnterpriseService workEnterpriseService;
+	@Autowired
+	private SysUserService sysUserService;
+	@Autowired
+	private WorkRegisterService workRegisterService;
+	
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,WorkProcessApply workProcessApply, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		try {
+			Map<String,Object> map=new HashMap<String,Object>();
+			String startTime =request.getParameter("startTime");
+			String endTime =request.getParameter("endTime");
+			if(null!=startTime && !"".equals(startTime)){
+				map.put("startTime", startTime+" 00:00:00");
+			}
+			if(null!=endTime && !"".equals(endTime)){
+				map.put("endTime", endTime+" 24:00:00");
+			}
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			//String flag=request.getParameter("flag");
+			Map<String,Object> selectMap=JsonUtils.object2Map(workProcessApply);
+			map.putAll(selectMap);
+			map.put("personAll", currentUser.getAccount());
+			/*if(flag!=null){
+	  			 if(flag.equals("apply")){
+	  		  	    if(currentUser!=null){
+	  		  	    	map.put("proposer", currentUser.getAccount());
+	  		  	    }
+	  		    }else if(flag.equals("task")){
+	  		    	map.put("nextPerson", currentUser.getAccount());
+	  		    	map.put("status", "审批中");
+	  		    }
+	  		}*/
+		    List<WorkProcessApply> list= workProcessApplyService.selectListByMap(map);
+		    int total= workProcessApplyService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toEdit")
+	public String toEdit(HttpServletRequest request){
+		
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			String url="";
+			String id=request.getParameter("id");
+			if(null!=id && !"".equals(id)) {
+				url="/workProcessApply/upd";
+				WorkProcessApply wp = workProcessApplyService.selectByPrimaryKey(id);
+				request.setAttribute("add_edit", "edit");
+				request.setAttribute("obj", wp);
+			}else{
+				WorkPerson workPerson=workPersonService.selectByAccount(currentUser.getAccount());
+				WorkEnterprise  workEnterprise =workEnterpriseService.selectByPrimaryKey(workPerson.getEnterpriseId());
+				url="/workProcessApply/save";
+				String processId=UUID.randomUUID().toString().replace("-", "");
+				WorkProcessApply wp=new WorkProcessApply();
+				wp.setId(processId);
+				wp.setProposer(currentUser.getAccount());
+				wp.setProposerName(currentUser.getName());
+				String code=OrderUtil.buildOrderId("");
+				wp.setCode(code);
+				if(null!=workEnterprise){
+					wp.setEnterpriseId(workEnterprise.getId());
+					wp.setEnterpriseName(workEnterprise.getName());
+				}
+				request.setAttribute("add_edit", "add");
+				request.setAttribute("obj", wp);
+				request.setAttribute("workPerson", workPerson);
+			}
+			request.setAttribute("url", url);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "processApply/add";
+	}
+
+	@ResponseBody
+	@RequestMapping("/checkPerson")
+	public GlobalResult checkPerson(HttpServletRequest request){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkPerson workPerson=workPersonService.selectByAccount(currentUser.getAccount());
+			if(null!=workPerson){
+				result.setStatus(200);
+			}else{
+				result.setStatus(500);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			String leaveTime=request.getParameter("leaveTime");
+			String start=leaveTime.substring(0, 10);
+			String end=leaveTime.substring(leaveTime.length()-10, leaveTime.length());
+			workProcessApply.setLeaveStartTime(sdf.parse(start));
+			workProcessApply.setLeaveEndTime(sdf.parse(end));
+			workProcessApply.setStatus("审批中");
+			workProcessApply.setCreateTime(new Date());
+			workProcessApplyService.insertSelective(workProcessApply);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	
+	@RequestMapping("/toTaskDetails")
+	public String toTaskDetails(HttpServletRequest request){
+		try {
+			String id=request.getParameter("id");
+			taskDetails(request,id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "processApply/taskDetails";
+	}
+	
+	@RequestMapping("/toTaskDetailsShow")
+	public String toTaskDetailsShow(HttpServletRequest request){
+		String id=request.getParameter("id");
+		taskDetails(request,id);
+		return "processApply/taskDetailsShow";
+		
+	}
+	
+	@RequestMapping("/toTaskDetailsRelevant")
+	public String toTaskDetailsRelevant(HttpServletRequest request){
+		String id=request.getParameter("id");
+		taskDetails(request,id);
+		return "processApply/taskRelevant";
+		
+	}
+	private void taskDetails(HttpServletRequest request,String id) {
+		WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(id);
+		WorkPerson workPerson=workPersonService.selectByAccount(wp.getProposer());
+		wp.setProposerName(workPerson.getName());
+		SysUser userSp=sysUserService.getUserByAccount(wp.getNextperson());
+		if(null!=userSp){
+			wp.setNextpersonName(userSp.getName());
+		}
+		SysUser userCy=sysUserService.getUserByAccount(wp.getRelatedId());
+		if(null!=userCy){
+			wp.setRelatedName(userCy.getName());
+		}
+		WorkEnterprise  workEnterprise =workEnterpriseService.selectByPrimaryKey(workPerson.getEnterpriseId());
+		if(null!=workEnterprise){
+			wp.setEnterpriseId(workEnterprise.getId());
+			wp.setEnterpriseName(workEnterprise.getName());
+		}
+		//查审批意见表
+		Map<String,Object> map=new HashMap<String, Object>();
+		map.put("processId", id);
+		List<WorkProcessHistory> wphList= workProcessHistoryService.selectListByMap(map);
+		request.setAttribute("wphList", wphList);
+		request.setAttribute("workPerson", workPerson);
+		request.setAttribute("obj", wp);
+	}
+	
+	/**
+	 * 
+	 * @Description: 任务办理、审批
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-5-31下午3:12:00
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/handleTask")
+	public GlobalResult handleTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			wp.setStatus("结束");
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			WorkProcessHistory wph=new WorkProcessHistory();
+			String id=UUID.randomUUID().toString().replace("-", "");
+			wph.setId(id);
+			wph.setOperatorId(currentUser.getAccount());
+			wph.setOperatorName(currentUser.getName());
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setProcessId(workProcessApply.getId());
+			wph.setRelatedId(workProcessApply.getRelatedId());
+			wph.setRelatedName(workProcessApply.getRelatedName());
+			wph.setOperatorNode("结束");
+			wph.setCreateTime(new Date());
+			wph.setOperatorTime(new Date());
+			workProcessHistoryService.insertSelective(wph);
+			//插入考勤表
+			String regYear=wp.getLeaveStartTimeStr().substring(0, 4);
+			String regMonth=wp.getLeaveStartTimeStr().substring(5,7).replace("0", "");
+			String yearMonth=regYear+regMonth;
+			String leaveStart=wp.getLeaveStartTimeStr();
+			String leaveEnd=wp.getLeaveEndTimeStr();
+			long days=OrderUtil.getDaySub(leaveStart,leaveEnd);
+			String startDay=leaveStart.substring(8,10).replace("0", "");
+			String endDay=leaveEnd.substring(8,10).replace("0", "");
+			int s=Integer.parseInt(startDay);
+			int e=Integer.parseInt(endDay);
+			Map<String,Object> map=new HashMap<String, Object>();
+			for(int i=s;i<e;i++){
+				map.clear();
+				map.put("personId", wp.getProposer());
+				map.put("regYear", regYear);
+				map.put("regMonth",regMonth);
+				map.put("regDay", i);
+				List<WorkRegister> registerList = workRegisterService.selectByDay(map);
+				 WorkRegister register=null;
+				 if(null!=registerList&& registerList.size()>0){
+					 register=registerList.get(0);
+					 register.setMorning("上班");
+					 register.setAfternoon("上班");
+					 register.setCreater(currentUser.getName());
+					 workRegisterService.updateByPrimaryKeySelective(register);
+				 }else{
+					 register=new WorkRegister();
+					 String id1=UUID.randomUUID().toString().replace("-", "");
+					 register.setId(id1);
+					 register.setPersonId(wp.getProposer());
+					 register.setEnterpriseId(wp.getEnterpriseId());
+					 register.setRegYearMonth(yearMonth);
+					 register.setRegYear(regYear);
+					 register.setRegMonth(regMonth);
+					 register.setRegDay(i+"");
+					 register.setMorning(wp.getType());
+					 register.setAfternoon(wp.getType());
+					 register.setWorkingDay(null);
+					 register.setCreateTime(new Date());
+					 register.setCreater(currentUser.getName());
+					 register.setRemark("请假单");
+					 register.setRegisterTime(new Date());
+					 workRegisterService.insertSelective(register);
+				 }
+			}
+			System.out.println("-------------:"+days);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	/**
+	 * 
+	 * @Description: 驳回任务再次提交
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-6-3上午11:54:12
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/relevantHandleTask")
+	public GlobalResult relevantHandleTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			String leaveTime=request.getParameter("leaveTime");
+			String start=leaveTime.substring(0, 10);
+			String end=leaveTime.substring(leaveTime.length()-10, leaveTime.length());
+			wp.setLeaveStartTime(sdf.parse(start));
+			wp.setLeaveEndTime(sdf.parse(end));
+			wp.setType(workProcessApply.getType());
+			wp.setStatus("审批中");
+			wp.setContent(workProcessApply.getContent());
+			wp.setMorAftAll(workProcessApply.getMorAftAll());
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			WorkProcessHistory wph=new WorkProcessHistory();
+			String id=UUID.randomUUID().toString().replace("-", "");
+			wph.setId(id);
+			wph.setOperatorId(currentUser.getAccount());
+			wph.setOperatorName(currentUser.getName());
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setProcessId(workProcessApply.getId());
+			wph.setRelatedId(workProcessApply.getRelatedId());
+			wph.setRelatedName(workProcessApply.getRelatedName());
+			wph.setOperatorNode("审批");
+			wph.setCreateTime(new Date());
+			wph.setOperatorTime(new Date());
+			workProcessHistoryService.insertSelective(wph);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	/**
+	 * 
+	 * @Description: 驳回
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-5-31下午5:31:46
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/rejectTask")
+	public GlobalResult rejectTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			wp.setStatus("驳回");
+			//wp.setNextperson(wp.getProposer());
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			WorkProcessHistory wph=new WorkProcessHistory();
+			String id=UUID.randomUUID().toString().replace("-", "");
+			wph.setId(id);
+			wph.setOperatorId(currentUser.getAccount());
+			wph.setOperatorName(currentUser.getName());
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("不同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setProcessId(workProcessApply.getId());
+			wph.setRelatedId(workProcessApply.getRelatedId());
+			wph.setRelatedName(workProcessApply.getRelatedName());
+			wph.setOperatorNode("驳回");
+			wph.setCreateTime(new Date());
+			wph.setOperatorTime(new Date());
+			workProcessHistoryService.insertSelective(wph);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @Description: 结束
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-6-3上午11:34:48
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/endTask")
+	public GlobalResult endTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			wp.setStatus("结束");
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			WorkProcessHistory wph=new WorkProcessHistory();
+			String id=UUID.randomUUID().toString().replace("-", "");
+			wph.setId(id);
+			wph.setOperatorId(currentUser.getAccount());
+			wph.setOperatorName(currentUser.getName());
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setProcessId(workProcessApply.getId());
+			wph.setRelatedId(workProcessApply.getRelatedId());
+			wph.setRelatedName(workProcessApply.getRelatedName());
+			wph.setOperatorNode("结束");
+			wph.setCreateTime(new Date());
+			wph.setOperatorTime(new Date());
+			workProcessHistoryService.insertSelective(wph);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	
+}

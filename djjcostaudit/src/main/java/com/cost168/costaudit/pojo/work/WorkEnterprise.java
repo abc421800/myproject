@@ -1,0 +1,216 @@
+package com.cost168.costaudit.pojo.work;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class WorkEnterprise {
+    private String id;
+
+    private String name;//企业名称
+
+    private String type;//企业类型
+
+    private String personLiable;//联系人
+
+    private String address;//地址
+
+    private String phone;//手机
+
+    private String telephone;//固话
+
+    private String fax;//传真
+
+    private String email;//邮箱
+
+    private Date serviceStart;//服务开始时间
+    private String serviceStartStr;
+
+    private Date serviceEnd;//服务结束时间
+    private String serviceEndStr;
+
+    private String effectiveFlag;//是否有效
+
+    private Integer sendPerson;//累积派出驻场人数
+
+    private Integer sendPersonEffective;//累计派出驻场有效人数
+
+    private String creater;//创建人
+
+    private Date createTime;//创建时间
+
+    private String remark;//备注
+    
+    private String deleteFlag;//是否删除
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type == null ? null : type.trim();
+    }
+
+    public String getPersonLiable() {
+        return personLiable;
+    }
+
+    public void setPersonLiable(String personLiable) {
+        this.personLiable = personLiable == null ? null : personLiable.trim();
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address == null ? null : address.trim();
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone == null ? null : phone.trim();
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone == null ? null : telephone.trim();
+    }
+
+    public String getFax() {
+        return fax;
+    }
+
+    public void setFax(String fax) {
+        this.fax = fax == null ? null : fax.trim();
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email == null ? null : email.trim();
+    }
+
+    public Date getServiceStart() {
+        return serviceStart;
+    }
+
+    public void setServiceStart(Date serviceStart) {
+        this.serviceStart = serviceStart;
+    }
+
+    public Date getServiceEnd() {
+        return serviceEnd;
+    }
+
+    public void setServiceEnd(Date serviceEnd) {
+        this.serviceEnd = serviceEnd;
+    }
+
+    public String getEffectiveFlag() {
+        return effectiveFlag;
+    }
+
+    public void setEffectiveFlag(String effectiveFlag) {
+        this.effectiveFlag = effectiveFlag == null ? null : effectiveFlag.trim();
+    }
+
+    public Integer getSendPerson() {
+        return sendPerson;
+    }
+
+    public void setSendPerson(Integer sendPerson) {
+        this.sendPerson = sendPerson;
+    }
+
+    public Integer getSendPersonEffective() {
+        return sendPersonEffective;
+    }
+
+    public void setSendPersonEffective(Integer sendPersonEffective) {
+        this.sendPersonEffective = sendPersonEffective;
+    }
+
+    public String getCreater() {
+        return creater;
+    }
+
+    public void setCreater(String creater) {
+        this.creater = creater == null ? null : creater.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+
+	public String getServiceStartStr() {
+		if(serviceStart==null){
+			return serviceStartStr;
+		}else{
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String dateString = formatter.format(serviceStart);
+			return dateString;
+		}
+	}
+
+	public void setServiceStartStr(String serviceStartStr) {
+		this.serviceStartStr = serviceStartStr;
+	}
+
+	public String getServiceEndStr() {
+		if(serviceEnd==null){
+			return serviceEndStr;
+		}else{
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String dateString = formatter.format(serviceEnd);
+			return dateString;
+		}
+	}
+
+	public void setServiceEndStr(String serviceEndStr) {
+		this.serviceEndStr = serviceEndStr;
+	}
+
+	public String getDeleteFlag() {
+		return deleteFlag;
+	}
+
+	public void setDeleteFlag(String deleteFlag) {
+		this.deleteFlag = deleteFlag;
+	}
+}

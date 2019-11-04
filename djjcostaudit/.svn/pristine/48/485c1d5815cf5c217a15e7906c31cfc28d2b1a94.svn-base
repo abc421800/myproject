@@ -1,0 +1,18 @@
+log4j.rootLogger=DEBUG,console,File,fileAppender,DailyRollingFileAppender,RollingFileAppender
+### \u663E\u793Asql\u8BED\u53E5 ###
+log4j.logger.org.mybatis = DEBUG
+### \u914D\u7F6E\u8F93\u51FA\u5230\u63A7\u5236\u53F0 ###
+log4j.appender.console =org.apache.log4j.ConsoleAppender
+log4j.appender.console.Target = System.out
+log4j.appender.console.layout=org.apache.log4j.PatternLayout
+log4j.appender.console.layout.ConversionPattern=%-d{yyyy-MM-dd HH:mm:ss,SSS} [%t] [%c]-[%p] %m%n
+### \u914D\u7F6E\u8F93\u51FA\u5230\u6587\u4EF6 ###
+log4j.appender.fileAppender = org.apache.log4j.FileAppender
+log4j.appender.fileAppender.File = E:\\gzdjj_logs/logs_tomcat.log
+log4j.appender.fileAppender.Append = true
+log4j.appender.fileAppender.Threshold = DEBUG
+log4j.appender.fileAppender.layout = org.apache.log4j.PatternLayout
+log4j.appender.fileAppender.layout.ConversionPattern = %-d{yyyy-MM-dd HH:mm:ss}  [ %t:%r ] - [ %p ]  %m%n
+
+
+

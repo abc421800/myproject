@@ -1,0 +1,283 @@
+package com.cost168.costaudit.controller.work;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.pojo.work.vo.WorkRegisterVo;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.JsonUtils;
+/**
+ * 
+ * ClassName: WorkRegisterController 
+ * @Description: TODO
+ * @author lixiang
+ */
+@Controller
+@RequestMapping("/workRegister")
+public class WorkRegisterController {
+	
+	
+	@Autowired
+	private WorkRegisterService workRegisterService;
+	@Autowired
+	private WorkPersonService workPersonService;
+	@Autowired
+	private WorkEnterpriseService workEnterpriseService;
+	
+	
+	@RequestMapping("/tolist")
+	public String toRegister(HttpServletRequest request){
+		Map<String,Object> map=new HashMap<String, Object>();
+		String year=workRegisterService.selectYearList();
+		String month=workRegisterService.selectMonthList();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		String currentDate= sdf.format(new Date());
+		String regYear=currentDate.substring(0,4);
+		String regMonth=currentDate.substring(5,7).replace("0", "");
+		//String regMonth="6";
+		map.put("regYear", regYear);
+		map.put("regMonth", regMonth);
+		List<WorkRegister> wrList= workRegisterService.selectByDay(map);
+		if(null==wrList || wrList.size()<=0 ){
+			//每个人的账号下插入一条一号的考勤记录
+			List<WorkPerson> wpList=workPersonService.selectListByMap(null);
+			if(null!=wpList&&wpList.size()>0){
+				WorkRegister register=null;
+				for(WorkPerson wp:wpList ){
+					register=new WorkRegister();
+					String id=UUID.randomUUID().toString().replace("-", "");
+					register.setId(id);
+					register.setPersonId(wp.getAccount());
+					register.setEnterpriseId(wp.getEnterpriseId());
+					register.setRegYearMonth(regYear+regMonth);
+					register.setRegYear(regYear);
+					register.setRegMonth(regMonth);
+					register.setRegDay("1");
+					register.setCreateTime(new Date());
+					workRegisterService.insertSelective(register);
+					System.out.println("插入");
+				}
+			}
+			
+		}
+		request.setAttribute("year", year);
+		request.setAttribute("month", month);
+		request.setAttribute("currentYear", regYear);
+		request.setAttribute("currentMonth", regMonth);
+		return "/register/list";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,WorkRegisterVo workRegisterVo, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> selectMap=JsonUtils.object2Map(workRegisterVo);
+		Map<String,Object> map=new HashMap<String,Object>();
+		map.putAll(selectMap);
+		try {
+		    List<WorkRegisterVo> list= workRegisterService.selectListByMap(map);
+		    int total= workRegisterService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toRegisterDialog")
+	public String toRegisterDialog(HttpServletRequest request){
+		String personId=request.getParameter("personId");
+		WorkPerson workPerson =workPersonService.selectByPrimaryKey(personId);
+		if(null!=workPerson){
+			WorkEnterprise workEnterprise =	workEnterpriseService.selectByPrimaryKey(workPerson.getEnterpriseId());
+			if(null!=workEnterprise){
+				workPerson.setEnterpriseId(workEnterprise.getId());
+				workPerson.setEnterpriseName(workEnterprise.getName());
+			}
+			request.setAttribute("obj", workPerson);
+		}
+		return "register/registerDialog";
+	}
+
+	@RequestMapping("/toRegisterBatchDialog")
+	public String toRegisterBatchDialog(HttpServletRequest request){
+		String personIds=request.getParameter("personIds");
+		String arrIds[]=personIds.split(",");
+		List<WorkPerson> wpList =new ArrayList<WorkPerson>();
+		WorkPerson wp=null;
+		for(String id:arrIds){
+			wp=workPersonService.selectByPrimaryKey(id);
+			wpList.add(wp);
+		}
+		request.setAttribute("objList", wpList);
+		return "register/registerBatchDialog";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,WorkRegister workRegister){
+		GlobalResult result=new GlobalResult();
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		try {
+			 String registerTimeStr= workRegister.getRegisterTimeStr();
+			 Map<String,Object> map=new HashMap<String,Object>();
+			 String regYear=registerTimeStr.substring(0,4);
+			 String regMonth=registerTimeStr.substring(5,7).replace("0", "");
+			 String regDay=registerTimeStr.substring(8,10).replace("0", "");
+			 String yearMonth=regYear+regMonth;
+			 String morning=workRegister.getMorning();
+			 String afternoon=workRegister.getAfternoon();
+			 float  workingDay=0;
+			 if("上班".equals(morning)&&"上班".equals(afternoon)){
+				  workingDay=1;
+			 }else if("上班".equals(morning)||"上班".equals(afternoon)){
+				  workingDay=0.5f;
+			 }else{
+				  workingDay=0;
+			 }
+			 map.put("personId", workRegister.getPersonId());
+			 map.put("regYear", regYear);
+			 map.put("regMonth",regMonth);
+			 map.put("regDay", regDay);
+			 List<WorkRegister> registerList = workRegisterService.selectByDay(map);
+			 WorkRegister register=null;
+			 SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			 if(null!=registerList&& registerList.size()>0){
+				 register=registerList.get(0);
+				 register.setMorning(workRegister.getMorning());
+				 register.setAfternoon(workRegister.getAfternoon());
+				 register.setCreater(currentUser.getName());
+				 register.setRemark(workRegister.getRemark());
+				 workRegisterService.updateByPrimaryKeySelective(register);
+			 }else{
+				 register=new WorkRegister();
+				 String id=UUID.randomUUID().toString().replace("-", "");
+				 register.setId(id);
+				 register.setPersonId(workRegister.getPersonId());
+				 register.setEnterpriseId(workRegister.getEnterpriseId());
+				 register.setRegYearMonth(yearMonth);
+				 register.setRegYear(regYear);
+				 register.setRegMonth(regMonth);
+				 register.setRegDay(regDay);
+				 register.setMorning(workRegister.getMorning());
+				 register.setAfternoon(workRegister.getAfternoon());
+				 register.setWorkingDay(workingDay);
+				 register.setCreateTime(new Date());
+				 register.setCreater(currentUser.getName());
+				 register.setRemark(workRegister.getRemark());
+				 register.setRegisterTime(sdf.parse(registerTimeStr));
+				 workRegisterService.insertSelective(register);
+			 }
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/batchSave")
+	public GlobalResult batchSave(HttpServletRequest request,WorkRegister workRegister){
+		GlobalResult result=new GlobalResult();
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		String personIds=workRegister.getPersonId();
+		try {
+			 String registerTimeStr= workRegister.getRegisterTimeStr();
+			 Map<String,Object> map=new HashMap<String,Object>();
+			 String regYear=registerTimeStr.substring(0,4);
+			 String regMonth=registerTimeStr.substring(5,7).replace("0", "");
+			 String regDay=registerTimeStr.substring(8,10).replace("0", "");
+			 String yearMonth=regYear+regMonth;
+			 String morning=workRegister.getMorning();
+			 String afternoon=workRegister.getAfternoon();
+			 float  workingDay=0;
+			 if("上班".equals(morning)&&"上班".equals(afternoon)){
+				  workingDay=1;
+			 }else if("上班".equals(morning)||"上班".equals(afternoon)){
+				  workingDay=0.5f;
+			 }else{
+				  workingDay=0;
+			 }
+			 
+			 String arrIds[]=personIds.split(",");
+			 List<WorkPerson> wpList =new ArrayList<WorkPerson>();
+			 WorkPerson wp=null;
+			 for(String id:arrIds){
+				wp=workPersonService.selectByPrimaryKey(id);
+				wpList.add(wp);
+			 }
+			 for(WorkPerson p:wpList){
+				 map.put("personId", p.getAccount());
+				 map.put("regYear", regYear);
+				 map.put("regMonth",regMonth);
+				 map.put("regDay", regDay);
+				 List<WorkRegister> registerList = workRegisterService.selectByDay(map);
+				 WorkRegister register=null;
+				 SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+				 if(null!=registerList&& registerList.size()>0){
+					 register=registerList.get(0);
+					 register.setMorning(workRegister.getMorning());
+					 register.setAfternoon(workRegister.getAfternoon());
+					 register.setCreater(currentUser.getName());
+					 register.setRemark(workRegister.getRemark());
+					 workRegisterService.updateByPrimaryKeySelective(register);
+				 }else{
+					 register=new WorkRegister();
+					 String id=UUID.randomUUID().toString().replace("-", "");
+					 register.setId(id);
+					 register.setPersonId(p.getAccount());
+					 register.setEnterpriseId(p.getEnterpriseId());
+					 register.setRegYearMonth(yearMonth);
+					 register.setRegYear(regYear);
+					 register.setRegMonth(regMonth);
+					 register.setRegDay(regDay);
+					 register.setMorning(workRegister.getMorning());
+					 register.setAfternoon(workRegister.getAfternoon());
+					 register.setWorkingDay(workingDay);
+					 register.setCreateTime(new Date());
+					 register.setCreater(currentUser.getName());
+					 register.setRemark(workRegister.getRemark());
+					 register.setRegisterTime(sdf.parse(registerTimeStr));
+					 workRegisterService.insertSelective(register);
+				 }
+			 }
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toPersonEdit")
+	public String toPersonEdit(HttpServletRequest request){
+		String id=request.getParameter("id");
+		WorkPerson workPerson =workPersonService.selectByPrimaryKey(id);
+		WorkEnterprise workEnterprise=workEnterpriseService.selectByPrimaryKey(workPerson.getEnterpriseId());
+		workPerson.setEnterpriseName(workEnterprise.getName());
+		request.setAttribute("obj", workPerson);
+		return "/register/personEdit";
+	}
+	
+}

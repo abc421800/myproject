@@ -1,0 +1,70 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>系统设置</title>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/pagecommon/base.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/icon.css">
+    <!-- 弹出框内容样-->
+    <%--<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/home/index.css">--%>
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/sys/setting/index.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/sys/setting/setting.css">
+	<script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/jquery.min.js"></script>
+    <script src="${pageContext.request.contextPath}/res/js/home/bootstrap.min.js"></script>
+    <!-- Slimscroll JS -->
+    <script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/jquery.easyui.min.js"></script>
+    <script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/locale/easyui-lang-zh_CN.js"></script>
+    <script src="${pageContext.request.contextPath}/res/js/home/layout.js"></script>
+    <!-- Common JS -->
+	<script src="${pageContext.request.contextPath}/res/js/sys/setting.js"></script>
+	
+</head>
+<body class="easyui-layout" id="main-layout">
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+<div data-options="region:'west',hideCollapsedContent:true,split:true,title:'菜单'" style="width:204px;">
+    <div class="left-menu">
+        <dl>
+            <dd onclick="addTabGrid('个人中心', '/sysUser/personCenter');" class="active"><span>个人中心</span></dd>
+            <dd onclick="addTabGrid('修改密码', 'forward_sys_changePassword');"><span>修改密码</span></dd>
+            <shiro:hasPermission name="security">
+            <shiro:hasPermission name="user:list">
+            <dd onclick="addTabGrid('用户列表', '/forward_sys_userList');"><span>用户列表</span></dd>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="org:list">
+            <dd onclick="addTabGrid('部门列表', '/forward_sys_orgList');"><span>部门列表</span></dd>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="role:list">
+            <dd onclick="addTabGrid('角色列表', '/forward_sys_roleList');"><span>角色列表</span></dd>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="per:list">
+            <dd onclick="addTabGrid('菜单列表', '/forward_sys_permissionList');"><span>菜单列表</span></dd>
+            </shiro:hasPermission>
+            </shiro:hasPermission>
+            <shiro:hasPermission name="calendarSetting">
+            <dd onclick="addTabGrid('日历设置', '/forward_calendarSetting_list');"><span>日历设置</span></dd>
+        	</shiro:hasPermission>
+        </dl>
+    </div>
+</div>
+<div data-options="region:'center',border:0" id="center" >
+    <div id="hualian_layout_center_tab_container" class="easyui-tabs1"  data-options="tabHeight:39,fitColumns: true, fit:true,plain:false" >
+        <div id="homePanel" data-options="title: '个人中心', iconCls: ''">
+            <iframe class="page-iframe2" name="iframe" src="/sysUser/personCenter" frameborder="no" border="no" height="100%" width="100%" scrolling="auto">
+            </iframe>
+        </div>
+    </div>
+</div>
+</body>
+</html>

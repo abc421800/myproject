@@ -1,0 +1,63 @@
+package com.cost168.costaudit.service.cost.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.cost.CostProjectStakeholderMapper;
+import com.cost168.costaudit.pojo.cost.CostProjectStakeholder;
+import com.cost168.costaudit.pojo.cost.CostProjectStakeholderExample;
+import com.cost168.costaudit.service.cost.CostProjectStakeholderService;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class CostProjectStakeholderServiceImpl implements CostProjectStakeholderService{
+	@Autowired
+	private CostProjectStakeholderMapper costProjectStakeholderMapper;
+
+	@Override
+	public List<CostProjectStakeholder> selectByExample(
+			CostProjectStakeholderExample example) {
+		return costProjectStakeholderMapper.selectByExample(example);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return costProjectStakeholderMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(CostProjectStakeholder record) {
+		return costProjectStakeholderMapper.insertSelective(record);
+	}
+
+	@Override
+	public CostProjectStakeholder selectByPrimaryKey(String id) {
+		return costProjectStakeholderMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(CostProjectStakeholder record) {
+		return costProjectStakeholderMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public List<CostProjectStakeholder> getListByProj(Map<String, Object> map) {
+		return costProjectStakeholderMapper.getListByProj(map);
+	}
+
+	@Override
+	public int getCountByProj(Map<String, Object> map) {
+		return costProjectStakeholderMapper.getCountByProj(map);
+	}
+
+	@Override
+	public List<CostProjectStakeholder> getListByName(Map<String, Object> map) {
+		// TODO Auto-generated method stub
+		return costProjectStakeholderMapper.getListByName(map);
+	}
+
+}

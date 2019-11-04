@@ -1,0 +1,199 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('fonts/icomoon.eot?nqhe5r');
+  src:  url('fonts/icomoon.eot?nqhe5r#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?nqhe5r') format('truetype'),
+    url('fonts/icomoon.woff?nqhe5r') format('woff'),
+    url('fonts/icomoon.svg?nqhe5r#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-record:before {
+  content: "\e92f";
+}
+.icon-attendance:before {
+  content: "\e930";
+}
+.icon-proTaizhang:before {
+  content: "\e92e";
+}
+.icon-fushen:before {
+  content: "\e92b";
+}
+.icon-fail:before {
+  content: "\e92c";
+}
+.icon-sucess:before {
+  content: "\e92d";
+}
+.icon-zhuanpai:before {
+  content: "\e92a";
+}
+.icon-collection:before {
+  content: "\e929";
+}
+.icon-con-receipts:before {
+  content: "\e923";
+}
+.icon-data-dic:before {
+  content: "\e920";
+}
+.icon-business-choice:before {
+  content: "\e921";
+}
+.icon-form-manager:before {
+  content: "\e922";
+}
+.icon-edit_new:before {
+  content: "\e802";
+}
+.icon-search1:before {
+  content: "\e800";
+}
+.icon-guiji:before {
+  content: "\e801";
+}
+.icon-hetong:before {
+  content: "\e928";
+}
+.icon-caogao:before {
+  content: "\e924";
+}
+.icon-review:before {
+  content: "\e925";
+}
+.icon-remove1:before {
+  content: "\e926";
+}
+.icon-submit:before {
+  content: "\e927";
+}
+.icon-arrow_drop_down:before {
+  content: "\e5c5";
+}
+.icon-arrow_drop_up:before {
+  content: "\e5c7";
+}
+.icon-check:before {
+  content: "\e5ca";
+}
+.icon-menu:before {
+  content: "\e5d2";
+}
+.icon-sort:before {
+  content: "\e164";
+}
+.icon-chevron-down:before {
+  content: "\e918";
+}
+.icon-chevron-left:before {
+  content: "\e919";
+}
+.icon-pwd:before {
+  content: "\e91c";
+}
+.icon-user:before {
+  content: "\e91d";
+}
+.icon-guide:before {
+  content: "\e91e";
+}
+.icon-tel:before {
+  content: "\e91f";
+}
+.icon-skin:before {
+  content: "\e91a";
+}
+.icon-quit:before {
+  content: "\e91b";
+}
+.icon-shouce:before {
+  content: "\e917";
+}
+.icon-project:before {
+  content: "\e916";
+}
+.icon-more:before {
+  content: "\e914";
+}
+.icon-flow:before {
+  content: "\e913";
+}
+.icon-shenqing:before {
+  content: "\e90a";
+}
+.icon-shenhe:before {
+  content: "\e90b";
+}
+.icon-rules:before {
+  content: "\e90c";
+}
+.icon-tishi:before {
+  content: "\e90d";
+}
+.icon-task:before {
+  content: "\e90e";
+}
+.icon-baobiao:before {
+  content: "\e90f";
+}
+.icon-addition:before {
+  content: "\e915";
+}
+.icon-calendar:before {
+  content: "\e910";
+}
+.icon-tixing:before {
+  content: "\e911";
+  color: #515151;
+}
+.icon-guanli:before {
+  content: "\e912";
+}
+.icon-kefu:before {
+  content: "\e900";
+  color: #666767;
+}
+.icon-total:before {
+  content: "\e901";
+}
+.icon-question:before {
+  content: "\e902";
+}
+.icon-setting:before {
+  content: "\e903";
+}
+.icon-message:before {
+  content: "\e904";
+}
+.icon-business:before {
+  content: "\e905";
+}
+.icon-add-outline:before {
+  content: "\e906";
+}
+.icon-cheveron-right:before {
+  content: "\e907";
+}
+.icon-cheveron-up:before {
+  content: "\e908";
+}
+.icon-minus-outline:before {
+  content: "\e909";
+}

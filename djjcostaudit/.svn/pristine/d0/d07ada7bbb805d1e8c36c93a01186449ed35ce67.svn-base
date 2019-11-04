@@ -1,0 +1,90 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>综合考核</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+</head>
+<body>
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="filter">
+        <div class="form-inline">
+            <div class="form-group">
+                <label>入库企业名称：</label>
+                <input type="text" id="enterpriseName" placeholder="请输入入库企业名称关键字" class="form-control input-sm">
+            </div>
+            <div class="form-group">
+                <label>入库状态：</label>
+                <select class="form-control input-sm" id="rukuStatus" style="width: 100px">
+                    <option value="">请选择</option>
+                    <option value="在库" >在库</option>
+                    <option value="出库" >出库</option>
+                    <option value="暂停" >暂停</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>考核年份：</label>
+                <select class="form-control input-sm" id="year" style="width: 100px" onchange="search()">
+                    <c:forTokens items="${years}" delims="," var="y">
+                        <option <c:if test="${y eq currentYear}"> selected="selected"</c:if> value="${y}">${y}年</option>
+                    </c:forTokens>
+                    <option value="">请选择</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>年度综评：</label>
+                <select class="form-control input-sm" id="assessResult" style="width: 100px">
+                    <option value="">请选择</option>
+                    <option value="第一档">第一档</option>
+                    <option value="第二档">第二档</option>
+                    <option value="不合格">不合格</option>
+                    <option value="未评定">未评定</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>年度摇珠档次：</label>
+                <select class="form-control input-sm" id="yaohaoGrade" style="width: 100px">
+                    <option value="">请选择</option>
+                    <option value="第一档">第一档</option>
+                    <option value="第二档">第二档</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>综合考核时间：</label>
+                <input class="Wdate form-control input-sm" type="text" id="startTime" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+                <label>至</label>
+                <input class="Wdate form-control input-sm" type="text" id="endTime" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+            </div>
+            <div class="form-group">
+                <input type="submit" value="查询" class="btn btn-primary" onclick="search()">&nbsp;
+                <input type="reset" value="重置" class="btn btn btn-success" onclick="refresh()">&nbsp;
+                <input type="button" value="导出" class="btn btn-danger" onclick="exportExcel()">&nbsp;
+            </div>
+        </div>
+    </div>
+    <a href="javascript:void(0);" class="switchBtn"></a>
+</div>
+<div class="row">
+    <table id="comprehensiveAssessment" style="width: 100%;">
+    </table>
+    <div id="tit1">
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="top.addTabGrid('综合考核单登记', '/assess/toEdit?editFlag=n');">添加综考企业</a>
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="deleteHandler()" style="visibility: hidden">删除</a>
+    </div>
+</div>
+<div id="dialogKey" style="background: #f4f8fb"></div>
+<script src="${pageContext.request.contextPath}/res/js/yaohao/assess/comprehensiveAssessment.js"></script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+$(function () {
+    var bool = false;
+    $(".switchBtn").on('click', function () {
+        $(".filter").toggle();
+        if (!bool) {
+            $(this).addClass("active");
+            $('#rockNumberAccounts').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+            bool = true;
+        } else {
+            $(this).removeClass("active");
+            bool = false;
+            $('#rockNumberAccounts').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+    $('#rockNumberAccounts').datagrid({
+        url: '/yaohaoOrder/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        rownumbers: true,
+        height: tableHeight(),
+        fitColumns: true,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 10,
+        singleSelect: false,
+        columns: [
+            [
+                {
+                    field: 'id',
+                    title: '单选框',
+                    checkbox: true
+                }, {
+                    field: 'code',
+                    title: '摇号批次',
+                    width: 160,
+                    align: 'center',
+                    sortable: false,
+                    formatter: function(value, rowData, index) {
+                    	if(rowData.id==undefined){
+                    		return "未找到相关信息！";
+                    	}else{
+                    		 return "<a href=\"javascript:void(0)\" title="+value+" style=\"color:#549de3;padding-left:2px;" +
+                     		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+                     		"max-width: 100%;vertical-align: middle;\" onclick=\"editInfo('"+rowData.enterpriseId+"')\">"+value+"</a>";
+                    	}
+
+                    }
+                }, {
+                    field: 'yaohaoYear',
+                    title: '摇号年份',
+                    width: 100,
+                    align: 'center',
+                    sortable: false,
+                }, {
+                    field: 'yaohaoTimeStr',
+                    title: '摇号日期',
+                    width: 100,
+                    align: 'center',
+                    sortable: false,
+                }, {
+                    field: 'yaohaoGrade',
+                    title: '摇号档次',
+                    width: 80,
+                    align: 'center',
+                    sortable: false
+                }, {
+                    field: 'enterpriseNum',
+                    title: '参加摇号企业数量',
+                    width: 80,
+                    align: 'center',
+                    sortable: false
+                }, {
+                    field: 'winbidNum',
+                    title: '中签企业数量',
+                    width: 80,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'serviceAmountTotalStr',
+                    title: '合计服务金额（元）',
+                    width: 80,
+                    align: 'center',
+                    sortable: false
+                },{
+                    field: 'creater',
+                    title: '登记人',
+                    width: 80,
+                    align: 'center',
+                    sortable: false
+            }]
+        ],
+        toolbar: '#tit1',
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#rockNumberAccounts').datagrid('loadData', {total: 1, rows: [{code: "未找到相关信息！"}]});
+            }
+        }
+    });
+    $(window).resize(function () {
+        if(bool){
+            $('#rockNumberAccounts').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+        }else{
+            $('#rockNumberAccounts').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+
+    });
+
+});
+//添加摇号单登记
+function rockRecord(id) {
+    top.addTabGrid('摇号单登记', 'page/rockNumberAccounts/rockListRecord.html');
+}
+
+function deleteHandler() {
+    var selections = $('#rockNumberAccounts').datagrid('getSelections');
+    if (selections.length == 0) {
+        $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+        return;
+    }
+    $.messager.confirm('提示信息', '确认要删除这' + selections.length + '条记录吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        $.messager.progress();
+        var ids = [];
+        for (var i in selections) {
+            ids[i] = selections[i].id;
+        }
+
+        $.ajax({
+            url: '/ajax/sat/zhzb/remove.do',
+            type: 'POST',
+            data: {'satGeneralZbkIds': ids},
+            traditional: true,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data.success) {
+                    $('#rockNumberAccounts').datagrid('reload');
+                } else if (data.code == 4) {
+                    $.messager.alert('提示信息', '不能删除已发布记录！', 'warn');
+                }
+            }
+        });
+    });
+}
+function searchOrd(){
+	var code = $("#code").val().trim();
+	var yaohaoGrade = $("#yaohaoGrade").val();
+	var yaohaoYear = $("#yaohaoYear").val();
+	var startTime = $("#yaohaoTimeStart").val();
+	var endTime = $("#yaohaoTimeEnd").val();
+    $('#rockNumberAccounts').datagrid({
+		queryParams: {
+			code:code,
+			yaohaoGrade:yaohaoGrade,
+			yaohaoYear:yaohaoYear,
+			startTime:startTime,
+			endTime:endTime
+		}
+	}); 
+}
+function refresh() {
+	var json1={tabTitle:'摇号台账',url:'/forward_yaohao_yaohaoMng_yaohaoList'};
+	window.parent.refreshTab(json1); 
+}
+function editInfo(id) {
+    var href = "/costEnterprise/toEdit?editFlag=y&id="+id;
+    var title = "入库企业修改";
+    top.addTabGrid(title, href);
+}

@@ -1,0 +1,711 @@
+package com.cost168.costaudit.controller.work;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.work.WorkCalendar;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.WorkProcessApply;
+import com.cost168.costaudit.pojo.work.WorkProcessHistory;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.service.sys.SysUserService;
+import com.cost168.costaudit.service.work.WorkCalendarService;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.service.work.WorkProcessApplyService;
+import com.cost168.costaudit.service.work.WorkProcessHistoryService;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.ExcelUtil;
+import com.cost168.costaudit.utils.Global;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.JsonUtils;
+import com.cost168.costaudit.utils.OrderUtil;
+
+
+/**
+ * 
+ * ClassName: WorkProcessApplyController 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-5-30上午10:27:41
+ * @Company  广东华联软件科技有限公司
+ */
+@Controller
+@RequestMapping("/workProcessApply")
+public class WorkProcessApplyController {
+	
+	@Autowired
+	private WorkProcessApplyService workProcessApplyService;
+	@Autowired
+	private WorkProcessHistoryService workProcessHistoryService;
+	@Autowired
+	private WorkPersonService workPersonService;
+	@Autowired
+	private WorkEnterpriseService workEnterpriseService;
+	@Autowired
+	private SysUserService sysUserService;
+	@Autowired
+	private WorkRegisterService workRegisterService;
+	@Autowired
+	private WorkCalendarService workCalendarService;
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,WorkProcessApply workProcessApply, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		try {
+			Map<String,Object> map=new HashMap<String,Object>();
+			String startTime =request.getParameter("startTime");
+			String endTime =request.getParameter("endTime");
+			if(null!=startTime && !"".equals(startTime)){
+				map.put("startTime", startTime+" 00:00:00");
+			}
+			if(null!=endTime && !"".equals(endTime)){
+				map.put("endTime", endTime+" 24:00:00");
+			}
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			//String flag=request.getParameter("flag");
+			Map<String,Object> selectMap=JsonUtils.object2Map(workProcessApply);
+			map.putAll(selectMap);
+			map.put("isPage", true);
+		    map.put("curPage", rows*(page-1));
+		    map.put("pageSize", rows);
+			map.put("personAll", currentUser.getAccount());
+			/*if(flag!=null){
+	  			 if(flag.equals("apply")){
+	  		  	    if(currentUser!=null){
+	  		  	    	map.put("proposer", currentUser.getAccount());
+	  		  	    }
+	  		    }else if(flag.equals("task")){
+	  		    	map.put("nextPerson", currentUser.getAccount());
+	  		    	map.put("status", "审批中");
+	  		    }
+	  		}*/
+		    List<WorkProcessApply> list= workProcessApplyService.selectListByMap(map);
+		    Global.PROCESS_EXPORT_LIST=list;
+		    int total= workProcessApplyService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/recodList")
+	public EUDataGridResult recodList(HttpServletRequest request, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		String id=request.getParameter("id");
+		try {
+			Map<String,Object> map=new HashMap<String, Object>();
+			map.put("processId", id);    
+			List<WorkProcessHistory> wphList= workProcessHistoryService.selectListByMap(map);
+			if(null!=wphList && wphList.size()>0){
+				for(WorkProcessHistory wph:wphList){
+					if(null!=wph.getCreateTime() && null!=wph.getOperatorTime()){
+						  Date d1 = wph.getCreateTime();
+					      Date d2 = wph.getOperatorTime();
+					      long diff = d2.getTime() - d1.getTime();//这样得到的差值是微秒级别
+					      long days = diff / (1000 * 60 * 60 * 24);
+					      long hours = (diff-days*(1000 * 60 * 60 * 24))/(1000* 60 * 60);
+					      long minutes = (diff-days*(1000 * 60 * 60 * 24)-hours*(1000* 60 * 60))/(1000* 60);
+					      System.out.println(""+days+"天"+hours+"小时"+minutes+"分");
+						  wph.setConsumeTime(""+days+"天"+hours+"小时"+minutes+"分");
+					}
+				}
+			}
+			result.setRows(wphList);
+			result.setTotal(wphList.size());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toEdit")
+	public String toEdit(HttpServletRequest request){
+		
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			String url="";
+			String id=request.getParameter("id");
+			if(null!=id && !"".equals(id)) {
+				url="/workProcessApply/upd";
+				WorkProcessApply wp = workProcessApplyService.selectByPrimaryKey(id);
+				request.setAttribute("add_edit", "edit");
+				request.setAttribute("obj", wp);
+			}else{
+				WorkPerson workPerson=workPersonService.selectByAccount(currentUser.getAccount());
+				WorkEnterprise  workEnterprise =workEnterpriseService.selectByPrimaryKey(workPerson.getEnterpriseId());
+				url="/workProcessApply/save";
+				String processId=UUID.randomUUID().toString().replace("-", "");
+				WorkProcessApply wp=new WorkProcessApply();
+				wp.setId(processId);
+				wp.setProposer(currentUser.getAccount());
+				wp.setProposerName(currentUser.getName());
+				String code=OrderUtil.buildOrderId("");
+				wp.setCode(code);
+				if(null!=workEnterprise){
+					wp.setEnterpriseId(workEnterprise.getId());
+					wp.setEnterpriseName(workEnterprise.getName());
+				}
+				request.setAttribute("add_edit", "add");
+				request.setAttribute("obj", wp);
+				request.setAttribute("workPerson", workPerson);
+			}
+			request.setAttribute("url", url);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "processApply/add";
+	}
+
+	@ResponseBody
+	@RequestMapping("/checkPerson")
+	public GlobalResult checkPerson(HttpServletRequest request){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkPerson workPerson=workPersonService.selectByAccount(currentUser.getAccount());
+			if(null!=workPerson){
+				result.setStatus(200);
+			}else{
+				result.setStatus(500);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			String leaveTime=request.getParameter("leaveTime");
+			String start=leaveTime.substring(0, 10); 
+			String end=leaveTime.substring(leaveTime.length()-10, leaveTime.length());
+			String regYear = start.substring(0, 4);
+			WorkPerson wp=workPersonService.selectByAccount(workProcessApply.getProposer());
+			Float total=Float.parseFloat(wp.getAnnualLeaveTotal());
+			Float usedup=Float.parseFloat(wp.getAnnualLeaveUseup());
+			workProcessApply.setLeaveStartTime(sdf.parse(start));
+			workProcessApply.setLeaveEndTime(sdf.parse(end));
+			workProcessApply.setStatus("审批中");
+			workProcessApply.setCreateTime(new Date());
+			String type=workProcessApply.getType();
+			//请假天数
+			String startDay=start.substring(8,10).replace("0", "");
+			String endDay=end.substring(8,10).replace("0", ""); 
+			int s=Integer.parseInt(startDay);
+			int e=Integer.parseInt(endDay);
+			List<String> excepdays=new ArrayList<String>();
+			WorkCalendar wc=workCalendarService.selectByPrimaryKey(regYear);
+			if(null!=wc && null!=wc.getExcepdays()){
+				excepdays=Arrays.asList(wc.getExcepdays().replaceAll(" ","").split(","));
+			}
+			float a=0;
+			for(int i=s;i<=e;i++){
+				String temDate="";
+				if(i<10){
+					temDate=regYear+"-"+start.substring(5,7)+"-0"+i+"";
+				}else{
+					temDate=regYear+"-"+start.substring(5,7)+"-"+i+"";
+				}
+				if(!excepdays.contains(temDate)){
+					a++;
+				}
+			}
+			workProcessApply.setLeaveDays(a);
+			//判断是否有可休年假
+			if("年休假".equals(type)){
+				Float ky=total-usedup;
+				//long days=OrderUtil.getDaySub(start,end);
+				if(a>ky){
+					result.setStatus(300);
+				}else{
+					workProcessApplyService.insertSelective(workProcessApply);
+					saveHistory(workProcessApply, currentUser);
+					result.setStatus(200);
+				}
+			}else{
+				workProcessApplyService.insertSelective(workProcessApply);
+				//插入历史表
+				saveHistory(workProcessApply, currentUser);
+				result.setStatus(200);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+
+	private void saveHistory(WorkProcessApply workProcessApply,SysUser currentUser) {
+		Calendar calendar = Calendar.getInstance();
+		WorkProcessHistory wph=new WorkProcessHistory();
+		String id=UUID.randomUUID().toString().replace("-", "");
+		wph.setId(id);
+		wph.setOperatorId(currentUser.getAccount());
+		wph.setOperatorName(currentUser.getName());
+		if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+			wph.setOpinion("同意");
+		}else{
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setProcessId(workProcessApply.getId());
+		wph.setRelatedId(workProcessApply.getRelatedId());
+		wph.setRelatedName(workProcessApply.getRelatedName());
+		wph.setOperatorNode("发起");
+		wph.setCreateTime(new Date());
+		calendar.add (Calendar.SECOND, 1);
+		wph.setOperatorTime(new Date());
+		wph.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph);
+		WorkProcessHistory wph2=new WorkProcessHistory();
+		String id2=UUID.randomUUID().toString().replace("-", "");
+		wph2.setId(id2);
+		wph2.setOperatorId(workProcessApply.getNextperson());
+		wph2.setOperatorName(workProcessApply.getNextpersonName());
+		wph2.setProcessId(workProcessApply.getId());
+		wph2.setRelatedId(workProcessApply.getRelatedId());
+		wph2.setRelatedName(workProcessApply.getRelatedName());
+		wph2.setOperatorNode("审批中");
+		wph2.setCreateTime(new Date());
+		calendar.add (Calendar.SECOND, 2);
+		wph2.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph2);
+	}
+	
+	
+	
+	
+	@RequestMapping("/toTaskDetails")
+	public String toTaskDetails(HttpServletRequest request){
+		try {
+			String id=request.getParameter("id");
+			taskDetails(request,id);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "processApply/taskDetails";
+	}
+	
+	@RequestMapping("/toTaskDetailsShow")
+	public String toTaskDetailsShow(HttpServletRequest request){
+		String id=request.getParameter("id");
+		taskDetails(request,id);
+		return "processApply/taskDetailsShow";
+		
+	}
+	
+	@RequestMapping("/toTaskDetailsRelevant")
+	public String toTaskDetailsRelevant(HttpServletRequest request){
+		String id=request.getParameter("id");
+		taskDetails(request,id);
+		return "processApply/taskRelevant";
+		
+	}
+	private void taskDetails(HttpServletRequest request,String id) {
+		WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(id);
+		WorkPerson workPerson=workPersonService.selectByAccount(wp.getProposer());
+		if(null!=workPerson){
+			wp.setProposerName(workPerson.getName());
+			WorkEnterprise  workEnterprise =workEnterpriseService.selectByPrimaryKey(workPerson.getEnterpriseId());
+			if(null!=workEnterprise){
+				wp.setEnterpriseId(workEnterprise.getId());
+				wp.setEnterpriseName(workEnterprise.getName());
+			}
+		}
+		SysUser userSp=sysUserService.getUserByAccount(wp.getNextperson());
+		if(null!=userSp){
+			wp.setNextpersonName(userSp.getName());
+		}
+		SysUser userCy=sysUserService.getUserByAccount(wp.getRelatedId());
+		if(null!=userCy){
+			wp.setRelatedName(userCy.getName());
+		}
+		request.setAttribute("workPerson", workPerson);
+		request.setAttribute("obj", wp);
+	}
+	
+	/**
+	 * 
+	 * @Description: 任务办理、审批
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-5-31下午3:12:00
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/handleTask")
+	public GlobalResult handleTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			wp.setStatus("结束");
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			//更新当前状态时间
+			Map<String,Object> map1=new HashMap<String, Object>();
+			map1.put("processId", workProcessApply.getId());
+			WorkProcessHistory wph=workProcessHistoryService.getCurrentNode(map1);
+			wph.setOperatorNode("结束");
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setOperatorTime(new Date());
+			workProcessHistoryService.updateByPrimaryKeySelective(wph);
+			//插入考勤表
+			String regYear=wp.getLeaveStartTimeStr().substring(0, 4);
+			String regMonth=wp.getLeaveStartTimeStr().substring(5,7).replace("0", "");
+			String yearMonth=regYear+regMonth;
+			String leaveStart=wp.getLeaveStartTimeStr();
+			String leaveEnd=wp.getLeaveEndTimeStr();
+			//long days=OrderUtil.getDaySub(leaveStart,leaveEnd);
+			String startDay=leaveStart.substring(8,10).replace("0", "");
+			String endDay=leaveEnd.substring(8,10).replace("0", ""); 
+			int s=Integer.parseInt(startDay);
+			int e=Integer.parseInt(endDay);
+			Map<String,Object> map=new HashMap<String, Object>();
+			List<String> excepdays=new ArrayList<String>();
+			WorkCalendar wc=workCalendarService.selectByPrimaryKey(regYear);
+			WorkPerson wps= workPersonService.selectByAccount(wp.getProposer());
+			if(null!=wc && null!=wc.getExcepdays()){
+				excepdays=Arrays.asList(wc.getExcepdays().replaceAll(" ","").split(","));
+			}
+			for(int i=s;i<=e;i++){
+				map.clear();
+				map.put("personId", wp.getProposer());
+				map.put("regYear", regYear);
+				map.put("regMonth",regMonth);
+				map.put("regDay", i);
+				List<WorkRegister> registerList = workRegisterService.selectByDay(map);
+				WorkRegister register=null;
+				String temDate="";
+				if(i<10){
+					temDate=regYear+"-"+leaveStart.substring(5,7)+"-0"+i+"";
+				}else{
+					temDate=regYear+"-"+leaveStart.substring(5,7)+"-"+i+"";
+				}
+				if(null!=registerList&& registerList.size()>0){
+					 	register=registerList.get(0);
+						if(excepdays.contains(temDate)){
+    						
+    					}else{
+						 	if("年休假".equals(wp.getType())){
+							 	if(!"年休假".equals(register.getMorning())){
+							 		wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup())+0.5)+"");
+	    						}
+	    					}else{
+	    						if("年休假".equals(register.getMorning())){
+	    							wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup())-0.5)+"");
+	    						}
+	    					}
+	    					if("年休假".equals(wp.getType())){
+	    						if(!"年休假".equals(register.getAfternoon())){
+	    							wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup())+0.5)+"");
+	    						}
+	    					}else{
+	    						if("年休假".equals(register.getAfternoon())){
+	    							wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup())-0.5)+"");
+	    						}
+	    					}
+	    					String morAftAll= wp.getMorAftAll();
+		   					if("全天".equals(morAftAll)){
+		   						 register.setMorning(wp.getType());
+		   						 register.setAfternoon(wp.getType());
+		   						 register.setWorkingDay(1.0f);
+		   					}else if("上午".equals(morAftAll)){
+		   						 register.setMorning(wp.getType());
+		   						 register.setWorkingDay(0.5f);
+		   					}else if("下午".equals(morAftAll)){
+		   						 register.setAfternoon(wp.getType());
+		   						 register.setWorkingDay(0.5f);
+		   					}
+	    			 }
+					 register.setCreater(currentUser.getName());
+					 register.setRemark(wp.getRemark());
+					 register.setLeaveprocess(wp.getId());
+					 workRegisterService.updateByPrimaryKeySelective(register);
+					 workPersonService.updateByPrimaryKeySelective(wps);
+				 }else{
+					 register=new WorkRegister();
+					 String id1=UUID.randomUUID().toString().replace("-", "");
+					 register.setId(id1);
+					 register.setPersonId(wp.getProposer());
+					 register.setEnterpriseId(wp.getEnterpriseId());
+					 register.setRegYearMonth(yearMonth);
+					 register.setRegYear(regYear);
+					 register.setRegMonth(regMonth);
+					 register.setRegDay(i+"");
+					 String morAftAll= wp.getMorAftAll();
+					 if("全天".equals(morAftAll)){
+						 register.setMorning(wp.getType());
+						 register.setAfternoon(wp.getType());
+						 register.setWorkingDay(1.0f);
+					 }else if("上午".equals(morAftAll)){
+						 register.setMorning(wp.getType());
+						 register.setWorkingDay(0.5f);
+					 }else if("下午".equals(morAftAll)){
+						 register.setAfternoon(wp.getType());
+						 register.setWorkingDay(0.5f);
+					 }
+					 register.setCreateTime(new Date());
+					 register.setCreater(currentUser.getName());
+					 register.setRemark(wp.getRemark());
+					 register.setLeaveprocess(wp.getId());
+					 register.setRegisterTime(new Date());
+					 workRegisterService.insertSelective(register);
+					 if("年休假".equals(register.getMorning())){
+						 wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup())+0.5)+"");
+					 }
+					 if("年休假".equals(register.getAfternoon())){
+						wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup())+0.5)+"");
+					 }
+					 workPersonService.updateByPrimaryKeySelective(wps);
+				 }
+			}
+		
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	/**
+	 * 
+	 * @Description: 驳回任务再次提交
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-6-3上午11:54:12
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/relevantHandleTask")
+	public GlobalResult relevantHandleTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			Calendar calendar = Calendar.getInstance();
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			String leaveTime=request.getParameter("leaveTime");
+			String start=leaveTime.substring(0, 10);
+			String end=leaveTime.substring(leaveTime.length()-10, leaveTime.length());
+			wp.setLeaveStartTime(sdf.parse(start));
+			wp.setLeaveEndTime(sdf.parse(end));
+			wp.setType(workProcessApply.getType());
+			wp.setStatus("审批中");
+			wp.setContent(workProcessApply.getContent());
+			wp.setMorAftAll(workProcessApply.getMorAftAll());
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			WorkProcessHistory wph=new WorkProcessHistory();
+			String id=UUID.randomUUID().toString().replace("-", "");
+			wph.setId(id);
+			wph.setOperatorId(currentUser.getAccount());
+			wph.setOperatorName(currentUser.getName());
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setProcessId(workProcessApply.getId());
+			wph.setRelatedId(workProcessApply.getRelatedId());
+			wph.setRelatedName(workProcessApply.getRelatedName());
+			wph.setOperatorNode("再次发起");
+			wph.setCreateTime(new Date());
+			wph.setOperatorTime(new Date());
+			calendar.add (Calendar.SECOND, 1);
+			wph.setOrderTime(calendar.getTime());
+			workProcessHistoryService.insertSelective(wph);
+			try{
+				Thread.sleep(2000);
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			WorkProcessHistory wph2=new WorkProcessHistory();
+			String id2=UUID.randomUUID().toString().replace("-", "");
+			wph2.setId(id2);
+			SysUser wps= sysUserService.selectByUserAccount(wp.getNextperson());
+			wph2.setOperatorId(wps.getAccount());
+			wph2.setOperatorName(wps.getName());
+			wph2.setProcessId(workProcessApply.getId());
+			wph2.setRelatedId(workProcessApply.getRelatedId());
+			wph2.setRelatedName(workProcessApply.getRelatedName());
+			wph2.setOperatorNode("审批");
+			wph2.setCreateTime(new Date());
+			calendar.add (Calendar.SECOND,2);
+			wph2.setOrderTime(calendar.getTime());
+			workProcessHistoryService.insertSelective(wph2);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	/**
+	 * 
+	 * @Description: 驳回
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-5-31下午5:31:46
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/rejectTask")
+	public GlobalResult rejectTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			wp.setStatus("驳回");
+			//wp.setNextperson(wp.getProposer());
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			//更新当前状态时间
+			Map<String,Object> map1=new HashMap<String, Object>();
+			map1.put("processId", workProcessApply.getId());
+			WorkProcessHistory wph=workProcessHistoryService.getCurrentNode(map1);
+			wph.setOperatorNode("驳回");
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setOperatorTime(new Date());
+			workProcessHistoryService.updateByPrimaryKeySelective(wph);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @Description: 结束
+	 * @param @param request
+	 * @param @param workProcessApply
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-6-3上午11:34:48
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/endTask")
+	public GlobalResult endTask(HttpServletRequest request,WorkProcessApply workProcessApply){
+		GlobalResult result=new GlobalResult();
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			WorkProcessApply wp=workProcessApplyService.selectByPrimaryKey(workProcessApply.getId());
+			wp.setStatus("结束");
+			workProcessApplyService.updateByPrimaryKeySelective(wp);
+			WorkProcessHistory wph=new WorkProcessHistory();
+			String id=UUID.randomUUID().toString().replace("-", "");
+			wph.setId(id);
+			wph.setOperatorId(currentUser.getAccount());
+			wph.setOperatorName(currentUser.getName());
+			if(null==workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())){
+				wph.setOpinion("同意");
+			}else{
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setProcessId(workProcessApply.getId());
+			wph.setRelatedId(workProcessApply.getRelatedId());
+			wph.setRelatedName(workProcessApply.getRelatedName());
+			wph.setOperatorNode("结束");
+			wph.setCreateTime(new Date());
+			wph.setOperatorTime(new Date());
+			wph.setOrderTime(new Date());
+			workProcessHistoryService.insertSelective(wph);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+    @RequestMapping("/exportWorkProcess")
+    public void exportWorkProcess(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            List<WorkProcessApply> list = Global.PROCESS_EXPORT_LIST;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String dateString = formatter.format(new Date());
+            String path = request.getSession().getServletContext().getRealPath("/template/report/请假申请单.xlsx");
+            String newPath = request.getSession().getServletContext().getRealPath("/template/temp/请假申请单导出_导出日期_" + dateString + ".xlsx");
+            Map<String, List<List<String>>> date = new HashMap<String, List<List<String>>>();
+            List<List<String>> rowList = new ArrayList<List<String>>();
+            List<String> cellList = new ArrayList<String>();
+            for (WorkProcessApply l : list) {
+                cellList = new ArrayList<String>();
+                cellList.add(l.getCode());
+                cellList.add(l.getProposerName());
+                cellList.add(l.getProJob());
+                cellList.add(l.getStatus());
+                cellList.add(l.getProPhone());
+                cellList.add(l.getAnnualLeaveSure());
+                cellList.add(l.getType());
+                cellList.add(l.getLeaveStartTimeStr());
+                cellList.add(l.getLeaveEndTimeStr());
+                long days=0;
+                if(null!=l.getLeaveStartTimeStr()&&null!=l.getLeaveEndTimeStr()){
+                	 days=OrderUtil.getDaySub(l.getLeaveStartTimeStr(),l.getLeaveEndTimeStr());
+                }
+                cellList.add(days+"");
+                cellList.add(l.getCreateTimeStr());
+                cellList.add(l.getNextpersonName());
+                cellList.add(l.getRelatedName());
+                rowList.add(cellList);
+            }
+            date.put("请假单", rowList);
+            ExcelUtil.copyExcel(1, date, path, newPath, request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+	
+}

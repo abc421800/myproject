@@ -1,0 +1,125 @@
+package com.cost168.costaudit.pojo.cost;
+
+import java.math.BigDecimal;
+
+public class CostUnitProject {
+    private String id;
+
+    private Double number;
+
+    private String projectId;
+
+    private BigDecimal subProjectCost;
+
+    private BigDecimal stepItemCost;
+
+    private Long otherProjectFee;
+
+    private Long feesTaxes;
+
+    private Long count;
+
+    private String unitProjectPercen;
+
+    private String coveredArea;
+
+    private String unilateralIndicators;
+
+    private String remark;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public Double getNumber() {
+        return number;
+    }
+
+    public void setNumber(Double number) {
+        this.number = number;
+    }
+
+    public String getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(String projectId) {
+        this.projectId = projectId == null ? null : projectId.trim();
+    }
+
+    public BigDecimal getSubProjectCost() {
+        return subProjectCost;
+    }
+
+    public void setSubProjectCost(BigDecimal subProjectCost) {
+        this.subProjectCost = subProjectCost;
+    }
+
+    public BigDecimal getStepItemCost() {
+        return stepItemCost;
+    }
+
+    public void setStepItemCost(BigDecimal stepItemCost) {
+        this.stepItemCost = stepItemCost;
+    }
+
+    public Long getOtherProjectFee() {
+        return otherProjectFee;
+    }
+
+    public void setOtherProjectFee(Long otherProjectFee) {
+        this.otherProjectFee = otherProjectFee;
+    }
+
+    public Long getFeesTaxes() {
+        return feesTaxes;
+    }
+
+    public void setFeesTaxes(Long feesTaxes) {
+        this.feesTaxes = feesTaxes;
+    }
+
+    public Long getCount() {
+        return count;
+    }
+
+    public void setCount(Long count) {
+        this.count = count;
+    }
+
+    public String getUnitProjectPercen() {
+        return unitProjectPercen;
+    }
+
+    public void setUnitProjectPercen(String unitProjectPercen) {
+        this.unitProjectPercen = unitProjectPercen == null ? null : unitProjectPercen.trim();
+    }
+
+    public String getCoveredArea() {
+        return coveredArea;
+    }
+
+    public void setCoveredArea(String coveredArea) {
+        this.coveredArea = coveredArea == null ? null : coveredArea.trim();
+    }
+
+    public String getUnilateralIndicators() {
+        return unilateralIndicators;
+    }
+
+    public void setUnilateralIndicators(String unilateralIndicators) {
+        this.unilateralIndicators = unilateralIndicators == null ? null : unilateralIndicators.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+}

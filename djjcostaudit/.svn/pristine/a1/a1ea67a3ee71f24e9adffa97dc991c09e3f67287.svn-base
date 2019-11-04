@@ -1,0 +1,957 @@
+package com.cost168.costaudit.pojo.cost;
+
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class CostProject {
+    private String id;
+
+    private String pid;
+
+    private String code;//项目代号
+
+    private String name;//项目名称
+
+    private String projectOwner;//项目业主
+
+    private String personLiableId;//项目责任人
+
+    private String lxpfNumber;//立项批复文号
+
+    private String projectCategoryId;//工程类别
+
+    private String projectClassificationId;//项目分类
+    private String projectClassification;
+
+    private String projectNode;//当前节点
+
+    private String nodeMemo;//节点备注
+
+    private Date nodeTime;//节点控制日期
+    private String nodeTimeStr;//节点控制日期
+
+    private BigDecimal xjGsJe;//项建估算
+
+    private BigDecimal kyGsJe;//可研估算
+
+    private Date planOverTime;//计划竣工日期
+    private String planOverTimeStr;//计划竣工日期
+
+    private String projectManagementAgreement;//项目管理协议书
+
+    private String settlementAgreement;//结算方式约定
+
+    private String settlementReivewMethod;//结算评审方式
+
+    private String projectLocation;//项目所在地
+
+    private String auditPriceUnit;//审价单位（入库企业）
+
+    private String projectIntroduction;//项目简介
+
+    private BigDecimal sumGsJe;//概算金额汇总
+
+    private BigDecimal sumYsJe;//预算金额汇总
+
+    private BigDecimal sumKzjJe;//控制价金额汇总
+
+    private BigDecimal sumHtjJe;//合同价汇总
+
+    private BigDecimal sumBgjJe;//变更价汇总
+
+    private BigDecimal sumJsjJe;//结算价汇总
+    
+    private String description;//备注
+    
+    private String projectOwnerPhone;//项目业主联系方式
+
+    private String creator;//创建人
+
+    private Date creatorTime;//创建时间
+    private String allProcess;//是否全过程项目
+    private BigDecimal xjGsGcf;//项建估算工程费
+
+    private BigDecimal xjGsElfy;//项建估算二类费用
+    private BigDecimal xjGsSlfy;//项建估算三类费用
+
+    private BigDecimal kyGsGcf;//可研估算工程费
+    private BigDecimal kyGsElfy;//可研估算二类费用
+    private BigDecimal kyGsSlfy;//可研估算三类费用
+    private BigDecimal gsGcf;//概算工程费
+    private BigDecimal gsElfy;//概算二类费用
+    private BigDecimal gsSlfy;//概算三类费用
+    private String unit;//单位
+    private String area;//项目所在区
+    private String illustration;//说明
+    private BigDecimal xjGsProjectScale;//项建估算工程规模
+    private BigDecimal xjGsCost;//项建估算单方造价
+    private BigDecimal xjGsArchitectural;//项建估算建筑工程
+    private BigDecimal xjGsInstallation;//项建估算安装工程
+    private BigDecimal xjGsRebar;//项建估算钢筋含量
+    private BigDecimal xjGsConcrete;//项建估算混泥土含量
+    private BigDecimal xjGsTemplate;//项建估算模板含量
+    private BigDecimal xjGsScaffolding;//项建估算脚手架含量
+    private BigDecimal kyGsProjectScale;//可研估算工程规模
+    private BigDecimal kyGsCost;//可研估算单方造价
+    private BigDecimal kyGsArchitectural;//可研估算建筑工程
+    private BigDecimal kyGsInstallation;//可研估算安装工程
+    private BigDecimal kyGsRebar;//可研估算钢筋含量
+    private BigDecimal kyGsConcrete;//可研估算混泥土含量
+    private BigDecimal kyGsTemplate;//可研估算模板含量
+    private BigDecimal kyGsScaffolding;//可研估算脚手架含量
+    private BigDecimal gsProjectScale;//概算工程规模
+    private BigDecimal gsCost;//可研估算单方造价
+    private BigDecimal gsArchitectural;//概算建筑工程
+    private BigDecimal gsInstallation;//概算安装工程
+    private BigDecimal gsRebar;//概算钢筋含量
+    private BigDecimal gsConcrete;//概算混泥土含量
+    private BigDecimal gsTemplate;//概算模板含量
+    private BigDecimal gsScaffolding;//概算脚手架含量
+    private BigDecimal kzjProjectScale;//控制价工程规模
+    private BigDecimal kzjCost;//控制价单方造价
+    private BigDecimal kzjArchitectural;//控制价建筑工程
+    private BigDecimal kzjInstallation;//控制价安装工程
+    private BigDecimal kzjRebar;//控制价钢筋含量
+    private BigDecimal kzjConcrete;//控制价混泥土含量
+    private BigDecimal kzjTemplate;//控制价模板含量
+    private BigDecimal kzjScaffolding;//控制价脚手架含量
+    private BigDecimal htjProjectScale;//合同价工程规模
+    private BigDecimal htjCost;//合同价单方造价
+    private BigDecimal htjArchitectural;//合同价建筑工程
+    private BigDecimal htjInstallation;//合同价安装工程
+    private BigDecimal htjRebar;//合同价钢筋含量
+    private BigDecimal htjConcrete;//合同价混泥土含量
+    private BigDecimal htjTemplate;//合同价模板含量
+    private BigDecimal htjScaffolding;//合同价脚手架含量
+    private BigDecimal sumJyJe;//结余资金=概算金额-合同金额-合同变更金额
+    private BigDecimal sumTzBgJe;//设计变更费：审价任务设计变更图纸金额和
+    
+    private String costUnit;//单方造价单位
+    private String architecturalUnit;//建筑工程单位
+    private String installationUnit;//安装工程单位
+    private String rebarUnit;//钢筋含量单位单位
+    private String concreteUnit;//混泥土含量单位
+    private String templateUnit;//模板含量单位
+    private String scaffoldingUnit;//脚手架含量单位
+    private String outdoorCost; //室外配套项建估算指标
+    private String outdoorKyGs; // 室外可研估算指标
+    private String outdoorGsCost; //概算指标
+
+    public String getOutdoorCost() {
+        return outdoorCost;
+    }
+
+    public void setOutdoorCost(String outdoorCost) {
+        this.outdoorCost = outdoorCost;
+    }
+
+    public String getOutdoorKyGs() {
+        return outdoorKyGs;
+    }
+
+    public void setOutdoorKyGs(String outdoorKyGs) {
+        this.outdoorKyGs = outdoorKyGs;
+    }
+
+    public String getOutdoorGsCost() {
+        return outdoorGsCost;
+    }
+
+    public void setOutdoorGsCost(String outdoorGsCost) {
+        this.outdoorGsCost = outdoorGsCost;
+    }
+
+    //结算台账是否显示标记
+    private String showFlag2;
+
+    public void setShowFlag2(String showFlag2) {
+        this.showFlag2 = showFlag2;
+    }
+
+    public String getShowFlag2() {
+        return showFlag2;
+    }
+
+    public String getProjectNode() {
+		return projectNode;
+	}
+
+	public void setProjectNode(String projectNode) {
+		this.projectNode = projectNode;
+	}
+
+	public String getAllProcess() {
+		return allProcess;
+	}
+
+	public void setAllProcess(String allProcess) {
+		this.allProcess = allProcess;
+	}
+
+	public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid == null ? null : pid.trim();
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code == null ? null : code.trim();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
+
+    public String getProjectOwner() {
+        return projectOwner;
+    }
+
+    public void setProjectOwner(String projectOwner) {
+        this.projectOwner = projectOwner == null ? null : projectOwner.trim();
+    }
+
+    public String getPersonLiableId() {
+        return personLiableId;
+    }
+
+    public void setPersonLiableId(String personLiableId) {
+        this.personLiableId = personLiableId == null ? null : personLiableId.trim();
+    }
+
+    public String getLxpfNumber() {
+        return lxpfNumber;
+    }
+
+    public void setLxpfNumber(String lxpfNumber) {
+        this.lxpfNumber = lxpfNumber == null ? null : lxpfNumber.trim();
+    }
+
+    public String getProjectCategoryId() {
+        return projectCategoryId;
+    }
+
+    public void setProjectCategoryId(String projectCategoryId) {
+        this.projectCategoryId = projectCategoryId == null ? null : projectCategoryId.trim();
+    }
+
+    public String getProjectClassificationId() {
+        return projectClassificationId;
+    }
+
+    public void setProjectClassificationId(String projectClassificationId) {
+        this.projectClassificationId = projectClassificationId == null ? null : projectClassificationId.trim();
+    }
+
+
+    public String getNodeMemo() {
+        return nodeMemo;
+    }
+
+    public void setNodeMemo(String nodeMemo) {
+        this.nodeMemo = nodeMemo == null ? null : nodeMemo.trim();
+    }
+
+    public Date getNodeTime() {
+        return nodeTime;
+    }
+
+    public void setNodeTime(Date nodeTime) {
+        this.nodeTime = nodeTime;
+    }
+
+    public BigDecimal getXjGsJe() {
+        return xjGsJe;
+    }
+
+    public void setXjGsJe(BigDecimal xjGsJe) {
+        this.xjGsJe = xjGsJe;
+    }
+
+    public BigDecimal getKyGsJe() {
+        return kyGsJe;
+    }
+
+    public void setKyGsJe(BigDecimal kyGsJe) {
+        this.kyGsJe = kyGsJe;
+    }
+
+    public Date getPlanOverTime() {
+        return planOverTime;
+    }
+
+    public void setPlanOverTime(Date planOverTime) {
+        this.planOverTime = planOverTime;
+    }
+
+    public String getProjectManagementAgreement() {
+        return projectManagementAgreement;
+    }
+
+    public void setProjectManagementAgreement(String projectManagementAgreement) {
+        this.projectManagementAgreement = projectManagementAgreement == null ? null : projectManagementAgreement.trim();
+    }
+
+    public String getSettlementAgreement() {
+        return settlementAgreement;
+    }
+
+    public void setSettlementAgreement(String settlementAgreement) {
+        this.settlementAgreement = settlementAgreement == null ? null : settlementAgreement.trim();
+    }
+
+    public String getSettlementReivewMethod() {
+        return settlementReivewMethod;
+    }
+
+    public void setSettlementReivewMethod(String settlementReivewMethod) {
+        this.settlementReivewMethod = settlementReivewMethod == null ? null : settlementReivewMethod.trim();
+    }
+
+    public String getProjectLocation() {
+        return projectLocation;
+    }
+
+    public void setProjectLocation(String projectLocation) {
+        this.projectLocation = projectLocation == null ? null : projectLocation.trim();
+    }
+
+    public String getAuditPriceUnit() {
+        return auditPriceUnit;
+    }
+
+    public void setAuditPriceUnit(String auditPriceUnit) {
+        this.auditPriceUnit = auditPriceUnit == null ? null : auditPriceUnit.trim();
+    }
+
+    public String getProjectIntroduction() {
+        return projectIntroduction;
+    }
+
+    public void setProjectIntroduction(String projectIntroduction) {
+        this.projectIntroduction = projectIntroduction == null ? null : projectIntroduction.trim();
+    }
+
+    public BigDecimal getSumGsJe() {
+        return sumGsJe;
+    }
+
+    public void setSumGsJe(BigDecimal sumGsJe) {
+        this.sumGsJe = sumGsJe;
+    }
+
+    public BigDecimal getSumYsJe() {
+        return sumYsJe;
+    }
+
+    public void setSumYsJe(BigDecimal sumYsJe) {
+        this.sumYsJe = sumYsJe;
+    }
+
+    public BigDecimal getSumKzjJe() {
+        return sumKzjJe;
+    }
+
+    public void setSumKzjJe(BigDecimal sumKzjJe) {
+        this.sumKzjJe = sumKzjJe;
+    }
+
+    public BigDecimal getSumHtjJe() {
+        return sumHtjJe;
+    }
+
+    public void setSumHtjJe(BigDecimal sumHtjJe) {
+        this.sumHtjJe = sumHtjJe;
+    }
+
+    public BigDecimal getSumBgjJe() {
+        return sumBgjJe;
+    }
+
+    public void setSumBgjJe(BigDecimal sumBgjJe) {
+        this.sumBgjJe = sumBgjJe;
+    }
+
+    public BigDecimal getSumJsjJe() {
+        return sumJsjJe;
+    }
+
+    public void setSumJsjJe(BigDecimal sumJsjJe) {
+        this.sumJsjJe = sumJsjJe;
+    }
+
+    public String getCreator() {
+        return creator;
+    }
+
+    public void setCreator(String creator) {
+        this.creator = creator == null ? null : creator.trim();
+    }
+
+    public Date getCreatorTime() {
+        return creatorTime;
+    }
+
+    public void setCreatorTime(Date creatorTime) {
+        this.creatorTime = creatorTime;
+    }
+
+
+	public String getNodeTimeStr() {
+		if(nodeTime==null){
+			return nodeTimeStr;
+		}else{
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			String dateString = formatter.format(nodeTime);
+			return dateString;
+		}		
+	}
+
+	public void setNodeTimeStr(String nodeTimeStr) {
+		this.nodeTimeStr = nodeTimeStr;
+	}
+
+	public String getPlanOverTimeStr() {
+		if(planOverTime==null){
+			return planOverTimeStr;
+		}else{
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+			String dateString = formatter.format(planOverTime);
+			return dateString;
+		}	
+	}
+
+	public void setPlanOverTimeStr(String planOverTimeStr) {
+		this.planOverTimeStr = planOverTimeStr;
+	}
+
+	public String getProjectClassification() {
+		return projectClassification;
+	}
+
+	public void setProjectClassification(String projectClassification) {
+		this.projectClassification = projectClassification;
+	}
+
+	public BigDecimal getXjGsGcf() {
+		return xjGsGcf;
+	}
+
+	public void setXjGsGcf(BigDecimal xjGsGcf) {
+		this.xjGsGcf = xjGsGcf;
+	}
+
+	public BigDecimal getXjGsElfy() {
+		return xjGsElfy;
+	}
+
+	public void setXjGsElfy(BigDecimal xjGsElfy) {
+		this.xjGsElfy = xjGsElfy;
+	}
+
+	public BigDecimal getXjGsSlfy() {
+		return xjGsSlfy;
+	}
+
+	public void setXjGsSlfy(BigDecimal xjGsSlfy) {
+		this.xjGsSlfy = xjGsSlfy;
+	}
+
+	public BigDecimal getKyGsGcf() {
+		return kyGsGcf;
+	}
+
+	public void setKyGsGcf(BigDecimal kyGsGcf) {
+		this.kyGsGcf = kyGsGcf;
+	}
+
+	public BigDecimal getKyGsElfy() {
+		return kyGsElfy;
+	}
+
+	public void setKyGsElfy(BigDecimal kyGsElfy) {
+		this.kyGsElfy = kyGsElfy;
+	}
+
+	public BigDecimal getKyGsSlfy() {
+		return kyGsSlfy;
+	}
+
+	public void setKyGsSlfy(BigDecimal kyGsSlfy) {
+		this.kyGsSlfy = kyGsSlfy;
+	}
+
+	public BigDecimal getGsGcf() {
+		return gsGcf;
+	}
+
+	public void setGsGcf(BigDecimal gsGcf) {
+		this.gsGcf = gsGcf;
+	}
+
+	public BigDecimal getGsElfy() {
+		return gsElfy;
+	}
+
+	public void setGsElfy(BigDecimal gsElfy) {
+		this.gsElfy = gsElfy;
+	}
+
+	public BigDecimal getGsSlfy() {
+		return gsSlfy;
+	}
+
+	public void setGsSlfy(BigDecimal gsSlfy) {
+		this.gsSlfy = gsSlfy;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public String getProjectOwnerPhone() {
+		return projectOwnerPhone;
+	}
+
+	public void setProjectOwnerPhone(String projectOwnerPhone) {
+		this.projectOwnerPhone = projectOwnerPhone;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
+	public String getArea() {
+		return area;
+	}
+
+	public void setArea(String area) {
+		this.area = area;
+	}
+
+	public String getIllustration() {
+		return illustration;
+	}
+
+	public void setIllustration(String illustration) {
+		this.illustration = illustration;
+	}
+
+	public BigDecimal getXjGsProjectScale() {
+		return xjGsProjectScale;
+	}
+
+	public void setXjGsProjectScale(BigDecimal xjGsProjectScale) {
+		this.xjGsProjectScale = xjGsProjectScale;
+	}
+
+	public BigDecimal getXjGsCost() {
+		return xjGsCost;
+	}
+
+	public void setXjGsCost(BigDecimal xjGsCost) {
+		this.xjGsCost = xjGsCost;
+	}
+
+	public BigDecimal getXjGsArchitectural() {
+		return xjGsArchitectural;
+	}
+
+	public void setXjGsArchitectural(BigDecimal xjGsArchitectural) {
+		this.xjGsArchitectural = xjGsArchitectural;
+	}
+
+	public BigDecimal getXjGsInstallation() {
+		return xjGsInstallation;
+	}
+
+	public void setXjGsInstallation(BigDecimal xjGsInstallation) {
+		this.xjGsInstallation = xjGsInstallation;
+	}
+
+	public BigDecimal getXjGsRebar() {
+		return xjGsRebar;
+	}
+
+	public void setXjGsRebar(BigDecimal xjGsRebar) {
+		this.xjGsRebar = xjGsRebar;
+	}
+
+	public BigDecimal getXjGsConcrete() {
+		return xjGsConcrete;
+	}
+
+	public void setXjGsConcrete(BigDecimal xjGsConcrete) {
+		this.xjGsConcrete = xjGsConcrete;
+	}
+
+	public BigDecimal getXjGsTemplate() {
+		return xjGsTemplate;
+	}
+
+	public void setXjGsTemplate(BigDecimal xjGsTemplate) {
+		this.xjGsTemplate = xjGsTemplate;
+	}
+
+	public BigDecimal getXjGsScaffolding() {
+		return xjGsScaffolding;
+	}
+
+	public void setXjGsScaffolding(BigDecimal xjGsScaffolding) {
+		this.xjGsScaffolding = xjGsScaffolding;
+	}
+
+	public BigDecimal getKyGsProjectScale() {
+		return kyGsProjectScale;
+	}
+
+	public void setKyGsProjectScale(BigDecimal kyGsProjectScale) {
+		this.kyGsProjectScale = kyGsProjectScale;
+	}
+
+	public BigDecimal getKyGsCost() {
+		return kyGsCost;
+	}
+
+	public void setKyGsCost(BigDecimal kyGsCost) {
+		this.kyGsCost = kyGsCost;
+	}
+
+	public BigDecimal getKyGsArchitectural() {
+		return kyGsArchitectural;
+	}
+
+	public void setKyGsArchitectural(BigDecimal kyGsArchitectural) {
+		this.kyGsArchitectural = kyGsArchitectural;
+	}
+
+	public BigDecimal getKyGsInstallation() {
+		return kyGsInstallation;
+	}
+
+	public void setKyGsInstallation(BigDecimal kyGsInstallation) {
+		this.kyGsInstallation = kyGsInstallation;
+	}
+
+	public BigDecimal getKyGsRebar() {
+		return kyGsRebar;
+	}
+
+	public void setKyGsRebar(BigDecimal kyGsRebar) {
+		this.kyGsRebar = kyGsRebar;
+	}
+
+	public BigDecimal getKyGsConcrete() {
+		return kyGsConcrete;
+	}
+
+	public void setKyGsConcrete(BigDecimal kyGsConcrete) {
+		this.kyGsConcrete = kyGsConcrete;
+	}
+
+	public BigDecimal getKyGsTemplate() {
+		return kyGsTemplate;
+	}
+
+	public void setKyGsTemplate(BigDecimal kyGsTemplate) {
+		this.kyGsTemplate = kyGsTemplate;
+	}
+
+	public BigDecimal getKyGsScaffolding() {
+		return kyGsScaffolding;
+	}
+
+	public void setKyGsScaffolding(BigDecimal kyGsScaffolding) {
+		this.kyGsScaffolding = kyGsScaffolding;
+	}
+
+	public BigDecimal getGsProjectScale() {
+		return gsProjectScale;
+	}
+
+	public void setGsProjectScale(BigDecimal gsProjectScale) {
+		this.gsProjectScale = gsProjectScale;
+	}
+
+	public BigDecimal getGsCost() {
+		return gsCost;
+	}
+
+	public void setGsCost(BigDecimal gsCost) {
+		this.gsCost = gsCost;
+	}
+
+	public BigDecimal getGsArchitectural() {
+		return gsArchitectural;
+	}
+
+	public void setGsArchitectural(BigDecimal gsArchitectural) {
+		this.gsArchitectural = gsArchitectural;
+	}
+
+	public BigDecimal getGsInstallation() {
+		return gsInstallation;
+	}
+
+	public void setGsInstallation(BigDecimal gsInstallation) {
+		this.gsInstallation = gsInstallation;
+	}
+
+	public BigDecimal getGsRebar() {
+		return gsRebar;
+	}
+
+	public void setGsRebar(BigDecimal gsRebar) {
+		this.gsRebar = gsRebar;
+	}
+
+	public BigDecimal getGsConcrete() {
+		return gsConcrete;
+	}
+
+	public void setGsConcrete(BigDecimal gsConcrete) {
+		this.gsConcrete = gsConcrete;
+	}
+
+	public BigDecimal getGsTemplate() {
+		return gsTemplate;
+	}
+
+	public void setGsTemplate(BigDecimal gsTemplate) {
+		this.gsTemplate = gsTemplate;
+	}
+
+	public BigDecimal getGsScaffolding() {
+		return gsScaffolding;
+	}
+
+	public void setGsScaffolding(BigDecimal gsScaffolding) {
+		this.gsScaffolding = gsScaffolding;
+	}
+
+	public BigDecimal getKzjProjectScale() {
+		return kzjProjectScale;
+	}
+
+	public void setKzjProjectScale(BigDecimal kzjProjectScale) {
+		this.kzjProjectScale = kzjProjectScale;
+	}
+
+	public BigDecimal getKzjCost() {
+		return kzjCost;
+	}
+
+	public void setKzjCost(BigDecimal kzjCost) {
+		this.kzjCost = kzjCost;
+	}
+
+	public BigDecimal getKzjArchitectural() {
+		return kzjArchitectural;
+	}
+
+	public void setKzjArchitectural(BigDecimal kzjArchitectural) {
+		this.kzjArchitectural = kzjArchitectural;
+	}
+
+	public BigDecimal getKzjInstallation() {
+		return kzjInstallation;
+	}
+
+	public void setKzjInstallation(BigDecimal kzjInstallation) {
+		this.kzjInstallation = kzjInstallation;
+	}
+
+	public BigDecimal getKzjRebar() {
+		return kzjRebar;
+	}
+
+	public void setKzjRebar(BigDecimal kzjRebar) {
+		this.kzjRebar = kzjRebar;
+	}
+
+	public BigDecimal getKzjConcrete() {
+		return kzjConcrete;
+	}
+
+	public void setKzjConcrete(BigDecimal kzjConcrete) {
+		this.kzjConcrete = kzjConcrete;
+	}
+
+	public BigDecimal getKzjTemplate() {
+		return kzjTemplate;
+	}
+
+	public void setKzjTemplate(BigDecimal kzjTemplate) {
+		this.kzjTemplate = kzjTemplate;
+	}
+
+	public BigDecimal getKzjScaffolding() {
+		return kzjScaffolding;
+	}
+
+	public void setKzjScaffolding(BigDecimal kzjScaffolding) {
+		this.kzjScaffolding = kzjScaffolding;
+	}
+
+	public BigDecimal getHtjProjectScale() {
+		return htjProjectScale;
+	}
+
+	public void setHtjProjectScale(BigDecimal htjProjectScale) {
+		this.htjProjectScale = htjProjectScale;
+	}
+
+	public BigDecimal getHtjCost() {
+		return htjCost;
+	}
+
+	public void setHtjCost(BigDecimal htjCost) {
+		this.htjCost = htjCost;
+	}
+
+	public BigDecimal getHtjArchitectural() {
+		return htjArchitectural;
+	}
+
+	public void setHtjArchitectural(BigDecimal htjArchitectural) {
+		this.htjArchitectural = htjArchitectural;
+	}
+
+	public BigDecimal getHtjInstallation() {
+		return htjInstallation;
+	}
+
+	public void setHtjInstallation(BigDecimal htjInstallation) {
+		this.htjInstallation = htjInstallation;
+	}
+
+	public BigDecimal getHtjConcrete() {
+		return htjConcrete;
+	}
+
+	public void setHtjConcrete(BigDecimal htjConcrete) {
+		this.htjConcrete = htjConcrete;
+	}
+
+	public BigDecimal getHtjTemplate() {
+		return htjTemplate;
+	}
+
+	public void setHtjTemplate(BigDecimal htjTemplate) {
+		this.htjTemplate = htjTemplate;
+	}
+
+	public BigDecimal getHtjScaffolding() {
+		return htjScaffolding;
+	}
+
+	public void setHtjScaffolding(BigDecimal htjScaffolding) {
+		this.htjScaffolding = htjScaffolding;
+	}
+
+	public BigDecimal getHtjRebar() {
+		return htjRebar;
+	}
+
+	public void setHtjRebar(BigDecimal htjRebar) {
+		this.htjRebar = htjRebar;
+	}
+
+	public BigDecimal getSumJyJe() {
+		return sumJyJe;
+	}
+
+	public void setSumJyJe(BigDecimal sumJyJe) {
+		this.sumJyJe = sumJyJe;
+	}
+
+	public BigDecimal getSumTzBgJe() {
+		return sumTzBgJe;
+	}
+
+	public void setSumTzBgJe(BigDecimal sumTzBgJe) {
+		this.sumTzBgJe = sumTzBgJe;
+	}
+
+	public String getCostUnit() {
+		return costUnit;
+	}
+
+	public void setCostUnit(String costUnit) {
+		this.costUnit = costUnit;
+	}
+
+	public String getArchitecturalUnit() {
+		return architecturalUnit;
+	}
+
+	public void setArchitecturalUnit(String architecturalUnit) {
+		this.architecturalUnit = architecturalUnit;
+	}
+
+	public String getInstallationUnit() {
+		return installationUnit;
+	}
+
+	public void setInstallationUnit(String installationUnit) {
+		this.installationUnit = installationUnit;
+	}
+
+	public String getRebarUnit() {
+		return rebarUnit;
+	}
+
+	public void setRebarUnit(String rebarUnit) {
+		this.rebarUnit = rebarUnit;
+	}
+
+	public String getConcreteUnit() {
+		return concreteUnit;
+	}
+
+	public void setConcreteUnit(String concreteUnit) {
+		this.concreteUnit = concreteUnit;
+	}
+
+	public String getTemplateUnit() {
+		return templateUnit;
+	}
+
+	public void setTemplateUnit(String templateUnit) {
+		this.templateUnit = templateUnit;
+	}
+
+	public String getScaffoldingUnit() {
+		return scaffoldingUnit;
+	}
+
+	public void setScaffoldingUnit(String scaffoldingUnit) {
+		this.scaffoldingUnit = scaffoldingUnit;
+	}
+}

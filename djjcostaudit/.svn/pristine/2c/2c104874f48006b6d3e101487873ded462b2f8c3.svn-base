@@ -1,0 +1,1168 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.cost.CostTaskMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.cost.CostTask" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="document_id" property="documentId" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="contract_id" property="contractId" jdbcType="VARCHAR" />
+    <result column="contract_cong_id" property="contractCongId" jdbcType="VARCHAR" />
+    <result column="contract_name" property="contractName" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="audit_price_type" property="auditPriceType" jdbcType="VARCHAR" />
+    <result column="audit_price_typecn" property="auditPriceTypecn" jdbcType="VARCHAR" />
+    <result column="contract_amount" property="contractAmount" jdbcType="DECIMAL" />
+    <result column="give_amount" property="giveAmount" jdbcType="DECIMAL" />
+    <result column="my_audit_amount" property="myAuditAmount" jdbcType="DECIMAL" />
+    <result column="agency_audit_amount" property="agencyAuditAmount" jdbcType="DECIMAL" />
+    <result column="decide_amount" property="decideAmount" jdbcType="DECIMAL" />
+    <result column="finalize_number" property="finalizeNumber" jdbcType="VARCHAR" />
+    <result column="delivery_flag" property="deliveryFlag" jdbcType="VARCHAR" />
+    <result column="entrust_number" property="entrustNumber" jdbcType="VARCHAR" />
+    <result column="audit_price_unit" property="auditPriceUnit" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="person_liable" property="personLiable" jdbcType="VARCHAR" />
+    <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
+    <result column="receive_time" property="receiveTime" jdbcType="TIMESTAMP" />
+    <result column="decide_time" property="decideTime" jdbcType="TIMESTAMP" />
+    <result column="progress_description" property="progressDescription" jdbcType="VARCHAR" />
+    <result column="give_number" property="giveNumber" jdbcType="INTEGER" />
+    <result column="audit_number" property="auditNumber" jdbcType="INTEGER" />
+    <result column="inline_number" property="inlineNumber" jdbcType="VARCHAR" />
+    <result column="agency_unit" property="agencyUnit" jdbcType="VARCHAR" />
+    <result column="coordinate_flag" property="coordinateFlag" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="gcf_amount" property="gcfAmount" jdbcType="DECIMAL" />
+    <result column="elfy_amount" property="elfyAmount" jdbcType="DECIMAL" />
+    <result column="slfy_amount" property="slfyAmount" jdbcType="DECIMAL" />
+    <result column="check_explain" property="checkExplain" jdbcType="VARCHAR" />
+    <result column="review_reportn" property="reviewReportn" jdbcType="VARCHAR" />
+    <result column="umber" property="umber" jdbcType="VARCHAR" />
+    <result column="whereabouts" property="whereabouts" jdbcType="VARCHAR" />
+    <result column="retrial" property="retrial" jdbcType="VARCHAR" />
+    <result column="taskEndTime" property="taskEndTime" jdbcType="TIMESTAMP" />
+    <result column="acceptanceTime" property="acceptanceTime" jdbcType="TIMESTAMP" />
+    <result column="financial" property="financial" jdbcType="VARCHAR" />
+    <result column="submissionTime" property="submissionTime" jdbcType="TIMESTAMP" />
+    <result column="fixedFinancial" property="fixedFinancial" jdbcType="VARCHAR" />
+    <result column="approval" property="approval" jdbcType="VARCHAR" />
+    <result column="deliveryTime" property="deliveryTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, document_id, project_id, project_name, contract_id,contract_cong_id, contract_name, code, name, 
+    audit_price_type, audit_price_typecn, contract_amount, give_amount, my_audit_amount, 
+    agency_audit_amount, decide_amount, finalize_number, delivery_flag, entrust_number, 
+    audit_price_unit, status, person_liable, contract_type, receive_time, decide_time, 
+    progress_description, give_number, audit_number, inline_number, agency_unit, coordinate_flag, 
+    creater, create_time, gcf_amount, elfy_amount, slfy_amount, check_explain, review_reportn,
+    umber, whereabouts, retrial, taskEndTime, acceptanceTime, financial, submissionTime, fixedFinancial,
+    approval, deliveryTime
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.cost.CostTaskExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cost_task
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+    select c.contract_amount AS contractAmount2,t.*,IF(COUNT(tc.id)>0,'是','否') as coordinateFlag,
+    c.name AS 'contractNameShow',p.name AS 'projectNameShow',ca.category AS 'category'
+    from cost_task t
+    LEFT JOIN cost_task_coordinate tc ON t.id=tc.task_id
+    LEFT JOIN cost_contract c ON c.id=t.contract_id
+    LEFT JOIN cost_project p ON t.project_id= p.id
+    LEFT JOIN cost_attachment ca ON ca.type_id = t.id
+      <if test="dataType != null and dataType !='' ">
+          AND ca.data_type = #{dataType}
+      </if>
+      <if test="suffix != null and suffix !='' ">
+          AND ca.suffix != #{suffix}
+      </if>
+      <where>
+    		1=1
+    	  <if test="documentId != null and documentId !='' ">
+               and t.document_id = #{documentId}
+          </if>
+          <if test="projectId != null and projectId !='' ">
+               and t.project_id = #{projectId}
+          </if>
+          <if test="contractId != null and contractId !='' ">
+               and t.contract_id = #{contractId}
+          </if>
+          <if test="contractCongId != null and contractCongId !='' ">
+               and t.contract_cong_id = #{contractCongId}
+          </if>
+          <if test="noContractCongId != null and noContractCongId !='' ">
+               AND ( t.contract_cong_id IS NULL OR  t.contract_cong_id = '')
+          </if>
+          <if test="name != null and name !='' ">
+               and t.name like concat('%',#{name},'%')
+          </if>
+          <if test="noLikeName != null and noLikeName !='' ">
+               and t.name = #{noLikeName}
+          </if>
+          <if test="code != null and code !='' ">
+               and t.code like concat('%',#{code},'%')
+          </if>
+          <if test="noLikeCode != null and noLikeCode !='' ">
+               and t.code = #{code}
+          </if>
+          <if test="projectName != null and projectName !='' ">
+               and p.name like concat('%',#{projectName},'%')
+          </if>
+          <if test="contractName != null and contractName !='' ">
+               and c.name like concat('%',#{contractName},'%')
+          </if>
+            <if test="auditPriceTypeList != null and auditPriceTypeList !='' ">
+           	   and t.audit_price_typecn in 
+		    	<foreach collection="auditPriceTypeList" index="index" item="item" open="(" separator="," close=")">
+	                #{item}       
+	        	</foreach>  
+          </if>
+          <if test="auditPriceType != null and auditPriceType !=''" >
+     		   and	FIND_IN_SET(t.audit_price_type,#{auditPriceType})
+   		  </if>
+        
+          <if test="auditPriceTypecn != null and auditPriceTypecn !='' ">
+               and t.audit_price_typecn = #{auditPriceTypecn}
+          </if>
+          <if test="personLiable != null and personLiable !='' ">
+               and t.person_liable like concat('%',#{personLiable},'%')
+          </if>
+          <if test="auditPriceUnit != null and auditPriceUnit !='' ">
+               and t.audit_price_unit like concat('%',#{auditPriceUnit},'%')
+          </if>
+          <if test="status != null and status !='' ">
+               and t.status = #{status}
+          </if>
+          <if test="finalizeNumber != null and finalizeNumber !='' ">
+               and t.finalize_number like concat('%',#{finalizeNumber},'%')
+          </if>
+          <if test="currentPerson != null and currentPerson !=''" >
+     			and (t.person_liable = #{currentPerson} or t.creater = #{currentPerson})
+   		  </if>
+	      <if test="noid != null and noid !=''" >
+     		   and t.id != #{noid}
+   		  </if>
+   		  <if test="inlineNumber != null and inlineNumber !=''" >
+     		   and t.inline_number like concat('%',#{inlineNumber},'%')
+   		  </if>
+   		  <if test="shenTime == 'receiveTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.receive_time>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.receive_time<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		  <if test="shenTime == 'decideTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.decide_time>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.decide_time<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		  <if test="shenTime == 'deliveryTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.deliveryTime>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.deliveryTime<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		   <if test="shenTime == 'createTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.create_time>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.create_time<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		  <if test="checkExplainNotNull != null and checkExplainNotNull !=''" >
+	    		   and <![CDATA[ t.check_explain IS NOT NULL AND t.check_explain !="" ]]>
+   		  </if>
+    </where>
+    GROUP BY t.id HAVING 1=1
+   	<if test="coordinateFlag != null and coordinateFlag!='' ">
+   		AND coordinateFlag = #{coordinateFlag}
+   	</if>
+      <if test="category != null and category !=''">
+        <choose>
+          <when test="category == '无'.toString()">
+              AND ca.category IS  NULL
+          </when>
+          <when test="category == '已上传'.toString()">
+              AND ca.category = '否'
+          </when>
+          <when test="category == '已入库'.toString()">
+              AND ca.category = '是'
+          </when>
+          <otherwise></otherwise>
+        </choose>
+      </if>
+        order by t.create_time desc
+    <if test="isPage==true">
+    	limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer"  parameterType="map" >
+  	SELECT COUNT(m.id) FROM(
+    SELECT t.id,IF(COUNT(tc.id)>0,'是','否') as coordinateFlag,ca.category AS 'categoryFlag' FROM cost_task t
+    LEFT JOIN cost_task_coordinate tc ON t.id=tc.task_id
+    LEFT JOIN cost_contract c ON c.id=t.contract_id
+    LEFT JOIN cost_project p ON t.project_id= p.id
+    LEFT JOIN cost_attachment ca ON ca.type_id = t.id
+    <if test="dataType !='' and dataType!=null">
+      AND ca.data_type = #{dataType}
+    </if>
+    <if test="suffix !='' and suffix!=null">
+      AND ca.suffix != #{suffix}
+    </if>
+    <where>
+    	  1=1
+    	 <if test="documentId != null and documentId !='' ">
+               and t.document_id = #{documentId}
+          </if>
+          <if test="projectId != null and projectId !='' ">
+               and t.project_id = #{projectId}
+          </if>
+          <if test="contractId != null and contractId !='' ">
+               and t.contract_id = #{contractId}
+          </if>
+           <if test="contractCongId != null and contractCongId !='' ">
+               and t.contract_cong_id = #{contractCongId}
+          </if>
+           <if test="noContractCongId != null and noContractCongId !='' ">
+               AND ( t.contract_cong_id IS NULL OR  t.contract_cong_id = '')
+           </if>
+          <if test="name != null and name !='' ">
+               and t.name like concat('%',#{name},'%')
+          </if>
+          <if test="noLikeName != null and noLikeName !='' ">
+               and t.name = #{noLikeName}
+          </if>
+          <if test="code != null and code !='' ">
+               and t.code like concat('%',#{code},'%')
+          </if>
+           <if test="noLikeCode != null and noLikeCode !='' ">
+               and t.code = #{code}
+          </if>
+          <if test="projectName != null and projectName !='' ">
+               and p.name like concat('%',#{projectName},'%')
+          </if>
+          <if test="contractName != null and contractName !='' ">
+               and c.name like concat('%',#{contractName},'%')
+          </if>
+           <if test="auditPriceTypeList != null and auditPriceTypeList !='' ">
+           	   and t.audit_price_typecn in 
+		    	<foreach collection="auditPriceTypeList" index="index" item="item" open="(" separator="," close=")">
+	                #{item}       
+	        	</foreach>  
+          </if>
+          <if test="auditPriceType != null and auditPriceType !=''" >
+     		   and FIND_IN_SET(t.audit_price_type,#{auditPriceType})
+   		  </if>
+         
+          <if test="auditPriceTypecn != null and auditPriceTypecn !='' ">
+               and t.audit_price_typecn = #{auditPriceTypecn}
+          </if>
+          <if test="personLiable != null and personLiable !='' ">
+               and t.person_liable like concat('%',#{personLiable},'%')
+          </if>
+          <if test="auditPriceUnit != null and auditPriceUnit !='' ">
+               and t.audit_price_unit like concat('%',#{auditPriceUnit},'%')
+          </if>
+          <if test="status != null and status !='' ">
+               and t.status = #{status}
+          </if>
+          <if test="finalizeNumber != null and finalizeNumber !='' ">
+               and t.finalize_number like concat('%',#{finalizeNumber},'%')
+          </if>
+          <if test="currentPerson != null and currentPerson !=''" >
+     			and (t.person_liable = #{currentPerson} or t.creater = #{currentPerson})
+   		  </if>
+	      <if test="noid != null and noid !=''" >
+     		   and t.id != #{noid}
+   		  </if>
+   		  <if test="inlineNumber != null and inlineNumber !=''" >
+     		   and t.inline_number like concat('%',#{inlineNumber},'%')
+   		  </if>
+   		  <if test="shenTime == 'receiveTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.receive_time>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.receive_time<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		  <if test="shenTime == 'decideTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.decide_time>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.decide_time<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		  <if test="shenTime == 'deliveryTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.deliveryTime>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.deliveryTime<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		   <if test="shenTime == 'createTime'">
+	   		  <if test="startTime != null and startTime !=''" >
+	    		   and <![CDATA[ t.create_time>=#{startTime} ]]>
+	  		  </if>
+	  		  <if test="endTime != null and endTime !=''" >
+	    		   and <![CDATA[ t.create_time<=#{endTime} ]]>
+	  		  </if>
+   		  </if>
+   		  <if test="checkExplainNotNull != null and checkExplainNotNull !=''" >
+	    		   and <![CDATA[ t.check_explain IS NOT NULL AND t.check_explain !="" ]]>
+   		  </if>
+
+    </where>
+    GROUP BY t.id HAVING 1=1
+   	<if test="coordinateFlag!=null and coordinateFlag!=''">
+   		AND coordinateFlag = #{coordinateFlag}
+   	</if>
+      <if test="category != null and category !=''">
+      <choose>
+          <when test="category == '无'.toString()">
+              AND categoryFlag IS  NULL
+          </when>
+          <when test="category == '已上传'.toString()">
+              AND categoryFlag = '否'
+          </when>
+          <when test="category == '已入库'.toString()">
+              AND categoryFlag = '是'
+          </when>
+          <otherwise></otherwise>
+      </choose>
+      </if>
+    )m
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from cost_task
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from cost_task
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.cost.CostTaskExample" >
+    delete from cost_task
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.cost.CostTask" >
+    insert into cost_task (id, document_id, project_id, 
+      project_name, contract_id,contract_cong_id, contract_name, 
+      code, name, audit_price_type, 
+      audit_price_typecn, contract_amount, give_amount, 
+      my_audit_amount, agency_audit_amount, decide_amount, 
+      finalize_number, delivery_flag, entrust_number, 
+      audit_price_unit, status, person_liable, 
+      contract_type, receive_time, decide_time, 
+      progress_description, give_number, audit_number, 
+      inline_number, agency_unit, coordinate_flag, 
+      creater, create_time,gcf_amount,elfy_amount,slfy_amount,check_explain,
+      review_reportn,umber,whereabouts,retrial, taskEndTime, acceptanceTime, financial,
+      submissionTime, fixedFinancial, approval, deliveryTime)
+    values (#{id,jdbcType=VARCHAR}, #{documentId,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, 
+      #{projectName,jdbcType=VARCHAR}, #{contractId,jdbcType=VARCHAR}, #{contractCongId,jdbcType=VARCHAR}, #{contractName,jdbcType=VARCHAR}, 
+      #{code,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{auditPriceType,jdbcType=VARCHAR}, 
+      #{auditPriceTypecn,jdbcType=VARCHAR}, #{contractAmount,jdbcType=DECIMAL}, #{giveAmount,jdbcType=DECIMAL}, 
+      #{myAuditAmount,jdbcType=DECIMAL}, #{agencyAuditAmount,jdbcType=DECIMAL}, #{decideAmount,jdbcType=DECIMAL}, 
+      #{finalizeNumber,jdbcType=VARCHAR}, #{deliveryFlag,jdbcType=VARCHAR}, #{entrustNumber,jdbcType=VARCHAR}, 
+      #{auditPriceUnit,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{personLiable,jdbcType=VARCHAR}, 
+      #{contractType,jdbcType=VARCHAR}, #{receiveTime,jdbcType=TIMESTAMP}, #{decideTime,jdbcType=TIMESTAMP}, 
+      #{progressDescription,jdbcType=VARCHAR}, #{giveNumber,jdbcType=INTEGER}, #{auditNumber,jdbcType=INTEGER}, 
+      #{inlineNumber,jdbcType=VARCHAR}, #{agencyUnit,jdbcType=VARCHAR}, #{coordinateFlag,jdbcType=VARCHAR}, 
+      #{creater,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},#{gcfAmount,jdbcType=DECIMAL},
+      #{elfyAmount,jdbcType=DECIMAL},#{slfyAmount,jdbcType=DECIMAL},#{checkExplain,jdbcType=VARCHAR},
+      #{reviewReportn,jdbcType=VARCHAR},#{umber,jdbcType=VARCHAR},#{whereabouts,jdbcType=VARCHAR},
+      #{retrial,jdbcType=VARCHAR}, #{taskEndTime,jdbcType=TIMESTAMP}, #{acceptanceTime,jdbcType=TIMESTAMP}, #{financial,jdbcType=VARCHAR},
+      #{submissionTime,jdbcType=TIMESTAMP}, #{fixedFinancial,jdbcType=VARCHAR}, #{approval,jdbcType=VARCHAR}, #{deliveryTime,jdbcType=TIMESTAMP})
+     
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.cost.CostTask" >
+    insert into cost_task
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="documentId != null" >
+        document_id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="projectName != null" >
+        project_name,
+      </if>
+      <if test="contractId != null" >
+        contract_id,
+      </if>
+      <if test="contractCongId != null" >
+        contract_cong_id,
+      </if>
+      <if test="contractName != null" >
+        contract_name,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="auditPriceType != null" >
+        audit_price_type,
+      </if>
+      <if test="auditPriceTypecn != null" >
+        audit_price_typecn,
+      </if>
+      <if test="contractAmount != null" >
+        contract_amount,
+      </if>
+      <if test="giveAmount != null" >
+        give_amount,
+      </if>
+      <if test="myAuditAmount != null" >
+        my_audit_amount,
+      </if>
+      <if test="agencyAuditAmount != null" >
+        agency_audit_amount,
+      </if>
+      <if test="decideAmount != null" >
+        decide_amount,
+      </if>
+      <if test="finalizeNumber != null" >
+        finalize_number,
+      </if>
+      <if test="deliveryFlag != null" >
+        delivery_flag,
+      </if>
+      <if test="entrustNumber != null" >
+        entrust_number,
+      </if>
+      <if test="auditPriceUnit != null" >
+        audit_price_unit,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="personLiable != null" >
+        person_liable,
+      </if>
+      <if test="contractType != null" >
+        contract_type,
+      </if>
+      <if test="receiveTime != null" >
+        receive_time,
+      </if>
+      <if test="decideTime != null" >
+        decide_time,
+      </if>
+      <if test="progressDescription != null" >
+        progress_description,
+      </if>
+      <if test="giveNumber != null" >
+        give_number,
+      </if>
+      <if test="auditNumber != null" >
+        audit_number,
+      </if>
+      <if test="inlineNumber != null" >
+        inline_number,
+      </if>
+      <if test="agencyUnit != null" >
+        agency_unit,
+      </if>
+      <if test="coordinateFlag != null" >
+        coordinate_flag,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="gcfAmount != null" >
+        gcf_amount,
+      </if>
+      <if test="elfyAmount != null" >
+        elfy_amount,
+      </if>
+      <if test="slfyAmount != null" >
+        slfy_amount,
+      </if>
+      <if test="checkExplain != null" >
+        check_explain,
+      </if>
+      <if test="reviewReportn != null" >
+        review_reportn,
+      </if>
+      <if test="umber != null" >
+        umber,
+      </if>
+      <if test="whereabouts != null" >
+        whereabouts,
+      </if>
+      <if test="retrial != null" >
+        retrial,
+      </if>
+      <if test="taskEndTime != null" >
+        taskEndTime,
+      </if>
+      <if test="acceptanceTime != null" >
+        acceptanceTime,
+      </if>
+      <if test="financial != null" >
+        financial,
+      </if>
+      <if test="submissionTime != null" >
+        submissionTime,
+      </if>
+      <if test="fixedFinancial != null" >
+        fixedFinancial,
+      </if>
+      <if test="approval != null" >
+        approval,
+      </if>
+      <if test="deliveryTime != null" >
+        deliveryTime,
+      </if>
+      
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="documentId != null" >
+        #{documentId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        #{contractId,jdbcType=VARCHAR},
+      </if>
+      <if test="contractCongId != null" >
+        #{contract_cong_id,jdbcType=VARCHAR},
+      </if>
+      <if test="contractName != null" >
+        #{contractName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceType != null" >
+        #{auditPriceType,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceTypecn != null" >
+        #{auditPriceTypecn,jdbcType=VARCHAR},
+      </if>
+      <if test="contractAmount != null" >
+        #{contractAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="giveAmount != null" >
+        #{giveAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="myAuditAmount != null" >
+        #{myAuditAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="agencyAuditAmount != null" >
+        #{agencyAuditAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="decideAmount != null" >
+        #{decideAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="finalizeNumber != null" >
+        #{finalizeNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryFlag != null" >
+        #{deliveryFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="entrustNumber != null" >
+        #{entrustNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceUnit != null" >
+        #{auditPriceUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="contractType != null" >
+        #{contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveTime != null" >
+        #{receiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="decideTime != null" >
+        #{decideTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="progressDescription != null" >
+        #{progressDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="giveNumber != null" >
+        #{giveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="auditNumber != null" >
+        #{auditNumber,jdbcType=INTEGER},
+      </if>
+      <if test="inlineNumber != null" >
+        #{inlineNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="agencyUnit != null" >
+        #{agencyUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinateFlag != null" >
+        #{coordinateFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gcfAmount != null" >
+        #{gcfAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="elfyAmount != null" >
+        #{elfyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="slfyAmount != null" >
+        #{slfyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="checkExplain != null" >
+        #{checkExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewReportn != null" >
+        #{reviewReportn,jdbcType=VARCHAR},
+      </if>
+      <if test="umber != null" >
+        #{umber,jdbcType=VARCHAR},
+      </if>
+      <if test="whereabouts != null" >
+        #{whereabouts,jdbcType=VARCHAR},
+      </if>
+      <if test="retrial != null" >
+        #{retrial,jdbcType=VARCHAR},
+      </if>
+      <if test="taskEndTime != null" >
+        #{taskEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="acceptanceTime != null" >
+        #{acceptanceTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="financial != null" >
+        #{financial,jdbcType=VARCHAR},
+      </if>
+      <if test="submissionTime != null" >
+        #{submissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fixedFinancial != null" >
+        #{fixedFinancial,jdbcType=VARCHAR},
+      </if>
+      <if test="approval != null" >
+        #{approval,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null" >
+        #{deliveryTime,jdbcType=TIMESTAMP},
+      </if>
+      
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.cost.CostTaskExample" resultType="java.lang.Integer" >
+    select count(*) from cost_task
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update cost_task
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.documentId != null" >
+        document_id = #{record.documentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectId != null" >
+        project_id = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectName != null" >
+        project_name = #{record.projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractId != null" >
+        contract_id = #{record.contractId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractCongId != null" >
+        contract_cong_id = #{record.contractCongId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractName != null" >
+        contract_name = #{record.contractName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.code != null" >
+        code = #{record.code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.auditPriceType != null" >
+        audit_price_type = #{record.auditPriceType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.auditPriceTypecn != null" >
+        audit_price_typecn = #{record.auditPriceTypecn,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractAmount != null" >
+        contract_amount = #{record.contractAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.giveAmount != null" >
+        give_amount = #{record.giveAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.myAuditAmount != null" >
+        my_audit_amount = #{record.myAuditAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.agencyAuditAmount != null" >
+        agency_audit_amount = #{record.agencyAuditAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.decideAmount != null" >
+        decide_amount = #{record.decideAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.finalizeNumber != null" >
+        finalize_number = #{record.finalizeNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.deliveryFlag != null" >
+        delivery_flag = #{record.deliveryFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.entrustNumber != null" >
+        entrust_number = #{record.entrustNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.auditPriceUnit != null" >
+        audit_price_unit = #{record.auditPriceUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=VARCHAR},
+      </if>
+      <if test="record.personLiable != null" >
+        person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractType != null" >
+        contract_type = #{record.contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.receiveTime != null" >
+        receive_time = #{record.receiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.decideTime != null" >
+        decide_time = #{record.decideTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.progressDescription != null" >
+        progress_description = #{record.progressDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="record.giveNumber != null" >
+        give_number = #{record.giveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.auditNumber != null" >
+        audit_number = #{record.auditNumber,jdbcType=INTEGER},
+      </if>
+      <if test="record.inlineNumber != null" >
+        inline_number = #{record.inlineNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.agencyUnit != null" >
+        agency_unit = #{record.agencyUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.coordinateFlag != null" >
+        coordinate_flag = #{record.coordinateFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creater != null" >
+        creater = #{record.creater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.gcfAmount != null" >
+        gcf_amount = #{record.gcfAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.elfyAmount != null" >
+        elfy_amount = #{record.elfyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.slfyAmount != null" >
+        slfy_amount = #{record.slfyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.checkExplain != null" >
+        check_explain = #{record.checkExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reviewReportn != null" >
+        review_reportn = #{record.reviewReportn,jdbcType=VARCHAR},
+      </if>
+      <if test="record.umber != null" >
+        umber = #{record.umber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.whereabouts != null" >
+        whereabouts = #{record.whereabouts,jdbcType=VARCHAR},
+      </if>
+      <if test="record.retrial != null" >
+        retrial = #{record.retrial,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskEndTime != null" >
+        taskEndTime = #{record.taskEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.acceptanceTime != null" >
+        acceptanceTime = #{record.acceptanceTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.financial != null" >
+        financial = #{record.financial,jdbcType=VARCHAR},
+      </if>
+      <if test="record.submissionTime != null" >
+        submissionTime = #{record.submissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.fixedFinancial != null" >
+        fixedFinancial = #{record.fixedFinancial,jdbcType=VARCHAR},
+      </if>
+      <if test="record.approval != null" >
+        approval = #{record.approval,jdbcType=VARCHAR},
+      </if>
+      <if test="record.deliveryTime != null" >
+        deliveryTime = #{record.deliveryTime,jdbcType=TIMESTAMP},
+      </if>
+      
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update cost_task
+    set id = #{record.id,jdbcType=VARCHAR},
+      document_id = #{record.documentId,jdbcType=VARCHAR},
+      project_id = #{record.projectId,jdbcType=VARCHAR},
+      project_name = #{record.projectName,jdbcType=VARCHAR},
+      contract_id = #{record.contractId,jdbcType=VARCHAR},
+      contract_cong_id = #{record.contractCongId,jdbcType=VARCHAR},
+      contract_name = #{record.contractName,jdbcType=VARCHAR},
+      code = #{record.code,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      audit_price_type = #{record.auditPriceType,jdbcType=VARCHAR},
+      audit_price_typecn = #{record.auditPriceTypecn,jdbcType=VARCHAR},
+      contract_amount = #{record.contractAmount,jdbcType=DECIMAL},
+      give_amount = #{record.giveAmount,jdbcType=DECIMAL},
+      my_audit_amount = #{record.myAuditAmount,jdbcType=DECIMAL},
+      agency_audit_amount = #{record.agencyAuditAmount,jdbcType=DECIMAL},
+      decide_amount = #{record.decideAmount,jdbcType=DECIMAL},
+      finalize_number = #{record.finalizeNumber,jdbcType=VARCHAR},
+      delivery_flag = #{record.deliveryFlag,jdbcType=VARCHAR},
+      entrust_number = #{record.entrustNumber,jdbcType=VARCHAR},
+      audit_price_unit = #{record.auditPriceUnit,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=VARCHAR},
+      person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      contract_type = #{record.contractType,jdbcType=VARCHAR},
+      receive_time = #{record.receiveTime,jdbcType=TIMESTAMP},
+      decide_time = #{record.decideTime,jdbcType=TIMESTAMP},
+      progress_description = #{record.progressDescription,jdbcType=VARCHAR},
+      give_number = #{record.giveNumber,jdbcType=INTEGER},
+      audit_number = #{record.auditNumber,jdbcType=INTEGER},
+      inline_number = #{record.inlineNumber,jdbcType=VARCHAR},
+      agency_unit = #{record.agencyUnit,jdbcType=VARCHAR},
+      coordinate_flag = #{record.coordinateFlag,jdbcType=VARCHAR},
+      creater = #{record.creater,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      gcf_amount = #{record.gcfAmount,jdbcType=DECIMAL},
+      elfy_amount = #{record.elfyAmount,jdbcType=DECIMAL},
+      slfy_amount = #{record.slfyAmount,jdbcType=DECIMAL},
+      check_explain = #{record.checkExplain,jdbcType=VARCHAR},
+      review_reportn = #{record.reviewReportn,jdbcType=VARCHAR},
+      umber = #{record.umber,jdbcType=VARCHAR},
+      whereabouts = #{record.whereabouts,jdbcType=VARCHAR},
+      retrial = #{record.retrial,jdbcType=VARCHAR},
+      taskEndTime = #{record.taskEndTime,jdbcType=TIMESTAMP},
+      acceptanceTime = #{record.acceptanceTime,jdbcType=TIMESTAMP},
+      financial = #{record.financial,jdbcType=VARCHAR},
+      submissionTime = #{record.submissionTime,jdbcType=TIMESTAMP},
+      fixedFinancial = #{record.fixedFinancial,jdbcType=VARCHAR},
+      approval = #{record.approval,jdbcType=VARCHAR},
+      deliveryTime = #{record.deliveryTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.cost.CostTask" >
+    update cost_task
+    <set >
+      <if test="documentId != null" >
+        document_id = #{documentId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        contract_id = #{contractId,jdbcType=VARCHAR},
+      </if>
+      <if test="contractCongId != null" >
+        contract_cong_id = #{contractCongId,jdbcType=VARCHAR},
+      </if>
+      <if test="contractName != null" >
+        contract_name = #{contractName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceType != null" >
+        audit_price_type = #{auditPriceType,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceTypecn != null" >
+        audit_price_typecn = #{auditPriceTypecn,jdbcType=VARCHAR},
+      </if>
+      <if test="contractAmount != null" >
+        contract_amount = #{contractAmount,jdbcType=DECIMAL},
+      </if>
+        give_amount = #{giveAmount,jdbcType=DECIMAL},
+        my_audit_amount = #{myAuditAmount,jdbcType=DECIMAL},
+        agency_audit_amount = #{agencyAuditAmount,jdbcType=DECIMAL},
+        decide_amount = #{decideAmount,jdbcType=DECIMAL},
+      <if test="finalizeNumber != null" >
+        finalize_number = #{finalizeNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryFlag != null" >
+        delivery_flag = #{deliveryFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="entrustNumber != null" >
+        entrust_number = #{entrustNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceUnit != null" >
+        audit_price_unit = #{auditPriceUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        person_liable = #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="contractType != null" >
+        contract_type = #{contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="receiveTime != null" >
+        receive_time = #{receiveTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="decideTime != null" >
+        decide_time = #{decideTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="progressDescription != null" >
+        progress_description = #{progressDescription,jdbcType=VARCHAR},
+      </if>
+      <if test="giveNumber != null" >
+        give_number = #{giveNumber,jdbcType=INTEGER},
+      </if>
+      <if test="auditNumber != null" >
+        audit_number = #{auditNumber,jdbcType=INTEGER},
+      </if>
+      <if test="inlineNumber != null" >
+        inline_number = #{inlineNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="agencyUnit != null" >
+        agency_unit = #{agencyUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="coordinateFlag != null" >
+        coordinate_flag = #{coordinateFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="gcfAmount != null" >
+        gcf_amount = #{gcfAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="elfyAmount != null" >
+        elfy_amount = #{elfyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="slfyAmount != null" >
+        slfy_amount = #{slfyAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="checkExplain != null" >
+        check_explain = #{checkExplain,jdbcType=VARCHAR},
+      </if>
+      <if test="reviewReportn != null" >
+        review_reportn = #{reviewReportn,jdbcType=VARCHAR},
+      </if>
+      <if test="umber != null" >
+        umber = #{umber,jdbcType=VARCHAR},
+      </if>
+      <if test="whereabouts != null" >
+        whereabouts = #{whereabouts,jdbcType=VARCHAR},
+      </if>
+      <if test="retrial != null" >
+        retrial = #{retrial,jdbcType=VARCHAR},
+      </if>
+      <if test="taskEndTime != null" >
+        taskEndTime = #{taskEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="acceptanceTime != null" >
+        acceptanceTime = #{acceptanceTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="financial != null" >
+        financial = #{financial,jdbcType=VARCHAR},
+      </if>
+      <if test="submissionTime != null" >
+        submissionTime = #{submissionTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="fixedFinancial != null" >
+        fixedFinancial = #{fixedFinancial,jdbcType=VARCHAR},
+      </if>
+      <if test="approval != null" >
+        approval = #{approval,jdbcType=VARCHAR},
+      </if>
+      <if test="deliveryTime != null" >
+        deliveryTime = #{deliveryTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deliveryTimeStr == 'NULL'">
+      	deliveryTime = NULL 
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.cost.CostTask" >
+    update cost_task
+    set document_id = #{documentId,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=VARCHAR},
+      project_name = #{projectName,jdbcType=VARCHAR},
+      contract_id = #{contractId,jdbcType=VARCHAR},
+      contract_cong_id = #{contractCongId,jdbcType=VARCHAR},
+      contract_name = #{contractName,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      audit_price_type = #{auditPriceType,jdbcType=VARCHAR},
+      audit_price_typecn = #{auditPriceTypecn,jdbcType=VARCHAR},
+      contract_amount = #{contractAmount,jdbcType=DECIMAL},
+      give_amount = #{giveAmount,jdbcType=DECIMAL},
+      my_audit_amount = #{myAuditAmount,jdbcType=DECIMAL},
+      agency_audit_amount = #{agencyAuditAmount,jdbcType=DECIMAL},
+      decide_amount = #{decideAmount,jdbcType=DECIMAL},
+      finalize_number = #{finalizeNumber,jdbcType=VARCHAR},
+      delivery_flag = #{deliveryFlag,jdbcType=VARCHAR},
+      entrust_number = #{entrustNumber,jdbcType=VARCHAR},
+      audit_price_unit = #{auditPriceUnit,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      person_liable = #{personLiable,jdbcType=VARCHAR},
+      contract_type = #{contractType,jdbcType=VARCHAR},
+      receive_time = #{receiveTime,jdbcType=TIMESTAMP},
+      decide_time = #{decideTime,jdbcType=TIMESTAMP},
+      progress_description = #{progressDescription,jdbcType=VARCHAR},
+      give_number = #{giveNumber,jdbcType=INTEGER},
+      audit_number = #{auditNumber,jdbcType=INTEGER},
+      inline_number = #{inlineNumber,jdbcType=VARCHAR},
+      agency_unit = #{agencyUnit,jdbcType=VARCHAR},
+      coordinate_flag = #{coordinateFlag,jdbcType=VARCHAR},
+      creater = #{creater,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      gcf_amount = #{gcfAmount,jdbcType=DECIMAL},
+      elfy_amount = #{elfyAmount,jdbcType=DECIMAL},
+      slfy_amount = #{slfyAmount,jdbcType=DECIMAL},
+      check_explain = #{checkExplain,jdbcType=VARCHAR},
+      review_reportn = #{reviewReportn,jdbcType=VARCHAR},
+      umber = #{umber,jdbcType=VARCHAR},
+      whereabouts = #{whereabouts,jdbcType=VARCHAR},
+      retrial = #{retrial,jdbcType=VARCHAR},
+      taskEndTime = #{taskEndTime,jdbcType=TIMESTAMP},
+      acceptanceTime = #{acceptanceTime,jdbcType=TIMESTAMP},
+      financial = #{financial,jdbcType=VARCHAR},
+      submissionTime = #{submissionTime,jdbcType=TIMESTAMP},
+      fixedFinancial = #{fixedFinancial,jdbcType=VARCHAR},
+      approval = #{approval,jdbcType=VARCHAR},
+      deliveryTime = #{deliveryTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

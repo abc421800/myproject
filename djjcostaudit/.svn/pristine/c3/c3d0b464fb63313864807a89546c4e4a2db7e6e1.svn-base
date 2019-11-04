@@ -1,0 +1,347 @@
+package com.cost168.costaudit.service.work.impl;
+
+import com.cost168.costaudit.mapper.work.WorkPersonMapper;
+import com.cost168.costaudit.pojo.sys.SysOrg;
+import com.cost168.costaudit.pojo.sys.SysRole;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.sys.SysUserOrgKey;
+import com.cost168.costaudit.pojo.sys.SysUserRoleKey;
+import com.cost168.costaudit.pojo.work.WorkCalendar;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.WorkPersonExample;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.service.sys.SysOrgService;
+import com.cost168.costaudit.service.sys.SysRoleService;
+import com.cost168.costaudit.service.sys.SysUserOrgService;
+import com.cost168.costaudit.service.sys.SysUserRoleService;
+import com.cost168.costaudit.service.sys.SysUserService;
+import com.cost168.costaudit.service.work.WorkCalendarService;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import com.cost168.costaudit.utils.OrderUtil;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class WorkPersonServiceImpl implements WorkPersonService {
+    @Autowired
+    private WorkPersonMapper workPersonMapper;
+    @Autowired
+	private WorkEnterpriseService workEnterpriseService;
+	@Autowired
+	private SysUserService sysUserService;
+	@Autowired
+	private SysUserOrgService sysUserOrgService;
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
+	@Autowired
+	private SysRoleService sysRoleService;
+	@Autowired
+	private SysOrgService sysOrgService;
+	@Autowired
+	private WorkCalendarService workCalendarService;
+	@Autowired
+    private WorkRegisterService workRegisterService;
+	
+	
+    @Override
+    public List<WorkPerson> selectByExample(WorkPersonExample example) {
+        return workPersonMapper.selectByExample(example);
+    }
+
+
+    @Override
+    public WorkPerson selectByPrimaryKey(String id) {
+        return workPersonMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int insertSelective(WorkPerson record) {
+        return workPersonMapper.insertSelective(record);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(WorkPerson workPerson) {
+        return workPersonMapper.updateByPrimaryKeySelective(workPerson);
+    }
+
+    @Override
+    public int deleteByPrimaryKey(String id) {
+        return workPersonMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public List<WorkPerson> selectListByMap(Map<String, Object> map) {
+        return workPersonMapper.selectListByMap(map);
+    }
+
+    @Override
+    public int selectCountByMap(Map<String, Object> map) {
+        return workPersonMapper.selectCountByMap(map);
+    }
+
+    @Override
+    public WorkPerson selectByAccount(String account) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("account", account);
+        WorkPerson wp = null;
+        List<WorkPerson> wpList = workPersonMapper.selectListByMap(map);
+        if (null != wpList && wpList.size() > 0) {
+            wp = wpList.get(0);
+        }
+        return wp;
+    }
+
+    /**
+     * created by ZYL on 2019/6/12
+     * 根据姓名查找驻场人员
+     */
+    @Override
+    public WorkPerson selectByName(String name) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("nameEq", name);
+        WorkPerson wp = null;
+        List<WorkPerson> wpList = workPersonMapper.selectListByMap(map);
+        if (null != wpList && wpList.size() > 0) {
+            wp = wpList.get(0);
+        }
+        return wp;
+    }
+
+    @Override
+    public int deleteByExample(WorkPersonExample example) {
+        return workPersonMapper.deleteByExample(example);
+    }
+    
+    @Override
+	public List<WorkPerson> importPerson(HttpServletRequest request) {
+    	List<WorkPerson> listDocument=new ArrayList<WorkPerson>();
+		try{
+			 MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+			 List<MultipartFile> files=multipartRequest.getFiles("file");
+				if(files.size()>0){
+					MultipartFile file=files.get(0);
+					String fileName = file.getOriginalFilename();
+					SimpleDateFormat fmt=new SimpleDateFormat("yyyy-MM-dd");
+					String nowDate=fmt.format(new Date());
+					Properties props = new Properties();
+					props.load(this.getClass().getResourceAsStream("/resource/resource.properties"));
+					String path=(String) props.get("fileupload");
+					path=path+"WorkPerson/"+nowDate+"/";
+					File filePath=new File(path+fileName);
+					if (!filePath.exists()) {    
+						filePath.mkdirs();    
+					}
+					file.transferTo(filePath); 
+					String suffix=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+					Workbook wb = null;
+					InputStream stream = new FileInputStream(filePath);
+					if (suffix.equals("xls")) {
+						POIFSFileSystem fs = new POIFSFileSystem(stream);
+						wb = new HSSFWorkbook(fs);
+					} else if (suffix.equals("xlsx")) {
+						wb = new XSSFWorkbook(stream);
+					}
+					Sheet sheet = wb.getSheetAt(1);
+					if(sheet!=null){
+						int num = sheet.getLastRowNum();
+						WorkPerson p =null;
+						WorkPerson resut=null;
+						for (int i = 1; i <= num; i++) {
+							// 循环输出表格中的内容
+							Row row = sheet.getRow(i);
+							if(row!=null){
+								resut=new WorkPerson();
+								try {
+									//去重复
+									if(row.getCell(1)!=null && !"".equals(row.getCell(1).toString())){
+										WorkPerson we = selectByName(row.getCell(1).toString());
+										SysUser su=sysUserService.selectByUserAccount(row.getCell(16).toString());
+										if(null==we){
+											    p = new WorkPerson();
+									            String enteId = UUID.randomUUID().toString().replace("-", "");
+									            p.setId(enteId);
+									            WorkEnterprise enterprise= workEnterpriseService.selectByWorkEnterpriseName(row.getCell(0).toString());
+									            if(null!=enterprise){
+									            	p.setEnterpriseId(enterprise.getId());
+									            }else{
+									            	resut.setName(row.getCell(1).toString());
+													listDocument.add(resut);
+									            	continue;
+									            }
+									            p.setName(row.getCell(1).toString());
+									            p.setSex(row.getCell(2).toString());
+									            p.setJob(row.getCell(3).toString());
+									            Cell cell4=row.getCell(4);
+											    if(null!=cell4 && !"".equals(cell4)){
+											    	cell4.setCellType(HSSFCell.CELL_TYPE_STRING);  
+											    	String content = cell4.getStringCellValue();
+											    	p.setPhone(content);
+											    }
+									            p.setEmail(row.getCell(5).toString());
+									            p.setWechat(row.getCell(6).toString());
+									            Cell cell7 =row.getCell(7);
+											    if (cell7 != null && !"".equals(cell7.toString())) {
+											    	if (cell7.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell7)) {
+											    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+											    		Date date = HSSFDateUtil.getJavaDate(cell7.getNumericCellValue());
+											    		String value = sdf.format(date); 
+											    		p.setPlanStartTime(sdf.parse(value));
+											    	} 
+											    }
+									            Cell cell8 =row.getCell(8);
+											    if (cell8 != null && !"".equals(cell8.toString())) {
+											    	if (cell8.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell8)) {
+											    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+											    		Date date = HSSFDateUtil.getJavaDate(cell8.getNumericCellValue());
+											    		String value = sdf.format(date); 
+											    		p.setPlanEndTime(sdf.parse(value));
+											    	} 
+											    }
+									            Cell cell9 =row.getCell(9);
+											    if (cell9 != null && !"".equals(cell9.toString())) {
+											    	if (cell9.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell9)) {
+											    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+											    		Date date = HSSFDateUtil.getJavaDate(cell9.getNumericCellValue());
+											    		String value = sdf.format(date); 
+											    		p.setActualStartTime(sdf.parse(value));
+											    	} 
+											    }
+									            Cell cell10 =row.getCell(10);
+											    if (cell10 != null && !"".equals(cell10.toString())) {
+											    	if (cell10.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell10)) {
+											    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+											    		Date date = HSSFDateUtil.getJavaDate(cell10.getNumericCellValue());
+											    		String value = sdf.format(date); 
+											    		p.setActualEndTime(sdf.parse(value));
+											    	} 
+											    }
+									            p.setEffectiveFlag(row.getCell(11).toString());
+									            p.setRemark(row.getCell(12).toString());
+									            Cell cell13 =row.getCell(13);
+											    if (cell13 != null && !"".equals(cell13.toString())) {
+											    	if (cell13.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell13)) {
+											    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+											    		Date date = HSSFDateUtil.getJavaDate(cell13.getNumericCellValue());
+											    		String value = sdf.format(date); 
+											    		p.setAnnualLeaveStartTime(sdf.parse(value));
+											    	} 
+											    }
+									            Cell cell14 =row.getCell(14);
+											    if (cell14 != null && !"".equals(cell14.toString())) {
+											    	if (cell14.getCellTypeEnum() != CellType.STRING &&HSSFDateUtil.isCellDateFormatted(cell14)) {
+											    		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); 
+											    		Date date = HSSFDateUtil.getJavaDate(cell14.getNumericCellValue());
+											    		String value = sdf.format(date); 
+											    		p.setAnnualLeaveEndTime(sdf.parse(value));
+											    	} 
+											    }
+									            p.setAnnualLeaveTotal(null!=row.getCell(15)?row.getCell(15).toString().replace(".0",""):"");
+									            p.setAccount(row.getCell(16).toString());
+									            p.setCreateTime(new Date());
+									            workPersonMapper.insertSelective(p);
+									            //插入系统用户表
+									    		if(null==su){
+													SysUser u=new SysUser();
+													//插入user表
+													String uid = UUID.randomUUID().toString().replace("-", "");
+													u.setId(uid);
+													u.setAccount(row.getCell(16).toString());
+													u.setName(row.getCell(1).toString());
+													u.setEmail(row.getCell(5).toString());
+													u.setWechat(row.getCell(6).toString());
+													u.setPassword(DigestUtils.md5Hex("000000"));
+													u.setPhone(row.getCell(4).toString());
+													if("有效"==row.getCell(11).toString()){
+														u.setStatus("可用");
+													}else{
+														u.setStatus("禁用");
+													}
+													u.setCreateTime(new Date());
+													u.setSex(row.getCell(2).toString());
+													sysUserService.insertSelective(u, null);
+													//插入关联表user_role
+													SysRole role=sysRoleService.selectByRoleName("驻场人员");
+													if(null!=role){
+														SysUserRoleKey userRole=new SysUserRoleKey();
+														userRole.setUserId(uid);
+														userRole.setRoleId(role.getId());
+														sysUserRoleService.insertSelective(userRole);
+													}
+													//插入user_org
+													SysOrg org=sysOrgService.selectByOrgName("造价审核部");
+													if(null!=org){
+														SysUserOrgKey userOrg=new SysUserOrgKey();
+														userOrg.setUserId(uid);
+														userOrg.setOrgId(org.getId());
+														sysUserOrgService.insertSelective(userOrg);
+													}
+												}else{
+													su.setAccount(row.getCell(16).toString());
+													su.setName(row.getCell(1).toString());
+													su.setEmail(row.getCell(5).toString());
+													su.setWechat(row.getCell(6).toString());
+													su.setPassword(DigestUtils.md5Hex("000000"));
+													su.setPhone(row.getCell(4).toString());
+													if("有效"==row.getCell(11).toString()){
+														su.setStatus("可用");
+													}else{
+														su.setStatus("禁用");
+													}
+													su.setCreateTime(new Date());
+													su.setSex(row.getCell(2).toString());
+													sysUserService.updateByPrimaryKeySelective(su, null);
+												}
+										}else{
+											resut.setName(row.getCell(1).toString());
+											listDocument.add(resut);
+										}
+									}
+								}catch (Exception e) {
+									 resut.setName(row.getCell(0).toString());
+									 listDocument.add(resut);
+								}  
+							}
+						}
+					}
+				}
+			}catch(Exception e){
+				e.printStackTrace();
+			}
+			return listDocument;
+		}
+}

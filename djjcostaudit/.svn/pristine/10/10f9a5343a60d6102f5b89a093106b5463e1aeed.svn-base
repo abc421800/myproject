@@ -1,0 +1,171 @@
+package com.cost168.costaudit.pojo.yaohao;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+public class YaohaoWinbid {
+	
+
+
+	private String id;
+
+    private String orderCode;
+
+    private String enterpriseCode;
+
+    private String name;
+
+    private BigDecimal serviceAmount;
+
+    private BigDecimal decideAmount;
+
+    private String contacts;
+
+    private String contactsPhone;
+
+    private String creater;
+
+    private Date createTime;
+    
+    private String yaohaoYear;
+    
+    //数据库没有的
+    private String yaohaoGrade;
+    private String enterpriseName;
+    private String yaohaoTimeStr;
+    private String assessResultStr;
+    private String enterpriseId;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getOrderCode() {
+        return orderCode;
+    }
+
+    public void setOrderCode(String orderCode) {
+        this.orderCode = orderCode == null ? null : orderCode.trim();
+    }
+
+    public String getEnterpriseCode() {
+        return enterpriseCode;
+    }
+
+    public void setEnterpriseCode(String enterpriseCode) {
+        this.enterpriseCode = enterpriseCode == null ? null : enterpriseCode.trim();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name == null ? null : name.trim();
+    }
+
+    public BigDecimal getServiceAmount() {
+        return serviceAmount;
+    }
+
+    public void setServiceAmount(BigDecimal serviceAmount) {
+        this.serviceAmount = serviceAmount;
+    }
+
+    public BigDecimal getDecideAmount() {
+        return decideAmount;
+    }
+
+    public void setDecideAmount(BigDecimal decideAmount) {
+        this.decideAmount = decideAmount;
+    }
+
+    public String getContacts() {
+        return contacts;
+    }
+
+    public void setContacts(String contacts) {
+        this.contacts = contacts == null ? null : contacts.trim();
+    }
+
+    public String getContactsPhone() {
+        return contactsPhone;
+    }
+
+    public void setContactsPhone(String contactsPhone) {
+        this.contactsPhone = contactsPhone == null ? null : contactsPhone.trim();
+    }
+
+    public String getCreater() {
+        return creater;
+    }
+
+    public void setCreater(String creater) {
+        this.creater = creater == null ? null : creater.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+	public String getYaohaoYear() {
+		return yaohaoYear;
+	}
+
+	public void setYaohaoYear(String yaohaoYear) {
+		this.yaohaoYear = yaohaoYear;
+	}
+
+	public String getYaohaoGrade() {
+		return yaohaoGrade;
+	}
+
+	public void setYaohaoGrade(String yaohaoGrade) {
+		this.yaohaoGrade = yaohaoGrade;
+	}
+
+	public String getEnterpriseName() {
+		return enterpriseName;
+	}
+
+	public void setEnterpriseName(String enterpriseName) {
+		this.enterpriseName = enterpriseName;
+	}
+
+	public String getYaohaoTimeStr() {
+		if(null!=yaohaoTimeStr){
+			return yaohaoTimeStr.substring(0,10);
+		}else{
+			return null;
+		}
+	}
+
+	public void setYaohaoTimeStr(String yaohaoTimeStr) {
+		this.yaohaoTimeStr = yaohaoTimeStr;
+	}
+
+	public String getAssessResultStr() {
+		return assessResultStr;
+	}
+
+	public void setAssessResultStr(String assessResultStr) {
+		this.assessResultStr = assessResultStr;
+	}
+
+	public String getEnterpriseId() {
+		return enterpriseId;
+	}
+
+	public void setEnterpriseId(String enterpriseId) {
+		this.enterpriseId = enterpriseId;
+	}
+
+}

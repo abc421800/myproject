@@ -1,0 +1,406 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import com.cost168.costaudit.mapper.cost.CostEnterpriseMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoAssessMapper;
+import com.cost168.costaudit.pojo.cost.CostEnterprise;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+import com.cost168.costaudit.pojo.yaohao.param.YaohaoAssessParam;
+import com.cost168.costaudit.service.yaohao.YaohaoAssessService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.ExcelUtil;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.OrderUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * @description: 综合考核服务层
+ * @author: ZYL
+ * @created: 2019-07-08
+ */
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class YaohaoAssessServiceImpl implements YaohaoAssessService {
+    @Resource
+    private YaohaoAssessMapper assessMapper;
+    @Autowired
+    private CostEnterpriseMapper costEnterpriseMapper;
+
+    @Override
+    public YaohaoAssess selectByPrimaryKey(String id) {
+        return assessMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int selectCountByMap(Map<String, Object> map) {
+        return assessMapper.selectCountByMap(map);
+    }
+
+    /**
+     * created by ZYL on 2019/7/10
+     * 批量删除
+     */
+    @Override
+    public GlobalResult deleteByPrimaryKey(HttpServletRequest request) {
+        GlobalResult result = new GlobalResult();
+        String ids = request.getParameter("ids");
+        String enterpriseCodes = request.getParameter("enterpriseCodes");
+        String arr[] = ids.split(",");
+        String[] arr2 = enterpriseCodes.split(",");
+        try {
+            for (String id : arr) {
+                if (id != null && !"".equals(id)) {
+                    assessMapper.deleteByPrimaryKey(id);
+                }
+            }
+            for (String enterpriseCode : arr2) {
+                if (enterpriseCode != null && !"".equals(enterpriseCode)) {
+                    CostEnterprise costEnterprise = assessMapper.selectEnterpriseCodeByCode(enterpriseCode);
+                    costEnterprise.setEffectiveFlag("在库");
+                    costEnterpriseMapper.updateByPrimaryKey(costEnterprise);
+                }
+            }
+            result.setStatus(200);
+        } catch (Exception e) {
+            result.setStatus(500);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/18
+     * 插入综合考勤单
+     */
+    @Override
+    public GlobalResult insert(YaohaoAssessParam assessParam, HttpServletRequest request) {
+        GlobalResult result = new GlobalResult();
+        Map<String, Object> map = new HashMap<String, Object>();
+        CostEnterprise costEnterprise = assessMapper.selectEnterpriseCodeByCode(assessParam.getEnterpriseCode());
+        assessParam.setCreateTime(new Date());
+        int temp = assessMapper.insert(assessParam);
+        map.put("year", assessParam.getYear());
+        map.put("zpFlag", "是");
+        List<YaohaoAssessParam> list = assessMapper.selectListByMap(map);
+        //比65分还低，不合格的企业
+        YaohaoAssessParam yaohaoAssessParam = new YaohaoAssessParam();
+        CostEnterprise costEnterprise2 = new CostEnterprise();
+        //名次
+        int scoreRank = 0;
+        int count = 1;
+        for (int i = 0; i < list.size() - 1; i++) {
+            if (list.get(i).getId().equals(assessParam.getId())) {
+                yaohaoAssessParam = list.get(i - 1);
+                costEnterprise2 = assessMapper.selectEnterpriseCodeByCode(yaohaoAssessParam.getEnterpriseCode());
+                scoreRank = count;
+            }
+            count++;
+        }
+        //分数
+        double assessScore = assessParam.getAssessScore();
+        boolean flag = false;
+        //是否是最后一名
+        if (list.get(list.size() - 1).getId().equals(assessParam.getId())) {
+            flag = true;
+        }
+        if (temp > 0) {
+            //暂停资格
+            if ("暂停".equals(assessParam.getEffectiveFlag())) {
+                assessParam.setAssessResult("未评定");
+                assessParam.setYaohaoGrade("第二档");
+                assessParam.setRukuStatus("在库");
+                assessParam.setEffectiveFlag("在库");
+                assessMapper.updateByPrimaryKey(assessParam);
+                //更新入库企业
+                costEnterprise.setEffectiveFlag(assessParam.getEffectiveFlag());
+                costEnterpriseMapper.updateByPrimaryKey(costEnterprise);
+            } else {
+                if (scoreRank > 5) {
+                    //如果分数小于等于65且排名最后，默认状态为出库,下一年摇号档次默认无
+                    if (assessScore <= 65 && flag == true) {
+                        assessParam.setAssessResult("不合格");
+                        assessParam.setYaohaoGrade(null);
+                        assessParam.setRukuStatus("出库");
+                        assessParam.setEffectiveFlag("出库");
+                        if (yaohaoAssessParam.getAssessScore() <= 65) {
+                            yaohaoAssessParam.setAssessScore(65);
+                            yaohaoAssessParam.setAssessResult("第二档");
+                            yaohaoAssessParam.setYaohaoGrade("第二档");
+                            costEnterprise2.setEffectiveFlag("在库");
+                            assessMapper.updateByPrimaryKey(yaohaoAssessParam);
+                            costEnterpriseMapper.updateByPrimaryKey(costEnterprise2);
+                        }
+                        assessMapper.updateByPrimaryKey(assessParam);
+                        costEnterprise.setEffectiveFlag(assessParam.getEffectiveFlag());
+                        costEnterpriseMapper.updateByPrimaryKey(costEnterprise);
+                    } else if (assessScore > 65) {
+                        assessParam.setAssessResult("第二档");
+                        assessParam.setYaohaoGrade("第二档");
+                        assessParam.setRukuStatus("在库");
+                        assessParam.setEffectiveFlag("在库");
+                        assessMapper.updateByPrimaryKey(assessParam);
+                        costEnterprise.setEffectiveFlag(assessParam.getEffectiveFlag());
+                        costEnterpriseMapper.updateByPrimaryKey(costEnterprise);
+                    }
+                } else {
+                    if (assessScore <= 65 && flag == true) {
+                        assessParam.setAssessResult("不合格");
+                        assessParam.setYaohaoGrade(null);
+                        assessParam.setRukuStatus("出库");
+                        assessParam.setEffectiveFlag("出库");
+                        if (yaohaoAssessParam.getAssessScore() <= 65) {
+                            yaohaoAssessParam.setAssessScore(65);
+                            yaohaoAssessParam.setAssessResult("第二档");
+                            yaohaoAssessParam.setYaohaoGrade("第二档");
+                            assessMapper.updateByPrimaryKey(yaohaoAssessParam);
+                            costEnterprise2.setEffectiveFlag("在库");
+                            costEnterpriseMapper.updateByPrimaryKey(costEnterprise2);
+                        }
+                        costEnterprise.setEffectiveFlag(assessParam.getEffectiveFlag());
+                        assessMapper.updateByPrimaryKey(assessParam);
+                        costEnterpriseMapper.updateByPrimaryKey(costEnterprise);
+                    } else if (assessScore > 65) {
+                        assessParam.setAssessResult("第一档");
+                        assessParam.setYaohaoGrade("第一档");
+                        assessParam.setRukuStatus("在库");
+                        assessParam.setEffectiveFlag("在库");
+                        assessMapper.updateByPrimaryKey(assessParam);
+                        costEnterprise.setEffectiveFlag(assessParam.getEffectiveFlag());
+                        costEnterpriseMapper.updateByPrimaryKey(costEnterprise);
+                    }
+                }
+            }
+            result.setStatus(200);
+        } else {
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/18
+     * 跳转新增或者修改页面
+     */
+    @Override
+    public String toEdit(HttpServletRequest request) {
+        SysUser currentUser = shiroUtil.getInstance().currentUser();
+        String url = "";
+        String id = request.getParameter("id");
+        String scoreRankStr = request.getParameter("scoreRankStr");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = sdf.format(new Date());
+        String regYear = currentDate.substring(0, 4);
+        if (null != id && !"".equals(id)) {
+            //修改
+            url = "/assess/update";
+            YaohaoAssessParam param = assessMapper.queryOne(id);
+            param.setScoreRank(Integer.parseInt(scoreRankStr));
+            request.setAttribute("obj", param);
+            request.setAttribute("url", url);
+            return "/yaohao/assess/detail";
+        } else {
+            //新增
+            url = "/assess/insert";
+            YaohaoAssessParam param = new YaohaoAssessParam();
+            param.setId(OrderUtil.buildOrderId(""));
+            param.setCreater(currentUser.getName());
+            param.setYear(regYear);
+            request.setAttribute("obj", param);
+            request.setAttribute("url", url);
+            return "/yaohao/assess/assessAdd";
+        }
+    }
+
+    /**
+     * created by ZYL on 2019/7/17
+     * 更新综合考核单
+     */
+    @Override
+    public GlobalResult updateByPrimaryKeySelective(YaohaoAssessParam assessParam) {
+        GlobalResult result = new GlobalResult();
+        String code = assessMapper.selectEnterpriseCodeByName(assessParam.getEnterpriseName()).getCode();
+        assessParam.setEnterpriseCode(code);
+        CostEnterprise costEnterprise = assessMapper.selectEnterpriseCodeByCode(assessParam.getEnterpriseCode());
+        costEnterprise.setEffectiveFlag(assessParam.getRukuStatus());
+        int temp = assessMapper.updateByPrimaryKey(assessParam);
+        int temp2 = costEnterpriseMapper.updateByPrimaryKey(costEnterprise);
+        if (temp + temp2 > 1) {
+            result.setStatus(200);
+        } else {
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/10
+     * 获取所有的考核年份
+     */
+    @Override
+    public String queryYear(HttpServletRequest request) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = sdf.format(new Date());
+        String currentYear = currentDate.substring(0, 4);
+        request.setAttribute("currentYear", currentYear);
+        request.setAttribute("years", assessMapper.queryYear());
+        return "/yaohao/assess/list";
+    }
+
+    /**
+     * created by ZYL on 2019/7/9
+     * 根据条件检索数据
+     */
+    @Override
+    public EUDataGridResult selectListByMap(HttpServletRequest request, int page, int rows, Map<String, Object> map) {
+        EUDataGridResult result = new EUDataGridResult();
+        String enterpriseName = request.getParameter("enterpriseName");
+        String rukuStatus = request.getParameter("rukuStatus");
+        String year = request.getParameter("year");
+        String assessResult = request.getParameter("assessResult");
+        String yaohaoGrade = request.getParameter("yaohaoGrade");
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        map.put("enterpriseName", enterpriseName);
+        map.put("rukuStatus", rukuStatus);
+        if (year != null) {
+            map.put("year", year);
+        } else {
+            Calendar date = Calendar.getInstance();
+            String yearStr = String.valueOf(date.get(Calendar.YEAR));
+            map.put("year", yearStr);
+        }
+        map.put("assessResult", assessResult);
+        map.put("yaohaoGrade", yaohaoGrade);
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("isPage", true);
+        map.put("curPage", rows * (page - 1));
+        map.put("pageSize", rows);
+        List<YaohaoAssessParam> list = assessMapper.selectListByMap(map);
+        int temp = 1;
+        //设置排名
+        for (YaohaoAssessParam list2 : list) {
+            list2.setScoreRankStr(temp);
+            temp++;
+        }
+        int total = assessMapper.selectCountByMap(map);
+        result.setRows(list);
+        result.setTotal(total);
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/17
+     * 查询有效时间内的入库企业
+     */
+    @Override
+    public EUDataGridResult queryEnterpriseByParam(HttpServletRequest request, int page, int rows, Map<String, Object> map) {
+        EUDataGridResult result = new EUDataGridResult();
+        List<YaohaoAssessParam> assessParamList = null;
+        String enterpriseName = request.getParameter("enterpriseName");
+        String startTime = request.getParameter("startTime");
+        String endTime = String.valueOf(Integer.parseInt(startTime) + 2);
+        if (null != startTime && !"".equals(startTime)) {
+            map.put("startTime", startTime + "-01-01");
+            map.put("year", startTime);
+        }
+        if (null != endTime && !"".equals(endTime)) {
+            map.put("endTime", endTime + "-12-30");
+        }
+        map.put("enterpriseName", enterpriseName);
+        map.put("isPage", true);
+        map.put("curPage", rows * (page - 1));
+        map.put("pageSize", rows);
+        assessParamList = assessMapper.queryEnterpriseByParam(map);
+        if (assessParamList != null) {
+            int temp = assessMapper.countEnterpriseByParam(map);
+            if (assessParamList.size() > 0 && temp > 0) {
+                result.setRows(assessParamList);
+                result.setTotal(temp);
+            } else {
+                result.setRows(assessParamList);
+                result.setTotal(temp);
+            }
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/9
+     * 综合考核导出excel表格
+     */
+    @Override
+    public EUDataGridResult exportExcel(HttpServletRequest request, HttpServletResponse response, String year) {
+        EUDataGridResult result = new EUDataGridResult();
+        List<YaohaoAssessParam> list = new ArrayList<YaohaoAssessParam>();
+        Map<String, Object> selectMap = new HashMap<String, Object>();
+        try {
+            String costEnterpriseIds = request.getParameter("costEnterpriseIds");
+            String scoreRankStrs = request.getParameter("scoreRankStrs");
+            String[] arr2 = new String[0];
+            if (null != costEnterpriseIds && !"".equals(costEnterpriseIds) && null != scoreRankStrs && !"".equals(scoreRankStrs)) {
+                String[] arr = costEnterpriseIds.split(",");
+                arr2 = scoreRankStrs.split(",");
+                for (String costEnterpriseId : arr) {
+                    selectMap.put("costEnterpriseId", costEnterpriseId);
+                    YaohaoAssessParam param = assessMapper.selectOne(selectMap);
+                    list.add(param);
+                }
+            } else {
+                if (year != null) {
+                    selectMap.put("year", year);
+                }
+                list = assessMapper.selectListByMap(selectMap);
+            }
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String path = request.getSession().getServletContext().getRealPath("/template/report/assess_template.xlsx");
+            String newPath = "";
+            String dateString = formatter.format(new Date());
+            newPath = request.getSession().getServletContext().getRealPath("/template/temp/综合考核_" + dateString + ".xlsx");
+            Map<String, List<List<String>>> date = new HashMap<String, List<List<String>>>();
+            List<List<String>> rowList = new ArrayList<List<String>>();
+            SysUser user = shiroUtil.getInstance().currentUser();
+            List<String> cellList = new ArrayList<String>();
+            int temp = 1;
+            int temp2 = 0;
+            for (YaohaoAssessParam param : list) {
+                cellList = new ArrayList<String>();
+                cellList.add(param.getEnterpriseName());
+                cellList.add(param.getRukuStatus());
+                cellList.add(param.getYear());
+                cellList.add(param.getAssessScore() + "");
+                if (arr2.length > 0) {
+                    cellList.add(arr2[temp2] + "");
+                } else {
+                    cellList.add(temp + "");
+                }
+                cellList.add(param.getAssessResult());
+                cellList.add(param.getYaohaoGrade());
+                cellList.add(param.getRater());
+                cellList.add(formatter.format(param.getCreateTime()));
+                cellList.add(param.getCreater());
+                rowList.add(cellList);
+                temp++;
+                temp2++;
+            }
+            date.put("综合考核", rowList);
+            try {
+                ExcelUtil.copyExcel(1, date, path, newPath, request, response);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+}

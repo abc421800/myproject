@@ -1,0 +1,1029 @@
+package com.cost168.costaudit.service.work.impl;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.GlobalResult;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.work.WorkRegisterMapper;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.pojo.work.WorkRegisterExample;
+import com.cost168.costaudit.pojo.work.vo.WorkRegisterVo;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+
+@Service
+public class WorkRegisterServiceImpl implements WorkRegisterService {
+
+    @Autowired
+    private WorkRegisterMapper workRegisterMapper;
+
+    @Autowired
+    private WorkPersonService workPersonService;
+
+    @Autowired
+    private WorkEnterpriseService workEnterpriseService;
+
+    @Override
+    public List<WorkRegister> selectByExample(WorkRegisterExample example) {
+        return workRegisterMapper.selectByExample(example);
+    }
+
+    @Override
+    public WorkRegister selectByPrimaryKey(String id) {
+        return workRegisterMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int insertSelective(WorkRegister record) {
+        return workRegisterMapper.insertSelective(record);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(WorkRegister record) {
+        return workRegisterMapper.updateByPrimaryKeySelective(record);
+    }
+
+    @Override
+    public int deleteByPrimaryKey(String id) {
+        return workRegisterMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public List<WorkRegisterVo> selectListByMap(Map<String, Object> map) {
+        return workRegisterMapper.selectListByMap(map);
+    }
+
+    @Override
+    public int selectCountByMap(Map<String, Object> map) {
+        return workRegisterMapper.selectCountByMap(map);
+    }
+
+    @Override
+    public List<WorkRegister> selectByDay(Map<String, Object> map) {
+        return workRegisterMapper.selectByDay(map);
+    }
+
+    @Override
+    public String selectYearList() {
+        return workRegisterMapper.selectYearList();
+    }
+
+    @Override
+    public String selectMonthList() {
+        return workRegisterMapper.selectMonthList();
+    }
+
+    /**
+     * created by ZYL on 2019/6/12
+     * 考勤管理导入
+     */
+    @Override
+    public void attendanceImport(HttpServletRequest request) {
+        try {
+            MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+            List<MultipartFile> files = multipartRequest.getFiles("file");
+            if (files.size() > 0) {
+                MultipartFile file = files.get(0);
+                String fileName = file.getOriginalFilename();
+                SimpleDateFormat fmt = new SimpleDateFormat("yyyy-MM-dd");
+                String nowDate = fmt.format(new Date());
+                Properties props = new Properties();
+                props.load(this.getClass().getResourceAsStream("/resource/resource.properties"));
+                String path = (String) props.get("fileupload");
+                path = path + "attendance" + nowDate + "/";
+                File filePath = new File(path + fileName);
+                if (!filePath.exists()) {
+                    filePath.mkdirs();
+                }
+                file.transferTo(filePath);
+                String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                Workbook wb = null;
+                InputStream stream = new FileInputStream(filePath);
+                if (suffix.equals("xls")) {
+                    POIFSFileSystem fs = new POIFSFileSystem(stream);
+                    wb = new HSSFWorkbook(fs);
+                } else if (suffix.equals("xlsx")) {
+                    wb = new XSSFWorkbook(stream);
+                }
+                SysUser currentUser = shiroUtil.getInstance().currentUser();
+                Sheet sheet = wb.getSheetAt(0);
+                if (sheet != null) {
+                    int index = sheet.getLastRowNum();
+                    WorkRegister workRegister = null;
+                    SysUser user = shiroUtil.getInstance().currentUser();
+                    Date date = new Date();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    for (int i = 2; i <= index; i++) {
+                        Row row = sheet.getRow(i);
+                        if (row != null) {
+                            Cell cell2 = row.getCell(2);
+                            String name = cell2.toString();
+                            WorkPerson wp = workPersonService.selectByName(name);
+                            //判断名字是否重复，不重复则插入数据
+                            if (null != wp) {
+                                //插入register
+                                //1号
+                                workRegister = new WorkRegister();
+                                String id = UUID.randomUUID().toString().replace("-", "");
+                                String year = row.getCell(0).toString();
+                                String month = row.getCell(1).toString();
+                                workRegister.setId(id);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year + month);
+                                workRegister.setRegYear(year);
+                                workRegister.setRegMonth(month);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("1");
+                                if ("上班".equals(row.getCell(3).toString()) && "上班".equals(row.getCell(4).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(3).toString()) && !"上班".equals(row.getCell(4).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(3).toString()) && "上班".equals(row.getCell(4).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year + month + "1"));
+//                                workRegisterMapper.insertSelective(workRegister);
+                                //2号
+                                workRegister = new WorkRegister();
+                                String id2 = UUID.randomUUID().toString().replace("-", "");
+                                String year2 = row.getCell(0).toString();
+                                String month2 = row.getCell(1).toString();
+                                workRegister.setId(id2);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year2 + month2);
+                                workRegister.setRegYear(year2);
+                                workRegister.setRegMonth(month2);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("2");
+                                if ("上班".equals(row.getCell(5).toString()) && "上班".equals(row.getCell(6).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(5).toString()) && !"上班".equals(row.getCell(6).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(5).toString()) && "上班".equals(row.getCell(6).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year2 + month2 + "2"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //3号
+                                workRegister = new WorkRegister();
+                                String id3 = UUID.randomUUID().toString().replace("-", "");
+                                String year3 = row.getCell(0).toString();
+                                String month3 = row.getCell(1).toString();
+                                workRegister.setId(id3);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year3 + month3);
+                                workRegister.setRegYear(year3);
+                                workRegister.setRegMonth(month3);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("3");
+                                if ("上班".equals(row.getCell(7).toString()) && "上班".equals(row.getCell(8).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(7).toString()) && !"上班".equals(row.getCell(8).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(7).toString()) && "上班".equals(row.getCell(8).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year3 + month3 + "3"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //4号
+                                workRegister = new WorkRegister();
+                                String id4 = UUID.randomUUID().toString().replace("-", "");
+                                String year4 = row.getCell(0).toString();
+                                String month4 = row.getCell(1).toString();
+                                workRegister.setId(id4);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year4 + month4);
+                                workRegister.setRegYear(year4);
+                                workRegister.setRegMonth(month4);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("4");
+                                if ("上班".equals(row.getCell(9).toString()) && "上班".equals(row.getCell(10).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(9).toString()) && !"上班".equals(row.getCell(10).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(9).toString()) && "上班".equals(row.getCell(10).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year4 + month4 + "4"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //5号
+                                workRegister = new WorkRegister();
+                                String id5 = UUID.randomUUID().toString().replace("-", "");
+                                String year5 = row.getCell(0).toString();
+                                String month5 = row.getCell(1).toString();
+                                workRegister.setId(id5);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year5 + month5);
+                                workRegister.setRegYear(year5);
+                                workRegister.setRegMonth(month5);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("5");
+                                if ("上班".equals(row.getCell(11).toString()) && "上班".equals(row.getCell(12).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(11).toString()) && !"上班".equals(row.getCell(12).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(11).toString()) && "上班".equals(row.getCell(12).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year5 + month5 + "5"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //6号
+                                workRegister = new WorkRegister();
+                                String id6 = UUID.randomUUID().toString().replace("-", "");
+                                String year6 = row.getCell(0).toString();
+                                String month6 = row.getCell(1).toString();
+                                workRegister.setId(id6);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year6 + month6);
+                                workRegister.setRegYear(year6);
+                                workRegister.setRegMonth(month6);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("6");
+                                if ("上班".equals(row.getCell(13).toString()) && "上班".equals(row.getCell(14).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(13).toString()) && !"上班".equals(row.getCell(14).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(13).toString()) && "上班".equals(row.getCell(14).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year6 + month6 + "6"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //7号
+                                workRegister = new WorkRegister();
+                                String id7 = UUID.randomUUID().toString().replace("-", "");
+                                String year7 = row.getCell(0).toString();
+                                String month7 = row.getCell(1).toString();
+                                workRegister.setId(id7);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year7 + month7);
+                                workRegister.setRegYear(year7);
+                                workRegister.setRegMonth(month7);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("7");
+                                if ("上班".equals(row.getCell(15).toString()) && "上班".equals(row.getCell(16).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(15).toString()) && !"上班".equals(row.getCell(16).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(15).toString()) && "上班".equals(row.getCell(16).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year7 + month7 + "7"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //8号
+                                workRegister = new WorkRegister();
+                                String id8 = UUID.randomUUID().toString().replace("-", "");
+                                String year8 = row.getCell(0).toString();
+                                String month8 = row.getCell(1).toString();
+                                workRegister.setId(id8);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year8 + month8);
+                                workRegister.setRegYear(year8);
+                                workRegister.setRegMonth(month8);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("8");
+                                if ("上班".equals(row.getCell(17).toString()) && "上班".equals(row.getCell(18).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(17).toString()) && !"上班".equals(row.getCell(18).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(17).toString()) && "上班".equals(row.getCell(18).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year8 + month8 + "8"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //9号
+                                workRegister = new WorkRegister();
+                                String id9 = UUID.randomUUID().toString().replace("-", "");
+                                String year9 = row.getCell(0).toString();
+                                String month9 = row.getCell(1).toString();
+                                workRegister.setId(id9);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year9 + month9);
+                                workRegister.setRegYear(year9);
+                                workRegister.setRegMonth(month9);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("9");
+                                if ("上班".equals(row.getCell(18).toString()) && "上班".equals(row.getCell(19).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(18).toString()) && !"上班".equals(row.getCell(19).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(18).toString()) && "上班".equals(row.getCell(19).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year9 + month9 + "9"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //10号
+                                workRegister = new WorkRegister();
+                                String id10 = UUID.randomUUID().toString().replace("-", "");
+                                String year10 = row.getCell(0).toString();
+                                String month10 = row.getCell(1).toString();
+                                workRegister.setId(id10);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year10 + month10);
+                                workRegister.setRegYear(year10);
+                                workRegister.setRegMonth(month10);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("10");
+                                if ("上班".equals(row.getCell(20).toString()) && "上班".equals(row.getCell(21).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(20).toString()) && !"上班".equals(row.getCell(21).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(20).toString()) && "上班".equals(row.getCell(21).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year10 + month10 + "10"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //11号
+                                workRegister = new WorkRegister();
+                                String id11 = UUID.randomUUID().toString().replace("-", "");
+                                String year11 = row.getCell(0).toString();
+                                String month11 = row.getCell(1).toString();
+                                workRegister.setId(id11);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year11 + month11);
+                                workRegister.setRegYear(year11);
+                                workRegister.setRegMonth(month11);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("11");
+                                if ("上班".equals(row.getCell(22).toString()) && "上班".equals(row.getCell(23).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(22).toString()) && !"上班".equals(row.getCell(23).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(22).toString()) && "上班".equals(row.getCell(23).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year11 + month11 + "11"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //12号
+                                workRegister = new WorkRegister();
+                                String id12 = UUID.randomUUID().toString().replace("-", "");
+                                String year12 = row.getCell(0).toString();
+                                String month12 = row.getCell(1).toString();
+                                workRegister.setId(id12);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year12 + month12);
+                                workRegister.setRegYear(year12);
+                                workRegister.setRegMonth(month12);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("12");
+                                if ("上班".equals(row.getCell(24).toString()) && "上班".equals(row.getCell(25).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(24).toString()) && !"上班".equals(row.getCell(25).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(24).toString()) && "上班".equals(row.getCell(25).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year12 + month12 + "12"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //13号
+                                workRegister = new WorkRegister();
+                                String id13 = UUID.randomUUID().toString().replace("-", "");
+                                String year13 = row.getCell(0).toString();
+                                String month13 = row.getCell(1).toString();
+                                workRegister.setId(id13);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year13 + month13);
+                                workRegister.setRegYear(year13);
+                                workRegister.setRegMonth(month13);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("13");
+                                if ("上班".equals(row.getCell(26).toString()) && "上班".equals(row.getCell(27).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(26).toString()) && !"上班".equals(row.getCell(27).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(26).toString()) && "上班".equals(row.getCell(27).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year13 + month13 + "13"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //14号
+                                workRegister = new WorkRegister();
+                                String id14 = UUID.randomUUID().toString().replace("-", "");
+                                String year14 = row.getCell(0).toString();
+                                String month14 = row.getCell(1).toString();
+                                workRegister.setId(id14);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year14 + month14);
+                                workRegister.setRegYear(year14);
+                                workRegister.setRegMonth(month14);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("14");
+                                if ("上班".equals(row.getCell(28).toString()) && "上班".equals(row.getCell(29).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(28).toString()) && !"上班".equals(row.getCell(29).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(28).toString()) && "上班".equals(row.getCell(29).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year14 + month14 + "14"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //15号
+                                workRegister = new WorkRegister();
+                                String id15 = UUID.randomUUID().toString().replace("-", "");
+                                String year15 = row.getCell(0).toString();
+                                String month15 = row.getCell(1).toString();
+                                workRegister.setId(id15);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year15 + month15);
+                                workRegister.setRegYear(year15);
+                                workRegister.setRegMonth(month15);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("15");
+                                if ("上班".equals(row.getCell(30).toString()) && "上班".equals(row.getCell(31).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(30).toString()) && !"上班".equals(row.getCell(31).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(30).toString()) && "上班".equals(row.getCell(31).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year15 + month15 + "15"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //16号
+                                workRegister = new WorkRegister();
+                                String id16 = UUID.randomUUID().toString().replace("-", "");
+                                String year16 = row.getCell(0).toString();
+                                String month16 = row.getCell(1).toString();
+                                workRegister.setId(id16);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year16 + month16);
+                                workRegister.setRegYear(year16);
+                                workRegister.setRegMonth(month16);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("16");
+                                if ("上班".equals(row.getCell(32).toString()) && "上班".equals(row.getCell(33).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(32).toString()) && !"上班".equals(row.getCell(33).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(32).toString()) && "上班".equals(row.getCell(33).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year16 + month16 + "16"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //17号
+                                workRegister = new WorkRegister();
+                                String id17 = UUID.randomUUID().toString().replace("-", "");
+                                String year17 = row.getCell(0).toString();
+                                String month17 = row.getCell(1).toString();
+                                workRegister.setId(id17);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year17 + month17);
+                                workRegister.setRegYear(year17);
+                                workRegister.setRegMonth(month17);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("17");
+                                if ("上班".equals(row.getCell(34).toString()) && "上班".equals(row.getCell(35).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(34).toString()) && !"上班".equals(row.getCell(35).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(34).toString()) && "上班".equals(row.getCell(35).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year17 + month17 + "17"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //18号
+                                workRegister = new WorkRegister();
+                                String id18 = UUID.randomUUID().toString().replace("-", "");
+                                String year18 = row.getCell(0).toString();
+                                String month18 = row.getCell(1).toString();
+                                workRegister.setId(id18);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year18 + month18);
+                                workRegister.setRegYear(year18);
+                                workRegister.setRegMonth(month18);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("18");
+                                if ("上班".equals(row.getCell(36).toString()) && "上班".equals(row.getCell(37).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(36).toString()) && !"上班".equals(row.getCell(37).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(36).toString()) && "上班".equals(row.getCell(37).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year18 + month18 + "18"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //19号
+                                workRegister = new WorkRegister();
+                                String id19 = UUID.randomUUID().toString().replace("-", "");
+                                String year19 = row.getCell(0).toString();
+                                String month19 = row.getCell(1).toString();
+                                workRegister.setId(id19);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year19 + month19);
+                                workRegister.setRegYear(year19);
+                                workRegister.setRegMonth(month19);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("19");
+                                if ("上班".equals(row.getCell(38).toString()) && "上班".equals(row.getCell(39).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(38).toString()) && !"上班".equals(row.getCell(39).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(38).toString()) && "上班".equals(row.getCell(39).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year19 + month19 + "19"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //20号
+                                workRegister = new WorkRegister();
+                                String id20 = UUID.randomUUID().toString().replace("-", "");
+                                String year20 = row.getCell(0).toString();
+                                String month20 = row.getCell(1).toString();
+                                workRegister.setId(id20);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year20 + month20);
+                                workRegister.setRegYear(year20);
+                                workRegister.setRegMonth(month20);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("20");
+                                if ("上班".equals(row.getCell(40).toString()) && "上班".equals(row.getCell(41).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(40).toString()) && !"上班".equals(row.getCell(41).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(40).toString()) && "上班".equals(row.getCell(41).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year20 + month20 + "20"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //21号
+                                workRegister = new WorkRegister();
+                                String id21 = UUID.randomUUID().toString().replace("-", "");
+                                String year21 = row.getCell(0).toString();
+                                String month21 = row.getCell(1).toString();
+                                workRegister.setId(id21);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year21 + month21);
+                                workRegister.setRegYear(year21);
+                                workRegister.setRegMonth(month21);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("21");
+                                if ("上班".equals(row.getCell(42).toString()) && "上班".equals(row.getCell(43).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(42).toString()) && !"上班".equals(row.getCell(43).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(42).toString()) && "上班".equals(row.getCell(43).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year21 + month21 + "21"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //22号
+                                workRegister = new WorkRegister();
+                                String id22 = UUID.randomUUID().toString().replace("-", "");
+                                String year22 = row.getCell(0).toString();
+                                String month22 = row.getCell(1).toString();
+                                workRegister.setId(id22);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year22 + month22);
+                                workRegister.setRegYear(year22);
+                                workRegister.setRegMonth(month22);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("22");
+                                if ("上班".equals(row.getCell(44).toString()) && "上班".equals(row.getCell(45).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(44).toString()) && !"上班".equals(row.getCell(45).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(44).toString()) && "上班".equals(row.getCell(45).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year22 + month22 + "22"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //23号
+                                workRegister = new WorkRegister();
+                                String id23 = UUID.randomUUID().toString().replace("-", "");
+                                String year23 = row.getCell(0).toString();
+                                String month23 = row.getCell(1).toString();
+                                workRegister.setId(id23);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year23 + month23);
+                                workRegister.setRegYear(year23);
+                                workRegister.setRegMonth(month23);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("23");
+                                if ("上班".equals(row.getCell(46).toString()) && "上班".equals(row.getCell(47).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(46).toString()) && !"上班".equals(row.getCell(47).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(46).toString()) && "上班".equals(row.getCell(47).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year23 + month23 + "23"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //24号
+                                workRegister = new WorkRegister();
+                                String id24 = UUID.randomUUID().toString().replace("-", "");
+                                String year24 = row.getCell(0).toString();
+                                String month24 = row.getCell(1).toString();
+                                workRegister.setId(id24);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year24 + month24);
+                                workRegister.setRegYear(year24);
+                                workRegister.setRegMonth(month24);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("24");
+                                if ("上班".equals(row.getCell(48).toString()) && "上班".equals(row.getCell(49).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(48).toString()) && !"上班".equals(row.getCell(49).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(48).toString()) && "上班".equals(row.getCell(49).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year24 + month24 + "24"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //25号
+                                workRegister = new WorkRegister();
+                                String id25 = UUID.randomUUID().toString().replace("-", "");
+                                String year25 = row.getCell(0).toString();
+                                String month25 = row.getCell(1).toString();
+                                workRegister.setId(id25);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year25 + month25);
+                                workRegister.setRegYear(year25);
+                                workRegister.setRegMonth(month25);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("25");
+                                if ("上班".equals(row.getCell(50).toString()) && "上班".equals(row.getCell(51).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(50).toString()) && !"上班".equals(row.getCell(51).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(50).toString()) && "上班".equals(row.getCell(51).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year25 + month25 + "25"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //26号
+                                workRegister = new WorkRegister();
+                                String id26 = UUID.randomUUID().toString().replace("-", "");
+                                String year26 = row.getCell(0).toString();
+                                String month26 = row.getCell(1).toString();
+                                workRegister.setId(id26);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year26 + month26);
+                                workRegister.setRegYear(year26);
+                                workRegister.setRegMonth(month26);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("26");
+                                if ("上班".equals(row.getCell(52).toString()) && "上班".equals(row.getCell(53).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(52).toString()) && !"上班".equals(row.getCell(53).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(52).toString()) && "上班".equals(row.getCell(53).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year26 + month26 + "26"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //27号
+                                workRegister = new WorkRegister();
+                                String id27 = UUID.randomUUID().toString().replace("-", "");
+                                String year27 = row.getCell(0).toString();
+                                String month27 = row.getCell(1).toString();
+                                workRegister.setId(id27);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year27 + month27);
+                                workRegister.setRegYear(year27);
+                                workRegister.setRegMonth(month27);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("27");
+                                if ("上班".equals(row.getCell(54).toString()) && "上班".equals(row.getCell(55).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(54).toString()) && !"上班".equals(row.getCell(55).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(54).toString()) && "上班".equals(row.getCell(55).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year27 + month27 + "27"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //28号
+                                workRegister = new WorkRegister();
+                                String id28 = UUID.randomUUID().toString().replace("-", "");
+                                String year28 = row.getCell(0).toString();
+                                String month28 = row.getCell(1).toString();
+                                workRegister.setId(id28);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year28 + month28);
+                                workRegister.setRegYear(year28);
+                                workRegister.setRegMonth(month28);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("28");
+                                if ("上班".equals(row.getCell(56).toString()) && "上班".equals(row.getCell(57).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(56).toString()) && !"上班".equals(row.getCell(57).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(56).toString()) && "上班".equals(row.getCell(57).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year28 + month28 + "28"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //29号
+                                workRegister = new WorkRegister();
+                                String id29 = UUID.randomUUID().toString().replace("-", "");
+                                String year29 = row.getCell(0).toString();
+                                String month29 = row.getCell(1).toString();
+                                workRegister.setId(id29);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year29 + month29);
+                                workRegister.setRegYear(year29);
+                                workRegister.setRegMonth(month29);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("29");
+                                if ("上班".equals(row.getCell(58).toString()) && "上班".equals(row.getCell(59).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(58).toString()) && !"上班".equals(row.getCell(59).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(58).toString()) && "上班".equals(row.getCell(59).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year29 + month29 + "29"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //30号
+                                workRegister = new WorkRegister();
+                                String id30 = UUID.randomUUID().toString().replace("-", "");
+                                String year30 = row.getCell(0).toString();
+                                String month30 = row.getCell(1).toString();
+                                workRegister.setId(id30);
+                                workRegister.setPersonId(wp.getAccount());
+                                workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                workRegister.setRegYearMonth(year30 + month30);
+                                workRegister.setRegYear(year30);
+                                workRegister.setRegMonth(month30);
+                                workRegister.setMorning(row.getCell(3).toString());
+                                workRegister.setAfternoon(row.getCell(4).toString());
+                                workRegister.setRegDay("30");
+                                if ("上班".equals(row.getCell(60).toString()) && "上班".equals(row.getCell(61).toString())) {
+                                    workRegister.setWorkingDay(1.0f);
+                                } else if ("上班".equals(row.getCell(60).toString()) && !"上班".equals(row.getCell(61).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else if (!"上班".equals(row.getCell(60).toString()) && "上班".equals(row.getCell(61).toString())) {
+                                    workRegister.setWorkingDay(0.5f);
+                                } else {
+                                    workRegister.setWorkingDay(0.0f);
+                                }
+                                workRegister.setCreater(user.getName());
+                                workRegister.setCreateTime(date);
+                                workRegister.setRemark(row.getCell(66).toString());
+                                workRegister.setRegisterTime(sdf.parse(year30 + month30 + "30"));
+                                //                                workRegisterMapper.insertSelective(workRegister);
+                                //如果31号无考勤情况，则不插入数据
+                                if ("".equals(row.getCell(62).toString()) && "".equals(row.getCell(63).toString())) {
+                                } else {
+                                    workRegister = new WorkRegister();
+                                    String id31 = UUID.randomUUID().toString().replace("-", "");
+                                    String year31 = row.getCell(0).toString();
+                                    String month31 = row.getCell(1).toString();
+                                    workRegister.setId(id31);
+                                    workRegister.setPersonId(wp.getAccount());
+                                    workRegister.setEnterpriseId(wp.getEnterpriseId());
+                                    workRegister.setRegYearMonth(year31 + month31);
+                                    workRegister.setRegYear(year31);
+                                    workRegister.setRegMonth(month31);
+                                    workRegister.setMorning(row.getCell(3).toString());
+                                    workRegister.setAfternoon(row.getCell(4).toString());
+                                    workRegister.setRegDay("31");
+                                    if ("上班".equals(row.getCell(62).toString()) && "上班".equals(row.getCell(63).toString())) {
+                                        workRegister.setWorkingDay(1.0f);
+                                    } else if ("上班".equals(row.getCell(62).toString()) && !"上班".equals(row.getCell(63).toString())) {
+                                        workRegister.setWorkingDay(0.5f);
+                                    } else if (!"上班".equals(row.getCell(62).toString()) && "上班".equals(row.getCell(63).toString())) {
+                                        workRegister.setWorkingDay(0.5f);
+                                    } else {
+                                        workRegister.setWorkingDay(0.0f);
+                                    }
+                                    workRegister.setCreater(user.getName());
+                                    workRegister.setCreateTime(date);
+                                    workRegister.setRemark(row.getCell(66).toString());
+                                    workRegister.setRegisterTime(sdf.parse(year31 + month31 + "31"));
+                                    //                                workRegisterMapper.insertSelective(workRegister);
+                                }
+                            }
+                        } else {
+                            continue;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

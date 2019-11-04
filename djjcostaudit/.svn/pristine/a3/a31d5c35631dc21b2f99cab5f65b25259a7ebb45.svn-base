@@ -1,0 +1,142 @@
+package com.cost168.costaudit.service.sys.impl;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.sys.SysUserMapper;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.sys.SysUserExample;
+import com.cost168.costaudit.pojo.sys.SysUserExample.Criteria;
+import com.cost168.costaudit.pojo.sys.SysUserOrgKey;
+import com.cost168.costaudit.pojo.sys.SysUserRoleKey;
+import com.cost168.costaudit.service.sys.SysUserOrgService;
+import com.cost168.costaudit.service.sys.SysUserRoleService;
+import com.cost168.costaudit.service.sys.SysUserService;
+
+@Service
+public class SysUserServiceImpl implements SysUserService {
+	
+	@Autowired
+	private SysUserMapper sysUserMapper;
+	@Autowired
+	private SysUserOrgService sysUserOrgService;
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
+	
+
+	@Override
+	public List<SysUser> selectByExample(SysUserExample example) {
+		return sysUserMapper.selectByExample(example);
+	}
+
+	@Override
+	public SysUser selectByPrimaryKey(String id) {
+		return sysUserMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(SysUser sysUser,Map<String, Object> map) {
+		if(null!=map){
+			String roleId=(String) map.get("roleId");
+			String orgId=(String) map.get("orgId");
+			if(!StringUtils.isBlank(orgId)){
+				SysUserOrgKey uo=new SysUserOrgKey();
+				uo.setUserId(sysUser.getId());
+				uo.setOrgId(orgId);
+				sysUserOrgService.insertSelective(uo);
+			}
+			if(!StringUtils.isBlank(roleId)){
+				String rIds[]=roleId.split(",");
+				SysUserRoleKey uR=null;
+				for( String r:rIds){
+					uR=new SysUserRoleKey();
+					uR.setUserId(sysUser.getId());
+					uR.setRoleId(r);
+					sysUserRoleService.insertSelective(uR);
+				}
+			}
+		}
+		sysUser.setCreateTime(new Date());
+		return sysUserMapper.insertSelective(sysUser);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(SysUser sysUser,Map<String, Object> map) {
+		if(null!=map){
+			String roleId=(String) map.get("roleId");
+			String orgId=(String) map.get("orgId");
+			if(orgId!=null && !"".equals(orgId)){
+				sysUserOrgService.deleteUserOrgByUserId(sysUser.getId());
+				SysUserOrgKey uo=new SysUserOrgKey();
+				uo.setUserId(sysUser.getId());
+				uo.setOrgId(orgId);
+				sysUserOrgService.insertSelective(uo);
+			}
+			if(roleId!=null && !"".equals(roleId)){
+				sysUserRoleService.deleteUserRoleByUserId(sysUser.getId());
+				String rIds[]=roleId.split(",");
+				SysUserRoleKey uR=null;
+				for( String r:rIds){
+					uR=new SysUserRoleKey();
+					uR.setUserId(sysUser.getId());
+					uR.setRoleId(r);
+					sysUserRoleService.insertSelective(uR);
+				}
+			}
+		}
+		sysUser.setUpdateTime(new Date());
+		return sysUserMapper.updateByPrimaryKeySelective(sysUser);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return sysUserMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<SysUser> selectListByMap(Map<String, Object> map) {
+		return sysUserMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return sysUserMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public SysUser getUserByAccount(String Account) {
+		SysUserExample example=new SysUserExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andAccountEqualTo(Account);
+		List<SysUser> list= sysUserMapper.selectByExample(example);
+		SysUser user=null;
+		if(null!=list && list.size()>0){
+			user=list.get(0);
+		}
+		return user;
+	}
+
+	@Override
+	public String allPermByUserId(String userId) {
+		return sysUserMapper.allPermByUserId(userId);
+	}
+
+	@Override
+	public SysUser selectByUserName(String userName) {
+		SysUserExample example=new SysUserExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andNameEqualTo(userName);
+		List<SysUser> userList=sysUserMapper.selectByExample(example);
+		if(null!=userList && userList.size()>0){
+			return userList.get(0);
+		}else{
+			return null;
+		}
+	}
+
+}

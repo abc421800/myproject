@@ -1,0 +1,892 @@
+package com.cost168.costaudit.service.work.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.work.WorkProcessApplyMapper;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.work.WorkCalendar;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.WorkProcessApply;
+import com.cost168.costaudit.pojo.work.WorkProcessApplyExample;
+import com.cost168.costaudit.pojo.work.WorkProcessHistory;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.service.sys.SysUserService;
+import com.cost168.costaudit.service.work.WorkCalendarService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.service.work.WorkProcessApplyService;
+import com.cost168.costaudit.service.work.WorkProcessHistoryService;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.GlobalResult;
+
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class WorkProcessApplyServiceImpl implements WorkProcessApplyService {
+
+	@Autowired
+	private WorkProcessApplyMapper workProcessApplyMapper;
+	@Autowired
+	private WorkPersonService workPersonService;
+	@Autowired
+	private WorkCalendarService workCalendarService;
+	@Autowired
+	private WorkProcessHistoryService workProcessHistoryService;
+	@Autowired
+	private WorkRegisterService workRegisterService;
+	@Autowired
+	private SysUserService sysUserService;
+
+	@Override
+	public List<WorkProcessApply> selectByExample(
+			WorkProcessApplyExample example) {
+		return workProcessApplyMapper.selectByExample(example);
+	}
+
+	@Override
+	public WorkProcessApply selectByPrimaryKey(String id) {
+		return workProcessApplyMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(WorkProcessApply record) {
+		return workProcessApplyMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(WorkProcessApply workProcessApply) {
+		return workProcessApplyMapper
+				.updateByPrimaryKeySelective(workProcessApply);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return workProcessApplyMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<WorkProcessApply> selectListByMap(Map<String, Object> map) {
+		return workProcessApplyMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return workProcessApplyMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public void save(HttpServletRequest request,
+					 WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		String remarkQt = request.getParameter("remarkQt");
+		if (null != remarkQt && !"".equals(remarkQt) && !"其他".equals(remarkQt)) {
+			workProcessApply.setRemark(remarkQt);
+		}
+		SysUser currentUser = shiroUtil.getInstance().currentUser();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String leaveTime = request.getParameter("leaveTime");
+		String start = leaveTime.substring(0, 10);
+		String end = leaveTime.substring(leaveTime.length() - 10,
+				leaveTime.length());
+		String regYear = start.substring(0, 4);
+		WorkPerson wp = workPersonService.selectByAccount(workProcessApply
+				.getProposer());
+		Float total = Float.parseFloat(wp.getAnnualLeaveTotal());
+		Float usedup = Float.parseFloat(wp.getAnnualLeaveUseup());
+		workProcessApply.setLeaveStartTime(sdf.parse(start));
+		workProcessApply.setLeaveEndTime(sdf.parse(end));
+		workProcessApply.setStatus("审批中");
+		workProcessApply.setCreateTime(new Date());
+		String type = workProcessApply.getType();
+		// 请假天数
+		String startDay = start.substring(8, 10).replace("0", "");
+		String endDay = end.substring(8, 10).replace("0", "");
+		int s = Integer.parseInt(startDay);
+		int e = Integer.parseInt(endDay);
+		List<String> excepdays = new ArrayList<String>();
+		WorkCalendar wc = workCalendarService.selectByPrimaryKey(regYear);
+		if (null != wc && null != wc.getExcepdays()) {
+			excepdays = Arrays.asList(wc.getExcepdays().replaceAll(" ", "")
+					.split(","));
+		}
+		float a = 0;
+		for (int i = s; i <= e; i++) {
+			String temDate = "";
+			if (i < 10) {
+				temDate = regYear + "-" + start.substring(5, 7) + "-0" + i + "";
+			} else {
+				temDate = regYear + "-" + start.substring(5, 7) + "-" + i + "";
+			}
+			if (!excepdays.contains(temDate)) {
+				a++;
+			}
+		}
+		// 判断是半天还是全天
+		String morAftAll = workProcessApply.getMorAftAll();
+		if ("全天".equals(morAftAll)) {
+			workProcessApply.setLeaveDays(a);
+		} else {
+			workProcessApply.setLeaveDays(a / 2);
+		}
+		// 判断是否有可休年假
+		Float ky = total - usedup;
+		if ("年休假".equals(type)) {
+			// long days=OrderUtil.getDaySub(start,end);
+			if (a > ky) {
+				result.setStatus(300);
+			} else {
+				workProcessApply.setKxnj(ky);
+				insertSelective(workProcessApply);
+				saveHistory(workProcessApply, currentUser);
+				result.setStatus(200);
+			}
+		} else {
+			workProcessApply.setKxnj(ky);
+			insertSelective(workProcessApply);
+			// 插入历史表
+			saveHistory(workProcessApply, currentUser);
+			result.setStatus(200);
+		}
+	}
+
+	private void saveHistory(WorkProcessApply workProcessApply,
+							 SysUser currentUser) {
+		Calendar calendar = Calendar.getInstance();
+		WorkProcessHistory wph = new WorkProcessHistory();
+		String id = UUID.randomUUID().toString().replace("-", "");
+		wph.setId(id);
+		wph.setOperatorId(currentUser.getAccount());
+		wph.setOperatorName(currentUser.getName());
+		if (null == workProcessApply.getOpinion()
+				|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setProcessId(workProcessApply.getId());
+		wph.setRelatedId(workProcessApply.getRelatedId());
+		wph.setRelatedName(workProcessApply.getRelatedName());
+		wph.setOperatorNode("发起");
+		wph.setCreateTime(new Date());
+		calendar.add(Calendar.SECOND, 1);
+		wph.setOperatorTime(new Date());
+		wph.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph);
+		WorkProcessHistory wph2 = new WorkProcessHistory();
+		String id2 = UUID.randomUUID().toString().replace("-", "");
+		wph2.setId(id2);
+		wph2.setOperatorId(workProcessApply.getNextperson());
+		wph2.setOperatorName(workProcessApply.getNextpersonName());
+		wph2.setProcessId(workProcessApply.getId());
+		wph2.setRelatedId(workProcessApply.getRelatedId());
+		wph2.setRelatedName(workProcessApply.getRelatedName());
+		wph2.setOperatorNode("审批中");
+		wph2.setCreateTime(new Date());
+		calendar.add(Calendar.SECOND, 2);
+		wph2.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph2);
+	}
+
+	@Override
+	public void handleTask(HttpServletRequest request,
+						   WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		wp.setStatus("结束");
+		wp.setRemark(workProcessApply.getRemark());
+		updateByPrimaryKeySelective(wp);
+		// 更新当前状态时间
+		Map<String, Object> map1 = new HashMap<String, Object>();
+		map1.put("processId", workProcessApply.getId());
+		WorkProcessHistory wph = workProcessHistoryService.getCurrentNode(map1);
+		wph.setOperatorNode("结束");
+		if (null == workProcessApply.getOpinion()
+				|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setOperatorTime(new Date());
+		workProcessHistoryService.updateByPrimaryKeySelective(wph);
+		// 插入考勤表
+		addAttendance(request, workProcessApply, result);
+	}
+
+	// 修改考勤表信息
+	public void addAttendance(HttpServletRequest request,
+							  WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		String regYear = wp.getLeaveStartTimeStr().substring(0, 4);
+		String regMonth = wp.getLeaveStartTimeStr().substring(5, 7)
+				.replace("0", "");
+		String yearMonth = regYear + regMonth;
+		String leaveStart = wp.getLeaveStartTimeStr();
+		String leaveEnd = wp.getLeaveEndTimeStr();
+		// long days=OrderUtil.getDaySub(leaveStart,leaveEnd);
+		String startDay = leaveStart.substring(8, 10);
+		String endDay = leaveEnd.substring(8, 10);
+		int s = Integer.parseInt(startDay);
+		int e = Integer.parseInt(endDay);
+		Map<String, Object> map = new HashMap<String, Object>();
+		List<String> excepdays = new ArrayList<String>();
+		WorkCalendar wc = workCalendarService.selectByPrimaryKey(regYear);
+		WorkPerson wps = workPersonService.selectByAccount(wp.getProposer());
+		if (null != wc && null != wc.getExcepdays()) {
+			excepdays = Arrays.asList(wc.getExcepdays().replaceAll(" ", "")
+					.split(","));
+		}
+		for (int i = s; i <= e; i++) {
+			map.clear();
+			map.put("personId", wp.getProposer());
+			map.put("regYear", regYear);
+			map.put("regMonth", regMonth);
+			map.put("regDay", i);
+			List<WorkRegister> registerList = workRegisterService
+					.selectByDay(map);
+			WorkRegister register = null;
+			String temDate = "";
+			if (i < 10) {
+				temDate = regYear + "-" + leaveStart.substring(5, 7) + "-0" + i
+						+ "";
+			} else {
+				temDate = regYear + "-" + leaveStart.substring(5, 7) + "-" + i
+						+ "";
+			}
+			if (null != registerList && registerList.size() > 0) {
+				register = registerList.get(0);
+				if (excepdays.contains(temDate)) {
+
+				} else {
+					String morAftAll = wp.getMorAftAll();
+					if ("全天".equals(morAftAll)) {
+
+						if ("年休假".equals(wp.getType())) {
+							if (!"年休假".equals(register.getMorning())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) + 0.5) + "");
+							}
+						} else {
+							if ("年休假".equals(register.getMorning())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) - 0.5) + "");
+							}
+						}
+						if ("年休假".equals(wp.getType())) {
+							if (!"年休假".equals(register.getAfternoon())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) + 0.5) + "");
+							}
+						} else {
+							if ("年休假".equals(register.getAfternoon())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) - 0.5) + "");
+							}
+						}
+						register.setMorning(wp.getType());
+						register.setAfternoon(wp.getType());
+						register.setWorkingDay(1.0f);
+					} else if ("上午".equals(morAftAll)) {
+
+						if ("年休假".equals(wp.getType())) {
+							if (!"年休假".equals(register.getMorning())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) + 0.5) + "");
+							}
+						} else {
+							if ("年休假".equals(register.getMorning())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) - 0.5) + "");
+							}
+						}
+						register.setMorning(wp.getType());
+						register.setWorkingDay(0.5f);
+					} else if ("下午".equals(morAftAll)) {
+						if ("年休假".equals(wp.getType())) {
+							if (!"年休假".equals(register.getAfternoon())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) + 0.5) + "");
+							}
+						} else {
+							if ("年休假".equals(register.getAfternoon())) {
+								wps.setAnnualLeaveUseup((Float.parseFloat(wps
+										.getAnnualLeaveUseup()) - 0.5) + "");
+							}
+						}
+						register.setAfternoon(wp.getType());
+						register.setWorkingDay(0.5f);
+					}
+
+				}
+				// register.setCreater(currentUser.getName());
+				register.setRemark(wp.getRemark());
+				register.setLeaveprocess(wp.getId());
+				workRegisterService.updateByPrimaryKeySelective(register);
+				workPersonService.updateByPrimaryKeySelective(wps);
+			} else {
+				register = new WorkRegister();
+				String id1 = UUID.randomUUID().toString().replace("-", "");
+				register.setId(id1);
+				register.setPersonId(wp.getProposer());
+				register.setEnterpriseId(wp.getEnterpriseId());
+				register.setRegYearMonth(yearMonth);
+				register.setRegYear(regYear);
+				register.setRegMonth(regMonth);
+				register.setRegDay(i + "");
+				String morAftAll = wp.getMorAftAll();
+				if ("全天".equals(morAftAll)) {
+					register.setMorning(wp.getType());
+					register.setAfternoon(wp.getType());
+					register.setWorkingDay(1.0f);
+				} else if ("上午".equals(morAftAll)) {
+					register.setMorning(wp.getType());
+					register.setWorkingDay(0.5f);
+				} else if ("下午".equals(morAftAll)) {
+					register.setAfternoon(wp.getType());
+					register.setWorkingDay(0.5f);
+				}
+				register.setCreateTime(new Date());
+				// register.setCreater(currentUser.getName());
+				register.setRemark(wp.getRemark());
+				register.setLeaveprocess(wp.getId());
+				register.setRegisterTime(new Date());
+				workRegisterService.insertSelective(register);
+				if ("年休假".equals(register.getMorning())) {
+					wps.setAnnualLeaveUseup((Float.parseFloat(wps
+							.getAnnualLeaveUseup()) + 0.5) + "");
+				}
+				if ("年休假".equals(register.getAfternoon())) {
+					wps.setAnnualLeaveUseup((Float.parseFloat(wps
+							.getAnnualLeaveUseup()) + 0.5) + "");
+				}
+				workPersonService.updateByPrimaryKeySelective(wps);
+			}
+		}
+
+	}
+	// 恢复考勤信息
+	public void updAttendance(HttpServletRequest request,
+							  WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		WorkPerson wps = workPersonService.selectByAccount(wp.getProposer());
+		WorkRegister register=new WorkRegister();
+		register.setLeaveprocess(workProcessApply.getId());
+		String leaveStart = wp.getLeaveStartTimeStr();
+		String leaveEnd = wp.getLeaveEndTimeStr();
+		// long days=OrderUtil.getDaySub(leaveStart,leaveEnd);
+		String startDay = leaveStart.substring(8, 10);
+		String endDay = leaveEnd.substring(8, 10);
+		int s = Integer.parseInt(startDay);
+		int e = Integer.parseInt(endDay);
+		for (int i = s; i <= e; i++) {
+			if("年休假".equals(wp.getType())){
+				if ("全天".equals(wp.getMorAftAll())) {
+					wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup()) -1.0) + "");
+					register.setMorning("上班");
+					register.setAfternoon("上班");
+				} else if ("上午".equals(wp.getMorAftAll())) {
+					wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup()) -0.5) + "");
+					register.setMorning("上班");
+				} else if ("下午".equals(wp.getMorAftAll())) {
+					wps.setAnnualLeaveUseup((Float.parseFloat(wps.getAnnualLeaveUseup()) -0.5) + "");
+					register.setAfternoon("上班");
+				}
+				workPersonService.updateByPrimaryKeySelective(wps);
+				workRegisterService.updateByLeaveprocess(register);
+			}else{
+				if ("全天".equals(wp.getMorAftAll())) {
+					register.setMorning("上班");
+					register.setAfternoon("上班");
+				} else if ("上午".equals(wp.getMorAftAll())) {
+					register.setMorning("上班");
+				} else if ("下午".equals(wp.getMorAftAll())) {
+					register.setAfternoon("上班");
+				}
+				workRegisterService.updateByLeaveprocess(register);
+			}
+
+		}
+	}
+
+
+	// 执行重启
+	@Override
+	public void handle(HttpServletRequest request,
+					   WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		if (!wp.getType().equals("审批中")) {
+			// 恢复考勤表
+/*
+			WorkRegister r = new WorkRegister();
+			String morAftAll = wp.getMorAftAll();
+			if ("全天".equals(morAftAll)) {
+				r.setMorning("上班");
+				r.setAfternoon("上班");
+				r.setWorkingDay(0.0f);
+			} else if ("上午".equals(morAftAll)) {
+				r.setMorning("上班");
+				r.setWorkingDay(0.5f);
+			} else if ("下午".equals(morAftAll)) {
+				r.setAfternoon("上班");
+				r.setWorkingDay(0.5f);
+			}
+			r.setLeaveprocess(workProcessApply.getId());
+			r.setCreateTime(new Date());
+			workRegisterService.updateByLeaveprocess(r);
+		}*/
+			updAttendance(request, workProcessApply, result);
+			wp.setStatus("重启结束");
+			updateByPrimaryKeySelective(wp);
+
+			// 更新当前状态时间
+			Map<String, Object> map1 = new HashMap<String, Object>();
+			map1.put("processId", workProcessApply.getId());
+			WorkProcessHistory wph = workProcessHistoryService.getCurrentNode(map1);
+			wph.setOperatorNode("重启结束");
+			if (null == workProcessApply.getOpinion()
+					|| "".equals(workProcessApply.getOpinion())) {
+				wph.setOpinion("同意");
+			} else {
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setOperatorTime(new Date());
+			workProcessHistoryService.updateByPrimaryKeySelective(wph);
+			// 插入考勤表
+
+			addAttendance(request, workProcessApply, result);
+		}
+	}
+
+	// 执行变更
+	@Override
+	public void handleChange(HttpServletRequest request,
+							 WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		// TODO Auto-generated method stub
+		/*
+		 * WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		 * wp.setType(workProcessApply.getType()); WorkPerson wps =
+		 * workPersonService.selectByAccount(wp.getProposer()); String startDay
+		 * = wp.getLeaveStartTimeStr().substring(8, 10); String endDay =
+		 * wp.getLeaveEndTimeStr().substring(8, 10); int s =
+		 * Integer.parseInt(startDay); int e = Integer.parseInt(endDay); String
+		 * regYear = wp.getLeaveStartTimeStr().substring(0, 4); String regMonth
+		 * = wp.getLeaveStartTimeStr().substring(5, 7) .replace("0", ""); String
+		 * yearMonth = regYear + regMonth; for (int i = s; i <= e; i++) {
+		 * WorkRegister register = new WorkRegister(); String id1 =
+		 * UUID.randomUUID().toString().replace("-", ""); register.setId(id1);
+		 * register.setPersonId(wp.getProposer());
+		 * register.setEnterpriseId(wp.getEnterpriseId());
+		 * register.setRegYearMonth(yearMonth); register.setRegYear(regYear);
+		 * register.setRegMonth(regMonth); register.setRegDay(i + ""); String
+		 * morAftAll = wp.getMorAftAll(); if ("全天".equals(morAftAll)) {
+		 * register.setMorning("上班"); register.setAfternoon("上班");
+		 * register.setWorkingDay(0.0f); } else if ("上午".equals(morAftAll)) {
+		 * register.setMorning("上班"); register.setWorkingDay(0.5f); } else if
+		 * ("下午".equals(morAftAll)) { register.setAfternoon("上班");
+		 * register.setWorkingDay(0.5f); } register.setCreateTime(new Date());
+		 * // register.setCreater(currentUser.getName());
+		 * register.setRemark(wp.getRemark());
+		 * register.setLeaveprocess(wp.getId()); register.setRegisterTime(new
+		 * Date()); workRegisterService.insertSelective(register); if
+		 * ("年休假".equals(register.getMorning())) {
+		 * wps.setAnnualLeaveUseup((Float.parseFloat(wps .getAnnualLeaveUseup())
+		 * + 0.5) + ""); } if ("年休假".equals(register.getAfternoon())) {
+		 * wps.setAnnualLeaveUseup((Float.parseFloat(wps .getAnnualLeaveUseup())
+		 * + 0.5) + ""); } workPersonService.updateByPrimaryKeySelective(wps);
+		 *
+		 * }
+		 */
+		handleTask(request, workProcessApply, result);
+	}
+
+	@Override
+	public void handleRepeal(HttpServletRequest request,
+							 WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		// wp.setType("上班");
+		wp.setStatus("销假");
+		// wp.setNextperson(wp.getProposer());
+		updateByPrimaryKeySelective(wp);
+		// 更新当前状态时间
+		Map<String, Object> map1 = new HashMap<String, Object>();
+		map1.put("processId", workProcessApply.getId());
+		WorkProcessHistory wph = workProcessHistoryService.getCurrentNode(map1);
+		WorkRegister wr=workRegisterService.selectByLeaveprocess(workProcessApply.getId());
+		wph.setOperatorNode("销假");
+		if (null == workProcessApply.getOpinion()|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setOperatorTime(new Date());
+		workProcessHistoryService.updateByPrimaryKeySelective(wph);
+
+		if (wr!=null) {
+//			// 修改考勤表
+//			WorkRegister r = new WorkRegister();
+//			String morAftAll = wp.getMorAftAll();
+//			if ("全天".equals(morAftAll)) {
+//				r.setMorning("上班");
+//				r.setAfternoon("上班");
+//			} else if ("上午".equals(morAftAll)) {
+//				r.setMorning("上班");
+//			} else if ("下午".equals(morAftAll)) {
+//				r.setAfternoon("上班");
+//			}
+//			r.setLeaveprocess(workProcessApply.getId());
+//			r.setCreateTime(new Date());
+//			workRegisterService.updateByLeaveprocess(r);
+			updAttendance(request, workProcessApply, result);
+		}
+	}
+
+	@Override
+	public void rejectTask(HttpServletRequest request,
+						   WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+
+		Map<String, Object> map1 = new HashMap<String, Object>();
+		map1.put("processId", workProcessApply.getId());
+		WorkProcessHistory wph = workProcessHistoryService.getCurrentNode(map1);
+		if (wp.getStatus().equals("重启审批中")) {
+			wph.setOperatorNode("重启驳回");
+			wp.setStatus("重启驳回");
+		} else {
+			wph.setOperatorNode("驳回");
+			wp.setStatus("驳回");
+		}
+		// wp.setNextperson(wp.getProposer());
+		updateByPrimaryKeySelective(wp);
+		if (null == workProcessApply.getOpinion()
+				|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setOperatorTime(new Date());
+		workProcessHistoryService.updateByPrimaryKeySelective(wph);
+	}
+
+	@Override
+	public void endTask(HttpServletRequest request,
+						WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		SysUser currentUser = shiroUtil.getInstance().currentUser();
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		wp.setStatus("结束");
+		updateByPrimaryKeySelective(wp);
+		WorkProcessHistory wph = new WorkProcessHistory();
+		String id = UUID.randomUUID().toString().replace("-", "");
+		wph.setId(id);
+		wph.setOperatorId(currentUser.getAccount());
+		wph.setOperatorName(currentUser.getName());
+		if (null == workProcessApply.getOpinion()
+				|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setProcessId(workProcessApply.getId());
+		wph.setRelatedId(workProcessApply.getRelatedId());
+		wph.setRelatedName(workProcessApply.getRelatedName());
+		wph.setOperatorNode("结束");
+		wph.setCreateTime(new Date());
+		wph.setOperatorTime(new Date());
+		wph.setOrderTime(new Date());
+		workProcessHistoryService.insertSelective(wph);
+	}
+
+	@Override
+	public void relevantHandleTask(HttpServletRequest request,
+								   WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		Calendar calendar = Calendar.getInstance();
+		SysUser currentUser = shiroUtil.getInstance().currentUser();
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String leaveTime = request.getParameter("leaveTime");
+		String start = leaveTime.substring(0, 10);
+		String end = leaveTime.substring(leaveTime.length() - 10,
+				leaveTime.length());
+		wp.setLeaveStartTime(sdf.parse(start));
+		wp.setLeaveEndTime(sdf.parse(end));
+		wp.setType(workProcessApply.getType());
+		wp.setStatus("审批中");
+		wp.setContent(workProcessApply.getContent());
+		wp.setMorAftAll(workProcessApply.getMorAftAll());
+		updateByPrimaryKeySelective(wp);
+		WorkProcessHistory wph = new WorkProcessHistory();
+		String id = UUID.randomUUID().toString().replace("-", "");
+		wph.setId(id);
+		wph.setOperatorId(currentUser.getAccount());
+		wph.setOperatorName(currentUser.getName());
+		if (null == workProcessApply.getOpinion()
+				|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setProcessId(workProcessApply.getId());
+		wph.setRelatedId(workProcessApply.getRelatedId());
+		wph.setRelatedName(workProcessApply.getRelatedName());
+		wph.setOperatorNode("再次发起");
+		wph.setCreateTime(new Date());
+		wph.setOperatorTime(new Date());
+		calendar.add(Calendar.SECOND, 1);
+		wph.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph);
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		WorkProcessHistory wph2 = new WorkProcessHistory();
+		String id2 = UUID.randomUUID().toString().replace("-", "");
+		wph2.setId(id2);
+		SysUser wps = sysUserService.selectByUserAccount(wp.getNextperson());
+		wph2.setOperatorId(wps.getAccount());
+		wph2.setOperatorName(wps.getName());
+		wph2.setProcessId(workProcessApply.getId());
+		wph2.setRelatedId(workProcessApply.getRelatedId());
+		wph2.setRelatedName(workProcessApply.getRelatedName());
+		wph2.setOperatorNode("审批");
+		wph2.setCreateTime(new Date());
+		wph.setOperatorTime(new Date());
+		calendar.add(Calendar.SECOND, 2);
+		wph2.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph2);
+	}
+
+	@Override
+	public void Change(HttpServletRequest request,
+					   WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		// TODO Auto-generated method stub
+		Calendar calendar = Calendar.getInstance();
+		SysUser currentUser = shiroUtil.getInstance().currentUser();
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String leaveTime = request.getParameter("leaveTime");
+		String start = leaveTime.substring(0, 10);
+		String end = leaveTime.substring(leaveTime.length() - 10,
+				leaveTime.length());
+		wp.setLeaveStartTime(sdf.parse(start));
+		wp.setLeaveEndTime(sdf.parse(end));
+		wp.setType(workProcessApply.getType());
+		wp.setContent(workProcessApply.getContent());
+		wp.setMorAftAll(workProcessApply.getMorAftAll());
+		wp.setRemark(workProcessApply.getRemark());
+		updateByPrimaryKeySelective(wp);
+
+		// 更新当前状态时间
+		Map<String, Object> map1 = new HashMap<String, Object>();
+		map1.put("processId", workProcessApply.getId());
+		WorkProcessHistory wph = workProcessHistoryService.getCurrentNode(map1);
+		wph.setOperatorNode("变更发起");
+		wph.setRemark(workProcessApply.getRemark());
+		if (null == workProcessApply.getOpinion()
+				|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setOperatorTime(new Date());
+		workProcessHistoryService.updateByPrimaryKeySelective(wph);
+		/*
+		 WorkProcessHistory wph=new WorkProcessHistory(); String
+		 id=UUID.randomUUID().toString().replace("-", ""); wph.setId(id);
+		 wph.setOperatorId(currentUser.getAccount());
+		 wph.setOperatorName(currentUser.getName());
+		 if(null==workProcessApply.getOpinion() ||
+		 "".equals(workProcessApply.getOpinion())){ wph.setOpinion("同意");
+		 }else{ wph.setOpinion(workProcessApply.getOpinion()); }
+		 wph.setProcessId(workProcessApply.getId());
+		 wph.setRelatedId(workProcessApply.getRelatedId());
+		 wph.setRelatedName(workProcessApply.getRelatedName());
+		 wph.setOperatorNode("变更发起"); wph.setCreateTime(new Date());
+		 wph.setOperatorTime(new Date()); calendar.add (Calendar.SECOND, 1);
+		 wph.setOrderTime(calendar.getTime());
+		 workProcessHistoryService.updateByPrimaryKeySelective(wph);
+		 */
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		WorkProcessHistory wph2 = new WorkProcessHistory();
+		String id2 = UUID.randomUUID().toString().replace("-", "");
+		wph2.setId(id2);
+		SysUser wps = sysUserService.selectByUserAccount(wp.getNextperson());
+		wph2.setOperatorId(wps.getAccount());
+		wph2.setOperatorName(wps.getName());
+		wph2.setProcessId(workProcessApply.getId());
+		wph2.setRelatedId(workProcessApply.getRelatedId());
+		wph2.setRelatedName(workProcessApply.getRelatedName());
+		wph2.setOperatorNode("变更审批");
+		wph2.setCreateTime(new Date());
+		// wph.setOperatorTime(new Date());
+		calendar.add(Calendar.SECOND, 2);
+		wph2.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph2);
+
+	}
+
+	public void repeal(HttpServletRequest request,
+					   WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		Calendar calendar = Calendar.getInstance();
+		SysUser currentUser = shiroUtil.getInstance().currentUser();
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		// SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+		// String leaveTime=request.getParameter("leaveTime");
+		// String start=leaveTime.substring(0, 10);
+		// String end=leaveTime.substring(leaveTime.length()-10,
+		// leaveTime.length());
+		// wp.setLeaveStartTime(sdf.parse(start));
+		// wp.setLeaveEndTime(sdf.parse(end));
+
+		// 更新当前状态时间
+		if (wp.getStatus().equals("审批中")) {
+			Map<String, Object> map1 = new HashMap<String, Object>();
+			map1.put("processId", workProcessApply.getId());
+			WorkProcessHistory wph1 = workProcessHistoryService
+					.getCurrentNode(map1);
+			wph1.setOperatorNode("销假发起");
+			if (null == workProcessApply.getOpinion() || "".equals(workProcessApply.getOpinion())) {
+				wph1.setOpinion("同意");
+			} else {
+				wph1.setOpinion(workProcessApply.getOpinion());
+			}
+			wph1.setOperatorTime(new Date());
+			workProcessHistoryService.updateByPrimaryKeySelective(wph1);
+		} else {
+			WorkProcessHistory wph = new WorkProcessHistory();
+			String id = UUID.randomUUID().toString().replace("-", "");
+			wph.setId(id);
+			wph.setOperatorId(currentUser.getAccount());
+			wph.setOperatorName(currentUser.getName());
+			if (null == workProcessApply.getOpinion()
+					|| "".equals(workProcessApply.getOpinion())) {
+				wph.setOpinion("同意");
+			} else {
+				wph.setOpinion(workProcessApply.getOpinion());
+			}
+			wph.setProcessId(workProcessApply.getId());
+			wph.setRelatedId(workProcessApply.getRelatedId());
+			wph.setRelatedName(workProcessApply.getRelatedName());
+			wph.setOperatorNode("销假发起");
+			wph.setCreateTime(new Date());
+			wph.setOperatorTime(new Date());
+			calendar.add(Calendar.SECOND, 1);
+			wph.setOrderTime(calendar.getTime());
+			workProcessHistoryService.insertSelective(wph);
+		}
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		wp.setStatus("销假审批中");
+		wp.setContent(workProcessApply.getContent());
+		wp.setMorAftAll(workProcessApply.getMorAftAll());
+		updateByPrimaryKeySelective(wp);
+
+		WorkProcessHistory wph2 = new WorkProcessHistory();
+		String id2 = UUID.randomUUID().toString().replace("-", "");
+		wph2.setId(id2);
+		SysUser wps = sysUserService.selectByUserAccount(wp.getNextperson());
+		wph2.setOperatorId(wps.getAccount());
+		wph2.setOperatorName(wps.getName());
+		wph2.setProcessId(workProcessApply.getId());
+		wph2.setRelatedId(workProcessApply.getRelatedId());
+		wph2.setRelatedName(workProcessApply.getRelatedName());
+		wph2.setOperatorNode("销假审批");
+		wph2.setCreateTime(new Date());
+		calendar.add(Calendar.SECOND, 2);
+		wph2.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph2);
+	}
+
+	@Override
+	public void restartTask(HttpServletRequest request,
+							WorkProcessApply workProcessApply, GlobalResult result)
+			throws Exception {
+		Calendar calendar = Calendar.getInstance();
+		SysUser currentUser = shiroUtil.getInstance().currentUser();
+		WorkProcessApply wp = selectByPrimaryKey(workProcessApply.getId());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		String leaveTime = request.getParameter("leaveTime");
+		String start = leaveTime.substring(0, 10);
+		String end = leaveTime.substring(leaveTime.length() - 10,
+				leaveTime.length());
+		wp.setLeaveStartTime(sdf.parse(start));
+		wp.setLeaveEndTime(sdf.parse(end));
+		wp.setType(workProcessApply.getType());
+		wp.setStatus("重启审批中");
+		wp.setContent(workProcessApply.getContent());
+		wp.setMorAftAll(workProcessApply.getMorAftAll());
+		updateByPrimaryKeySelective(wp);
+		WorkProcessHistory wph = new WorkProcessHistory();
+		String id = UUID.randomUUID().toString().replace("-", "");
+		wph.setId(id);
+		wph.setOperatorId(currentUser.getAccount());
+		wph.setOperatorName(currentUser.getName());
+		if (null == workProcessApply.getOpinion()
+				|| "".equals(workProcessApply.getOpinion())) {
+			wph.setOpinion("同意");
+		} else {
+			wph.setOpinion(workProcessApply.getOpinion());
+		}
+		wph.setProcessId(workProcessApply.getId());
+		wph.setRelatedId(workProcessApply.getRelatedId());
+		wph.setRelatedName(workProcessApply.getRelatedName());
+		wph.setOperatorNode("重启发起");
+		wph.setCreateTime(new Date());
+		wph.setOperatorTime(new Date());
+		calendar.add(Calendar.SECOND, 1);
+		wph.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph);
+		try {
+			Thread.sleep(2000);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		WorkProcessHistory wph2 = new WorkProcessHistory();
+		String id2 = UUID.randomUUID().toString().replace("-", "");
+		wph2.setId(id2);
+		SysUser wps = sysUserService.selectByUserAccount(wp.getNextperson());
+		wph2.setOperatorId(wps.getAccount());
+		wph2.setOperatorName(wps.getName());
+		wph2.setProcessId(workProcessApply.getId());
+		wph2.setRelatedId(workProcessApply.getRelatedId());
+		wph2.setRelatedName(workProcessApply.getRelatedName());
+		wph2.setOperatorNode("重启审批");
+		wph2.setCreateTime(new Date());
+		calendar.add(Calendar.SECOND, 2);
+		wph2.setOrderTime(calendar.getTime());
+		workProcessHistoryService.insertSelective(wph2);
+
+
+	}
+
+}

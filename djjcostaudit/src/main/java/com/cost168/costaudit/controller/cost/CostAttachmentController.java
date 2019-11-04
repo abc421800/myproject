@@ -1,0 +1,407 @@
+package com.cost168.costaudit.controller.cost;
+
+import com.cost168.costaudit.mapper.sys.SysUserMapper;
+import com.cost168.costaudit.pojo.cost.CostAttachment;
+import com.cost168.costaudit.pojo.cost.CostTask;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.service.cost.CostAttachmentService;
+import com.cost168.costaudit.service.cost.CostTaskService;
+import com.cost168.costaudit.shiro.AuthcRealm;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.PropertySources;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.util.FileCopyUtils;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.nio.charset.Charset;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * ClassName: CostAttachmentController
+ *
+ * @author lixiang
+ * @Description: TODO
+ * @date 2018-12-7上午11:23:44
+ * @Company 广东华联软件科技有限公司
+ */
+@Controller
+@RequestMapping("/costAttachment")
+@PropertySources(value = @PropertySource("classpath:resource/resource.properties"))
+public class CostAttachmentController {
+
+
+    @Autowired
+    private CostAttachmentService costAttachmentService;
+    @Autowired
+    private SysUserMapper sysUserMapper;
+    @Autowired
+    private CostTaskService costTaskService;
+    private static final Logger logger = LoggerFactory.getLogger(CostAttachmentController.class);
+   
+    @Value("${fileupload}")
+    private String fileupload;
+
+    @Bean
+    public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+        return new PropertySourcesPlaceholderConfigurer();
+    }
+
+
+    @ResponseBody
+    @RequestMapping("/list")
+    public Map<String, Object> list(HttpServletRequest request) {
+        String typeId = request.getParameter("typeId");
+        String dataType = request.getParameter("dataType");
+        Map<String, Object> attMap = new HashMap<String, Object>();
+        attMap.put("typeId", typeId);
+        if (null != dataType && !"".equals(dataType)) {
+            attMap.put("dataType", dataType);
+        }
+        List<CostAttachment> list = costAttachmentService.selectRelationAttachByMap(attMap);
+        Map<String, Object> mapO = new HashMap<String, Object>();
+        List<Map<String, Object>> mapList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> map = null;
+        for (CostAttachment l : list) {
+            map = new HashMap<String, Object>();
+            map.put("_parentId", l.getPid());
+            map.put("id", l.getId());
+            map.put("name", l.getName());
+            map.put("size", l.getSize());
+            map.put("suffix", l.getSuffix());
+            map.put("isLeaf", l.getLeaf());
+            map.put("category", l.getCategory());
+            map.put("creater", l.getCreater());
+            map.put("createrTime", l.getCreaterTime());
+            mapList.add(map);
+        }
+        mapO.put("rows", mapList);
+        return mapO;
+    }
+
+
+    @ResponseBody
+    @RequestMapping("/save")
+    public GlobalResult save(HttpServletRequest request, CostAttachment costAttachment) {
+        GlobalResult result = new GlobalResult();
+        try {
+            String id = UUID.randomUUID().toString().replace("-", "");
+            costAttachment.setId(id);
+            costAttachment.setSuffix("文件夹");
+            costAttachment.setCreaterTime(new Date());
+            costAttachmentService.insertSelective(costAttachment);
+
+            result.setStatus(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping("/update")
+    public GlobalResult update(HttpServletRequest request, CostAttachment costAttachment) {
+        GlobalResult result = new GlobalResult();
+        try {
+            costAttachment.setSuffix("文件夹");
+            costAttachmentService.updateByPrimaryKeySelective(costAttachment);
+            result.setStatus(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    @RequestMapping("/toEdit")
+    public String toEdit(HttpServletRequest request, ModelMap model) {
+        try {
+            String id = request.getParameter("id");
+            CostAttachment costAttachment = costAttachmentService.selectByPrimaryKey(id);
+            model.put("costAttachment", costAttachment);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "/document/editDialog";
+    }
+
+    @ResponseBody
+    @RequestMapping("/del")
+    public GlobalResult del(HttpServletRequest request) {
+        GlobalResult result = new GlobalResult();
+        String ids = request.getParameter("ids");
+        String arr[] = ids.split(",");
+        try {
+            for (String i : arr) {
+                costAttachmentService.deleteByPrimaryKey(i);
+            }
+            result.setStatus(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping("/fileUpload")
+    public GlobalResult fileUpload(HttpServletRequest request) {
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        String typeId = request.getParameter("typeId");
+        String folderId = request.getParameter("folderId");
+        String dataType = request.getParameter("dataType");
+        List<MultipartFile> files = multipartRequest.getFiles("file");
+        GlobalResult result = new GlobalResult();
+        try {
+            SysUser user = shiroUtil.getInstance().currentUser();
+            String storagePath = null;
+            for (int i = 0; i < files.size(); i++) {
+                String fileName = files.get(i).getOriginalFilename();
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String uploadPath = fileupload + sdf.format(new Date()) + "/" + typeId + "/";
+                File filePath = new File(uploadPath);
+                if (!filePath.exists()) {
+                    filePath.mkdirs();
+                }
+                File newfile = new File(uploadPath + files.get(i).getOriginalFilename());
+                files.get(i).transferTo(newfile);
+                if (fileupload.indexOf(":") == 1) {
+                    storagePath = fileupload.substring(2, fileupload.length()) + sdf.format(new Date()) + "/" + typeId + "/" + files.get(i).getOriginalFilename();
+                }
+                //判断是否文件丢失
+                if (newfile.exists()) {
+                    //保存到附件表
+                    CostAttachment attachment = new CostAttachment();
+                    String id = UUID.randomUUID().toString().replace("-", "");
+                    String suffix = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+                    String size = ExcelUtil.calculatedSize(newfile.length());
+                    attachment.setId(id);
+                    attachment.setTypeId(typeId);
+                    attachment.setName(fileName);
+                    attachment.setUrl(storagePath);
+                    attachment.setSuffix(suffix);
+                    attachment.setSize(size);
+                    attachment.setCreater(user.getName());
+                    if (null != dataType && !"".equals(dataType)) {
+                        attachment.setDataType(dataType);
+                    }
+                    attachment.setLeaf("Y");
+                    attachment.setCreaterTime(new Date());
+                    attachment.setPid(folderId);
+                    //对主材定价和综合单价的处理
+                    CostAttachment att = costAttachmentService.selectByPrimaryKey(folderId);
+                    CostTask task = costTaskService.selectByPrimaryKey(typeId);
+                    if (task != null) {
+                        if ("主材定价".equals(task.getAuditPriceType()) || "综合单价".equals(task.getAuditPriceType())) {
+                            if ("新增主材单价审批表".equals(att.getName()) || "换算（合同外）新增项目综合单价".equals(att.getName())) {
+                                attachment.setCategory("否");
+                            }
+                        }
+                    }
+                    costAttachmentService.insertSelective(attachment);
+                }
+            }
+            result.setStatus(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    @RequestMapping("/downLoadAttach")
+    public void downLoad(HttpServletRequest request, HttpServletResponse response, String id) {
+        try {
+            CostAttachment att = costAttachmentService.selectByPrimaryKey(id);
+            ExcelUtil.downLoad(fileupload.substring(0, 2) + att.getUrl(), null, request, response);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /* 预览 */
+    @RequestMapping("/preview")
+    public void preview(HttpServletRequest request, HttpServletResponse response, String id) {
+        CostAttachment attch = costAttachmentService.selectByPrimaryKey(id);
+        String filedir = fileupload.substring(0, 2) + attch.getUrl();
+        String filename = attch.getName();
+        String filetype = attch.getSuffix();
+        int type = 0;
+        if (Global.PREVIEW_JPG_1.contains(filetype)) {
+            type = 1;
+        } else if (Global.PREVIEW_DOC_2.contains(filetype)) {
+            type = 2;
+        } else if (Global.PREVIEW_XLS_3.contains(filetype)) {
+            type = 3;
+        }
+        attachTypePreview(response, filedir, filename, filetype, type);
+    }
+
+    private void attachTypePreview(HttpServletResponse response, String filedir, String filename, String filetype, int type) {
+        try {
+            File file = new File(filedir);
+            if (!file.exists()) {
+                String errorMessage = "抱歉，文件不存在!";
+                logger.debug(errorMessage);
+                OutputStream outputStream = response.getOutputStream();
+                outputStream.write(errorMessage.getBytes(Charset.forName("UTF-8")));
+                outputStream.close();
+                return;
+            }
+            switch (type) {
+                case 1:
+                    String mimeType = "application/octet-stream";
+                    if (filetype.equals("txt")) {
+                        mimeType = "text/plain";
+                    }
+                    if (filetype.equals("jpg")) {
+                        mimeType = "image/jpg";
+                    }
+                    if (filetype.equals("png")) {
+                        mimeType = "image/png";
+                    }
+                    if (filetype.equals("pdf")) {
+                        mimeType = "application/pdf";
+                    }
+                    if (filetype.equals("xml")) {
+                        mimeType = "text/plain";
+                    }
+                    response.setHeader("Content-Disposition", String.format("inline; filename=\"" + new String(file.getName().getBytes("gbk"), "iso-8859-1") + "\""));
+                    response.setContentLength((int) file.length());
+                    response.setContentType(mimeType);
+                    InputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+                    FileCopyUtils.copy(inputStream, response.getOutputStream());
+                    inputStream.close();
+                    break;
+                case 2:
+                    String imagepath = filedir.replace(filename, "html");
+                    String imageSrcPath = imagepath;
+                    String outpath = filedir.replace(filename, "").concat(filename.substring(0, filename.indexOf(".")) + ".html");
+                    File outfile = new File(outpath);
+                    if (!outfile.exists()) {
+                        POIWordToHtml.wordToHtml(filedir, imagepath, imageSrcPath, outpath);
+                    }
+                    response.setContentType("text/html;charset=gb2312");
+                    response.setHeader("Content-Disposition", String.format("inline; filename=\"" + outfile.getName() + "\""));
+                    response.setContentLength((int) outfile.length());
+                    InputStream input = new BufferedInputStream(new FileInputStream(outfile));
+                    FileCopyUtils.copy(input, response.getOutputStream());
+                    input.close();
+                    break;
+                case 3:
+                    String outExcelPath = filedir.replace(filename, "").concat(filename.substring(0, filename.indexOf(".")) + ".html");
+                    File outExcelFile = new File(outExcelPath);
+                    if (!outExcelFile.exists()) {
+                        POIExcelToHtml.exceltoHtml(filedir, outExcelPath);
+                    }
+                    response.setContentType("text/html;charset=gb2312");
+                    response.setHeader("Content-Disposition", String.format("inline; filename=\"" + outExcelFile.getName() + "\""));
+                    response.setContentLength((int) outExcelFile.length());
+                    InputStream excelInput = new BufferedInputStream(new FileInputStream(outExcelFile));
+                    FileCopyUtils.copy(excelInput, response.getOutputStream());
+                    excelInput.close();
+                    break;
+                default:
+                    String error = "该文件不支持预览!!";
+                    logger.debug(error);
+                    OutputStream outStream = response.getOutputStream();
+                    outStream.write(error.getBytes(Charset.forName("UTF-8")));
+                    outStream.close();
+                    break;
+            }
+        } catch (Exception e) {
+            String error = "获取数据出错，请重试!!";
+            OutputStream outStream;
+            try {
+                outStream = response.getOutputStream();
+                outStream.write(error.getBytes(Charset.forName("UTF-8")));
+                outStream.close();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+        }
+    }
+
+    @ResponseBody
+    @RequestMapping("/headImgUpload")
+    public GlobalResult headImgUpload(HttpServletRequest request) {
+        SysUser user = shiroUtil.getInstance().currentUser();
+        MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
+        List<MultipartFile> files = multipartRequest.getFiles("file");
+        GlobalResult result = new GlobalResult();
+        try {
+            String storagePath = null;
+            for (int i = 0; i < files.size(); i++) {
+                //String fileName=files.get(i).getOriginalFilename();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String uploadPath = fileupload + "headImg/" + sdf.format(new Date()) + "/" + user.getId() + "/";
+                File filePath = new File(uploadPath);
+                if (!filePath.exists()) {
+                    filePath.mkdirs();
+                }
+                File newfile = new File(uploadPath + files.get(i).getOriginalFilename());
+                files.get(i).transferTo(newfile);
+                if (fileupload.indexOf(":") == 1) {
+                    storagePath = "headImg/" + sdf.format(new Date()) + "/" + user.getId() + "/" + files.get(i).getOriginalFilename();
+                }
+                //判断是否文件丢失
+                if (newfile.exists()) {
+                    //保存到用户表
+                    user.setHeadImage(storagePath);
+                    sysUserMapper.updateByPrimaryKeySelective(user);
+                }
+            }
+            result.setStatus(200);
+            result.setMsg(storagePath);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    @ResponseBody
+    @RequestMapping("/findDndTree")
+    public GlobalResult findDndTree(HttpServletRequest request, String targetId, String sourceId, String point) {
+        GlobalResult result = new GlobalResult();
+        try {
+            //得到目标对象
+            CostAttachment target = costAttachmentService.selectByPrimaryKey(targetId);
+            //得到操作的对象(源对象)
+            CostAttachment source = costAttachmentService.selectByPrimaryKey(sourceId);
+            // append  top bottom
+            if ("append".equals(point)) {
+                source.setPid(target.getId());
+            } else {
+                source.setPid(target.getPid());
+            }
+            costAttachmentService.updateByPrimaryKeySelective(source);
+            result.setStatus(200);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+
+}

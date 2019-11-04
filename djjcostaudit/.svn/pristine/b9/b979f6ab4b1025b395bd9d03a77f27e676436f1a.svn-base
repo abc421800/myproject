@@ -1,0 +1,40 @@
+@charset "UTF-8";
+*{margin:0;padding:0;}
+body{
+    background: #f4f8fb;
+    padding:15px;
+    font-family: "微软雅黑";
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+a,a:focus{text-decoration: none;outline:none;}
+.fl{
+    float: left;
+}
+.fr{
+    float: right;
+}
+ul, li {
+    list-style-type: none;
+}
+.clearfix:after {
+    content: "";
+    display: block;
+    height: 0;
+    clear: both;
+    visibility: hidden
+}
+
+/*.clearfix {
+    display: inline-block
+}*/
+
+/*.clearfix {
+    height: 1%
+}*/
+
+/*
+.clearfix {
+    display: block;
+    overflow: hidden
+}*/

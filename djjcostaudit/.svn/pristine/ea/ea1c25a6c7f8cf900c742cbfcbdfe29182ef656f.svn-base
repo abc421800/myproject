@@ -1,0 +1,81 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoAutocodeMapper;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAutocode;
+import com.cost168.costaudit.service.yaohao.YaohaoAutocodeService;
+
+@Service
+public class YaohaoAutocodeServiceImpl implements YaohaoAutocodeService {
+
+	@Autowired
+	private YaohaoAutocodeMapper yaohaoAutocodeMapper;
+	
+	@Override
+	public YaohaoAutocode selectByPrimaryKey(String id) {
+		return yaohaoAutocodeMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoAutocodeMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoAutocode record) {
+		return yaohaoAutocodeMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public List<YaohaoAutocode> selectListByMap(Map<String, Object> map) {
+		return yaohaoAutocodeMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoAutocodeMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public int insertSelective(YaohaoAutocode record) {
+		return yaohaoAutocodeMapper.insertSelective(record);
+	}
+
+	@Override
+	public String getCodeAorB(String type) {
+		int count =yaohaoAutocodeMapper.selectCountByMap(null);
+		String resuat="";
+		if(count == 0){
+			/*YaohaoAutocode code=new YaohaoAutocode();
+			code.setId("1");
+			code.setCodeA("A-1-1");
+			code.setCodeB("B-1-1");
+			code.setLunNumA(1);
+			code.setLunNumB(1);
+			code.setCiNumA(1);
+			code.setCiNumB(1);
+			yaohaoAutocodeMapper.insertSelective(code);*/
+			if("A".equals(type)){
+				resuat="A-1-1";
+			}else{
+				resuat="B-1-1";
+			}
+		}else{
+			YaohaoAutocode code=yaohaoAutocodeMapper.selectByPrimaryKey("1");
+			if("A".equals(type)){
+				int ciA=code.getCiNumA()+1;
+				resuat="A-"+code.getLunNumA()+"-"+ciA;
+			}else{
+				int ciB=code.getCiNumB()+1;
+				resuat="B-"+code.getLunNumB()+"-"+ciB;
+			}
+		}
+		return resuat;
+	}
+
+}

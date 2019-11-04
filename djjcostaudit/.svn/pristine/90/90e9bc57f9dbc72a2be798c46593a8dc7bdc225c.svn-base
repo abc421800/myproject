@@ -1,0 +1,21 @@
+package com.cost168.costaudit.pojo.yaohao.param;
+
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+
+/**
+ * @description: 综合考核页面需要的参数
+ * @author: ZYL
+ * @created: 2019-07-08
+ */
+public class AssessParam extends YaohaoAssess{
+    private String enterpriseName;
+
+    public String getEnterpriseName() {
+        return enterpriseName;
+    }
+
+    public void setEnterpriseName(String enterpriseName) {
+
+        this.enterpriseName = enterpriseName;
+    }
+}

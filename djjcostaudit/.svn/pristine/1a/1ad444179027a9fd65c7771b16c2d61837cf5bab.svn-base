@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.yaohao.YaohaoWinbidMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.yaohao.YaohaoWinbid" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="order_code" property="orderCode" jdbcType="VARCHAR" />
+    <result column="enterprise_code" property="enterpriseCode" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="service_amount" property="serviceAmount" jdbcType="DECIMAL" />
+    <result column="decide_amount" property="decideAmount" jdbcType="DECIMAL" />
+    <result column="contacts" property="contacts" jdbcType="VARCHAR" />
+    <result column="contacts_phone" property="contactsPhone" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="yaohao_year" property="yaohaoYear" jdbcType="VARCHAR" />
+    <result column="candidateId" property="candidateId" jdbcType="VARCHAR" />
+    <result column="contractId" property="contractId" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, order_code, enterprise_code, name, service_amount, decide_amount, contacts, contacts_phone, 
+    creater, create_time,yaohao_year,candidateId,contractId
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoWinbidExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yaohao_winbid
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByOrderCode" resultMap="BaseResultMap" parameterType="string" >
+   		SELECT w.*,e.name as 'enterpriseName',e.id as 'enterpriseId' 
+   		FROM yaohao_winbid w 
+   		left JOIN cost_enterprise e  ON w.enterprise_code= e.`code`  
+   		where  w.order_code=#{orderCode}
+   		ORDER BY e.name
+  </select>
+  <select id="getServiceAmountSum" resultType="java.math.BigDecimal" parameterType="map">
+        SELECT sum(w.service_amount) as 'serviceAmount' FROM yaohao_winbid w
+        <where>
+         	<if test="orderCode != null and orderCode !=''" >
+     			and w.order_code = #{orderCode}
+   			</if>
+        </where>
+    </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+  		SELECT  o.id as 'orderId',a.assess_result as 'assessResultStr',o.yaohao_grade as 'yaohaoGrade',w.yaohao_year,o.yaohao_time as 'yaohaoTimeStr',
+  		e.id as 'enterpriseId', e.name as 'enterpriseName',w.* FROM yaohao_winbid w 
+  		INNER JOIN cost_enterprise e ON w.enterprise_code=e.`code`
+		LEFT JOIN yaohao_order o ON o.code=w.order_code
+		LEFT JOIN yaohao_assess a ON w.enterprise_code=a.enterprise_code AND a.year=w.yaohao_year-1
+		<where>
+     		<if test="id != null and id !=''" >
+     			and w.id = #{id}
+   			</if>
+   			<if test="enterpriseName != null and enterpriseName !=''" >
+     			and e.name like concat('%',#{enterpriseName},'%')
+   			</if>
+   			<if test="name != null and name !=''" >
+     			and w.name like concat('%',#{name},'%')
+   			</if>
+   			<if test="yaohaoGrade != null and yaohaoGrade !=''" >
+     			and o.yaohao_grade = #{yaohaoGrade}
+   			</if>
+   			<if test="yaohaoYear != null and yaohaoYear !=''" >
+     			and w.yaohao_year = #{yaohaoYear}
+   			</if>
+   			<if test="orderCode != null and orderCode !=''" >
+     			and w.order_code = #{orderCode}
+   			</if>
+   			<if test="enterpriseCode != null and enterpriseCode !=''" >
+     			and w.enterprise_code = #{enterpriseCode}
+   			</if>
+   			<if test="startTime!=null and startTime!=''">
+       		    and <![CDATA[ o.yaohao_time>=#{startTime} ]]>
+	        </if>
+	      	<if test="endTime!=null and endTime!=''">
+	       	    and <![CDATA[ o.yaohao_time<=#{endTime} ]]>
+	     	</if>
+        </where>
+          GROUP BY w.id
+        order by o.yaohao_time  desc,w.order_code 
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map" >
+  	SELECT COUNT(m.id) FROM(
+   		SELECT w.id FROM yaohao_winbid w 
+   		INNER JOIN cost_enterprise e ON w.enterprise_code=e.`code`
+		LEFT JOIN yaohao_order o ON o.code=w.order_code
+		LEFT JOIN yaohao_assess a ON w.enterprise_code=a.enterprise_code AND a.year=w.yaohao_year-1
+     	<where>
+     		<if test="id != null and id !=''" >
+     			and w.id = #{id}
+   			</if>
+   			<if test="enterpriseName != null and enterpriseName !=''" >
+     			and e.name like concat('%',#{enterpriseName},'%')
+   			</if>
+   			<if test="name != null and name !=''" >
+     			and w.name like concat('%',#{name},'%')
+   			</if>
+   			<if test="yaohaoGrade != null and yaohaoGrade !=''" >
+     			and o.yaohao_grade = #{yaohaoGrade}
+   			</if>
+   			<if test="orderCode != null and orderCode !=''" >
+     			and w.order_code = #{orderCode}
+   			</if>
+   			<if test="yaohaoYear != null and yaohaoYear !=''" >
+     			and w.yaohao_year = #{yaohaoYear}
+   			</if>
+   			<if test="enterpriseCode != null and enterpriseCode !=''" >
+     			and w.enterprise_code = #{enterpriseCode}
+   			</if>
+   			<if test="startTime!=null and startTime!=''">
+       		    and <![CDATA[ o.yaohao_time>=#{startTime} ]]>
+	        </if>
+	      	<if test="endTime!=null and endTime!=''">
+	       	    and <![CDATA[ o.yaohao_time<=#{endTime} ]]>
+	     	</if>
+        </where>
+        	GROUP BY w.id
+        )m
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select w.*,a.assess_result as 'assessResultStr' ,o.yaohao_grade as 'yaohaoGrade' ,o.yaohao_time as 'yaohaoTimeStr'
+    from yaohao_winbid w LEFT JOIN yaohao_assess a ON w.enterprise_code=a.enterprise_code AND a.year=w.yaohao_year
+    LEFT JOIN yaohao_order o ON o.code=w.order_code
+    where w.id = #{id,jdbcType=VARCHAR}
+    GROUP BY w.id
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from yaohao_winbid
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByOrderCode" parameterType="java.lang.String" >
+    delete from yaohao_winbid
+    where order_code = #{orderCode,jdbcType=VARCHAR}
+  </delete>
+  
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoWinbidExample" >
+    delete from yaohao_winbid
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoWinbid" >
+    insert into yaohao_winbid (id, order_code, enterprise_code, 
+      name, service_amount, decide_amount, 
+      contacts, contacts_phone, creater, 
+      create_time,yaohao_year,candidateId)
+    values (#{id,jdbcType=VARCHAR}, #{orderCode,jdbcType=VARCHAR}, #{enterpriseCode,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR}, #{serviceAmount,jdbcType=DECIMAL}, #{decideAmount,jdbcType=DECIMAL}, 
+      #{contacts,jdbcType=VARCHAR}, #{contactsPhone,jdbcType=VARCHAR}, #{creater,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP},#{yaohaoYear,jdbcType=VARCHAR},#{candidateId,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoWinbid" >
+    insert into yaohao_winbid
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="orderCode != null" >
+        order_code,
+      </if>
+      <if test="enterpriseCode != null" >
+        enterprise_code,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="serviceAmount != null" >
+        service_amount,
+      </if>
+      <if test="decideAmount != null" >
+        decide_amount,
+      </if>
+      <if test="contacts != null" >
+        contacts,
+      </if>
+      <if test="contactsPhone != null" >
+        contacts_phone,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="yaohaoYear != null" >
+        yaohao_year,
+      </if>
+      <if test="candidateId != null" >
+        candidateId,
+      </if>
+       <if test="contractId != null" >
+        contractId,
+      </if>
+      
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="orderCode != null" >
+        #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseCode != null" >
+        #{enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceAmount != null" >
+        #{serviceAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="decideAmount != null" >
+        #{decideAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="contacts != null" >
+        #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="contactsPhone != null" >
+        #{contactsPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="yaohaoYear != null" >
+        #{yaohaoYear,jdbcType=VARCHAR},
+      </if>
+      <if test="candidateId != null" >
+        #{candidateId,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        #{contractId,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoWinbidExample" resultType="java.lang.Integer" >
+    select count(*) from yaohao_winbid
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update yaohao_winbid
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.orderCode != null" >
+        order_code = #{record.orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.enterpriseCode != null" >
+        enterprise_code = #{record.enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serviceAmount != null" >
+        service_amount = #{record.serviceAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.decideAmount != null" >
+        decide_amount = #{record.decideAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.contacts != null" >
+        contacts = #{record.contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contactsPhone != null" >
+        contacts_phone = #{record.contactsPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creater != null" >
+        creater = #{record.creater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update yaohao_winbid
+    set id = #{record.id,jdbcType=VARCHAR},
+      order_code = #{record.orderCode,jdbcType=VARCHAR},
+      enterprise_code = #{record.enterpriseCode,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      service_amount = #{record.serviceAmount,jdbcType=DECIMAL},
+      decide_amount = #{record.decideAmount,jdbcType=DECIMAL},
+      contacts = #{record.contacts,jdbcType=VARCHAR},
+      contacts_phone = #{record.contactsPhone,jdbcType=VARCHAR},
+      creater = #{record.creater,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoWinbid" >
+    update yaohao_winbid
+    <set >
+      <if test="orderCode != null" >
+        order_code = #{orderCode,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseCode != null" >
+        enterprise_code = #{enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceAmount != null" >
+        service_amount = #{serviceAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="decideAmount != null" >
+        decide_amount = #{decideAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="contacts != null" >
+        contacts = #{contacts,jdbcType=VARCHAR},
+      </if>
+      <if test="contactsPhone != null" >
+        contacts_phone = #{contactsPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="yaohaoYear != null" >
+        yaohao_year = #{yaohaoYear,jdbcType=VARCHAR},
+      </if>
+      <if test="candidateId != null" >
+        candidateId = #{candidateId,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        contractId = #{contractId,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoWinbid" >
+    update yaohao_winbid
+    set order_code = #{orderCode,jdbcType=VARCHAR},
+      enterprise_code = #{enterpriseCode,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      service_amount = #{serviceAmount,jdbcType=DECIMAL},
+      decide_amount = #{decideAmount,jdbcType=DECIMAL},
+      contacts = #{contacts,jdbcType=VARCHAR},
+      contacts_phone = #{contactsPhone,jdbcType=VARCHAR},
+      creater = #{creater,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

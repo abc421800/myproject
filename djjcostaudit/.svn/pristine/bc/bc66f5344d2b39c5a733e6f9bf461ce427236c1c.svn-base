@@ -1,0 +1,58 @@
+$(function () {
+	$.post("/costProjectType/treeList",function(data){
+		if(typeof(projectType)=="undefined"){
+    	    var d=[{id:-1,text:'请选择',children:data}];
+    	    initCombotreeProj(d);
+       	}else if(projectType==""){
+       	    var d=[{id:-1,text:'请选择',children:data}];
+       	    initCombotreeProj(d); 
+       	}else{
+       		initCombotreeProj(data); 		       		
+       	}
+	}, "json");
+	
+	
+		
+});
+
+//初始化组合树
+function initCombotreeProj(data) {
+	var parents=[];
+    $('#projectClassificationId').combotree({
+    	data:data,
+        multiple: true,
+        checkbox: true,
+        height:30,
+        onlyLeafCheck: true,
+        options: [{
+
+        }],   
+      
+        onBeforeSelect:function(node,checked){
+        	if(checked){
+        		var exist=$.inArray(node.parentId,parents);
+            	if(exist==-1){
+            		parents.push(node.parentId);
+            		return true;
+            	}else{
+            		return false;
+            	}
+        	}else{
+        		parents=$.grep(parents,function(n,i){
+        			return (n!=node.parentId);
+        		});
+        	}
+        },
+        onLoadSuccess: function (node, data) {
+        	if(typeof(projectType)=="undefined"){
+        		$("#projectClassificationId").combotree('setValue',-1);
+	       	}else if(projectType==""){
+	       		$("#projectClassificationId").combotree('setValue',-1);
+	       	}else{
+	       		$("#projectClassificationId").combotree('setValues',projectType);
+	       	}
+        }
+    });
+}
+
+

@@ -1,0 +1,67 @@
+package com.cost168.costaudit.service.sys.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.sys.SysUserOrgMapper;
+import com.cost168.costaudit.pojo.sys.SysUserOrgExample;
+import com.cost168.costaudit.pojo.sys.SysUserOrgKey;
+import com.cost168.costaudit.pojo.sys.SysUserOrgExample.Criteria;
+import com.cost168.costaudit.service.sys.SysUserOrgService;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class SysUserOrgServiceImpl implements SysUserOrgService {
+	
+	@Autowired
+	private SysUserOrgMapper sysUserOrgMapper;
+
+	@Override
+	public List<SysUserOrgKey> selectByExample(SysUserOrgExample example) {
+		return sysUserOrgMapper.selectByExample(example);
+	}
+
+	@Override
+	public int insertSelective(SysUserOrgKey record) {
+		return sysUserOrgMapper.insertSelective(record);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(SysUserOrgKey key) {
+		return sysUserOrgMapper.deleteByPrimaryKey(key);
+	}
+
+	@Override
+	public int deleteUserOrgByUserId(String userid) {
+		SysUserOrgExample example=new SysUserOrgExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andUserIdEqualTo(userid);
+		return sysUserOrgMapper.deleteByExample(example);
+	}
+
+	@Override
+	public List<SysUserOrgKey> uoListByUserId(String userId) {
+		SysUserOrgExample example=new SysUserOrgExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andUserIdEqualTo(userId);
+		return sysUserOrgMapper.selectByExample(example);
+	}
+
+	@Override
+	public List<SysUserOrgKey> uoListByOrgId(String orgId) {
+		SysUserOrgExample example=new SysUserOrgExample();
+		Criteria criteria = example.createCriteria();
+		criteria.andOrgIdEqualTo(orgId);
+		return sysUserOrgMapper.selectByExample(example);
+	}
+
+	@Override
+	public String selectOrgByUserId(String userId) {
+		return sysUserOrgMapper.selectOrgByUserId(userId);
+	}
+
+
+}

@@ -1,0 +1,705 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>估算预结</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+	<style type="text/css">
+		.datagrid-cell-c3-name{
+		    overflow: hidden;
+		    text-overflow:ellipsis;
+		    white-space: nowrap!important;
+		}
+		.datagrid-cell-c3-contractName{
+		    overflow: hidden;
+		    text-overflow:ellipsis;
+		    white-space: nowrap!important;
+		}.datagrid-cell-c3-taskName{
+		    overflow: hidden;
+		    text-overflow:ellipsis;
+		    white-space: nowrap!important;
+		}
+	</style>
+</head>
+<body class="easyui-layout">
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+<div data-options="region:'center',border:0" class="wrap_center">
+    <form action="" id="formId">
+    	<input type="hidden" name="id" value="${obj.id }">
+    	<input type="hidden" name="dpctRelationId" value="${dpctRelationId}">
+        <table class="table_edit" id="table_edit" cellspacing="0" cellpadding="0" >
+                <tbody>
+                <tr>
+                        <td class="bgcolor"><strong>*</strong>所属项目：</td>
+                        <td colspan="5">
+                            <input type="text"  value="${obj.projectName}" readonly="readonly" placeholder="请选择所属项目" id="containProjectShowName" style="width:80%;margin-top:5px;">
+	           		 		<input type="hidden"  value="${obj.projectId }"  id="containProjectId" name="projectId" style="width:80%;margin-top:5px;">
+	            			<input type="hidden"  value="${obj.projectName }"  id="containProjectName" name="projectName" style="width:80%;margin-top:5px;">
+                            <a href="javascript:void(0)" onclick="agreeToProject()" class="fr" style="margin-top:5px;">
+                            	<img src="${pageContext.request.contextPath}/res/images/pagecommon/project.png" alt="" width="19"height="19">
+                            </a>
+                        	<input type="hidden" value="${obj.projectName }"  style="width:100%;">
+                        </td>
+                        
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>&nbsp;</strong>所属合同：</td>
+                        <td colspan="5">
+                            <input type="text"  value="${obj.contractName}" readonly="readonly" placeholder="请选择所属合同" id="containContractShowName" style="width:80%;margin-top:5px;">
+	           		 		<input type="hidden"  value="${obj.contractId }"  id="containContractId" name="contractId" style="width:80%;margin-top:5px;">
+	            			<input type="hidden"  value="${obj.contractName }"  id="containContractName" name="contractName" style="width:80%;margin-top:5px;">
+	            			<a href="javascript:void(0)" class="fr" style="margin-top:5px;" onclick="clearUnitContract();">
+		                    	<img src="${pageContext.request.contextPath}/res/images/pagecommon/remove.png" alt="" width="19"height="19">
+		                    </a>
+                            <a href="javascript:void(0)" onclick="agreeToContract()" class="fr" style="margin-top:5px;margin-right:5px;">
+                            	<img src="${pageContext.request.contextPath}/res/images/pagecommon/contract.png" alt="" width="19"height="19">
+                            </a>
+                        	<input type="hidden" value="${obj.contractName }"  style="width:100%;">
+                        </td>
+                       
+                    </tr>
+                   
+                    <tr>
+                    	<td class="bgcolor"><strong>*</strong>所属往来文件：</td>
+                        <td colspan="5">
+                            <input type="text"  value="" readonly="readonly" placeholder="请选择所往来文件" id="containDocumentShowName" style="width:80%;margin-top:5px;">
+	           		 		<input type="hidden"  value="${obj.documentId }"  id="containDocumentId" name="documentId" style="width:80%;margin-top:5px;">
+                            <a href="javascript:void(0)" onclick="agreeToDocument();" class="fr" style="margin-top:5px;">
+                            	<img src="${pageContext.request.contextPath}/res/images/pagecommon/contract.png" alt="" width="19"height="19">
+                            </a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>*</strong>审价任务名称：</td>
+                        <td colspan="5">
+                            <input type="text" id="name" name="name"   value="${obj.name }" placeholder="请输入审核内容" style="width:100%;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>*</strong>审价编号：</td>
+                        <td>
+                            <input type="text" id="code" name="code"   value="${obj.code }" placeholder="请输入审价编号" style="width:100%;">
+                        </td>
+                        <td class="bgcolor"><strong>*</strong>接收日期：</td>
+                        <td>
+                            <input placeholder="接收日期" class="Wdate search_text_form" name="receiveTimeStr" value="${fn:substring(obj.receiveTimeStr, 0, 10)}" type="text" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd',maxDate:'%y-%M-%d'})">
+                        </td>
+                         <td  class="bgcolor"><strong>&nbsp;</strong>内联单号：</td>
+                        <td>
+                            <input type="text"  name="inlineNumber" value="${obj.inlineNumber }" placeholder="请输入内联单号">
+                        </td>
+                        
+                       
+                    </tr>
+                    <tr>
+                    	<td class="bgcolor"><strong>*</strong>审价类型：</td>
+                        <td>
+                            <select onchange="show3feiyong()" style="width:100%;" id="auditPriceType" name="auditPriceType" class="custom-select">
+                            	<option value="">请选择</option>
+                            	<c:forEach items="${taskTypeList}" var="i">
+                            		<option value="${i.name}">${i.name}</option>
+                            	</c:forEach>
+                            </select>
+                        </td>
+                         <input type="hidden" value="估概预结" name="auditPriceTypecn">
+                         <td class="bgcolor"><strong>*</strong>当前状态：</td>
+                        <td>
+                            <select id="status" name="status" class="custom-select" onchange="statusChange();">
+                                <c:forTokens items="请选择,新建,办内审核中,办内审核完,退审,审结" delims="," var="i">
+                                	<option <c:if test="${i eq obj.status }">selected = "selected"</c:if>  value="${i}">${i}</option>
+                                </c:forTokens>
+                            </select>
+                        </td>
+                        <td class="bgcolor"><strong>&nbsp;</strong>评审报告书：</td>
+                        <td>
+                            <input type="text"  name="reviewReportn" value="${obj.reviewReportn }" placeholder="评审报告书" style="width:100%;">
+                        </td>
+                        <%--<td class="bgcolor"><strong>&nbsp;</strong>份数：</td>
+                        <td>
+                            <input type="text"  name="umber" value="${obj.umber }" placeholder="份数">
+                        </td>
+                        --%>
+                    </tr>
+                    <tr>
+                    	  <td class="bgcolor"><strong>*</strong>审价任务负责人：</td>
+                        <td>
+                        	<input type="text" id="personLiableId" name="personLiable" style="margin-top:5px;width:80%;" value="${obj.personLiable}" placeholder="请输入负责人" style="width:80%;"/>
+                         	<a href="javascript:void(0)" class="fr" style="margin-top:5px;" onclick="person();">
+                    		<img src="${pageContext.request.contextPath}/res/images/pagecommon/project.png" alt="" width="19"height="19">
+                        </td>
+                         <td class="bgcolor"><strong>&nbsp;</strong>合同类型：</td>
+                        <td>
+	                        <input type="text" value="${obj.contractType }" readonly="readonly" id="contractType" placeholder="读取合同类型" name="contractType">
+                        </td>
+                         <td class="bgcolor"><strong>&nbsp;</strong>合同金额（元）：</td>
+                        <td>
+                       		<input type="text" value="${obj.contractAmount }" readonly="readonly" placeholder="读取合同金额" name="contractAmount">
+                        </td>
+                        
+                    </tr>
+                   <tr>	
+                   		<td class="bgcolor" style="width:15%;"><strong>&nbsp;</strong><span id="ss">送审金额（元）：</span></td>
+                        <td style="width:15%">
+                            <input type="text" name="giveAmount"  value="${obj.giveAmount }" placeholder="请输入送审金额" class="easyui-numberbox" data-options="groupSeparator:',',precision:2"  style="width:100%;height:30px;line-height: 30px">
+                        </td>
+                        <td class="bgcolor" style="width:17%;"><strong>&nbsp;</strong><span id="zj">中介初审金额（元）：</span></td>
+                        <td style="width:22%;">
+                            <input type="text" name="agencyAuditAmount"  value="${obj.agencyAuditAmount }" placeholder="请输入中介初审金额" class="easyui-numberbox" data-options="groupSeparator:',',precision:2"  style="width:100%;height:30px;line-height: 30px">
+                        </td>
+                        <td class="bgcolor" style="width:17%;"><strong>&nbsp;</strong><span id="wb">我办审核金额（元）：</span></td>
+                        <td style="text-align: center;width: 19%">
+                            <input type="text" name="myAuditAmount"  value="${obj.myAuditAmount }" placeholder="请输入我办审核金额" class="easyui-numberbox" data-options="groupSeparator:',',precision:2"  style="width:100%;height:30px;line-height: 30px">
+                        </td>
+                        
+                   </tr>
+                   <tr id="show_deliveryFlag" >
+                        <td class="bgcolor"><strong>&nbsp;</strong>是否外送：</td>
+                        <td>
+                            <select onchange="deliveryFlagChange();" id="deliveryFlag" name="deliveryFlag" class="custom-select">
+                                <c:forTokens items="否,是" delims="," var="i">
+                                	<option <c:if test="${i eq obj.deliveryFlag }">selected = "selected"</c:if>  value="${i}">${i}</option>
+                                </c:forTokens>
+                            </select>
+                        </td>
+                        <td class="bgcolor"><strong>&nbsp;</strong><span style="display: none;" id="submissionTime">资料送审日期：</span></td>
+                        <td>
+                        	<div id="submissionTimeStr" style="display: none;">
+	                            <input placeholder="资料送审日期" class="Wdate search_text_form"  name="submissionTimeStr" value="${fn:substring(obj.submissionTimeStr, 0, 10)}" type="text" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+                        	</div>
+                        </td>
+                        <td class="bgcolor"><strong>&nbsp;</strong><span style="display: none;" id="fixedFinancial">已定审且不属于财政评审的<br>结算发函财局备案文号：</span></td>
+                        <td>
+                        	<div id="fixedFinancialStr" style="display: none;">
+	                            <input type="text" name="fixedFinancial"  value="${obj.fixedFinancial }" placeholder="填入信息" style="width:100%;">
+                        	</div>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td class="bgcolor"><strong id="entrustNumber_star"></strong>委托单号：</td>
+                        <td>
+                            <input type="text" name="entrustNumber" value="${obj.entrustNumber }" placeholder="请输入委托单号" style="width:100%;">
+                        </td>
+                        <td class="bgcolor"><strong id="auditPriceUnit_star"></strong>审价单位：</td>
+                        <td colspan="3">
+                        	<input type="text"  id="auditPriceUnit" value="${obj.auditPriceUnit}" name="auditPriceUnit" placeholder="请输入/选择审价单位" style="width:60%;margin-top:5px;">
+							<a href="javascript:void(0)" class="fr" style="margin-top:5px;margin-right:5px;" onclick="clearUnitEnterprise();">
+		                    	<img src="${pageContext.request.contextPath}/res/images/pagecommon/remove.png" alt="" width="19"height="19">
+		                    </a>
+							<a href="javascript:void(0)" class="fr" style="margin-top:5px;margin-right:5px;" onclick="unitEnterprise()">
+		                    	<img src="${pageContext.request.contextPath}/res/images/pagecommon/project.png" alt="" width="19"height="19">
+		                    </a>
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td class="bgcolor"><strong id="decideTimeStr_star">&nbsp;</strong>定审日期：</td>
+                        <td>
+                            <input placeholder="定审日期" class="Wdate search_text_form" id="decideTimeStr" name="decideTimeStr" value="${fn:substring(obj.decideTimeStr, 0, 10)}" type="text" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+                        </td>
+                        <td class="bgcolor"><strong id="finalizeNumber_star">&nbsp;</strong>定案文号：</td>
+                        <td>
+                            <input type="text" id="finalizeNumber" name="finalizeNumber"  value="${obj.finalizeNumber }" placeholder="财局/业主批发文号/发函财局备案文号" style="width:100%;">
+                        </td>
+                       <td class="bgcolor"><strong id="decideAmount_star">&nbsp;</strong><span id="ds">定审金额（元）：</span></td>
+                        <td>
+                            <input type="text" id="decideAmount" name="decideAmount"  value="${obj.decideAmount }" class="easyui-numberbox" data-options="groupSeparator:',',precision:2" placeholder="请输入定审金额" style="width:100%;height:30px;line-height: 30px">
+                        </td>
+                    </tr>
+                     <tr id="show_3feiyong">
+                        <td class="bgcolor"><strong>&nbsp;</strong><span id="gcfy">定审工程费（元）：</span></td>
+                        <td>
+                            <input type="text" id="gcfAmount" name="gcfAmount"  value="${obj.gcfAmount }" placeholder="请输入工程费金额" class="easyui-numberbox"  data-options="groupSeparator:',',precision:2"  style="width:100%;height:30px;line-height: 30px">
+                        </td>
+                        <td class="bgcolor"><strong>&nbsp;</strong><span id="elfy">定审二类费用（元）：</span></td>
+                        <td style="text-align: center;">
+                            <input type="text" id="elfyAmount" name="elfyAmount"  value="${obj.elfyAmount }" placeholder="请输入二类费用金额" class="easyui-numberbox" data-options="groupSeparator:',',precision:2"  style="width:100%;height:30px;line-height: 30px">
+                        </td>
+                        <td class="bgcolor"><strong>&nbsp;</strong><span id="slfy">定审三类费用（元）：</span></td>
+                        <td>
+                            <input type="text" id="slfyAmount" name="slfyAmount"  value="${obj.slfyAmount }" placeholder="请输入三类费用金额" class="easyui-numberbox" data-options="groupSeparator:',',precision:2"  style="width:100%;height:30px;line-height: 30px">
+                        </td>
+                    </tr>
+                     <%--
+                     <tr>
+                        <td class="bgcolor"><strong>&nbsp;</strong>评审报告书：</td>
+                        <td colspan="5">
+                            <input type="text"  name="reviewReportn" value="${obj.reviewReportn }" placeholder="评审报告书" style="width:100%;">
+                        </td>
+                     </tr>
+                    --%>
+                    <tr id="show_acceptance">
+                    	<td class="bgcolor"><strong id="acceptanceTime">&nbsp;</strong>预受理日期：</td>
+                        <td>
+                            <input placeholder="预受理日期" class="Wdate search_text_form" id="acceptanceTimeStr" name="acceptanceTimeStr" value="${fn:substring(obj.acceptanceTimeStr, 0, 10)}" type="text" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})">
+                        </td>
+                        <td class="bgcolor"><strong>&nbsp;</strong>发函财局：</td>
+                        <td>
+                            <input type="text" name="financial"  value="${obj.financial }" placeholder="填入发函财局" style="width:100%;">
+                        </td>
+                        
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr id="show_retrial">
+                        <td class="bgcolor"><strong>&nbsp;</strong>退审文号及原因：</td>
+                        <td colspan="5">
+                            <textarea id="retrial" name="retrial" cols="5" rows="2" placeholder="填入退审文号及原因">${obj.retrial }</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>&nbsp;</strong>备注：</td>
+                        <td colspan="5">
+                            <textarea name="progressDescription" cols="5" rows="2" placeholder="填入审价任务情况说明">${obj.progressDescription }</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>&nbsp;</strong>审核意见：</td>
+                        <td colspan="5">
+                            <textarea name="checkExplain" cols="5" rows="2" placeholder="填入审核意见、附注">${obj.checkExplain }</textarea>
+                        </td>
+                    </tr>
+                    <tr style="height:40px">
+                        <td colspan="6" style="text-align: center">
+                            <input type="button" class="btn btn-primary" id="save"  value="保存">&nbsp;&nbsp;
+                            <input type="button" class="btn btn-success" onclick="top.closeWindow('审价任务添加');top.closeWindow('审价任务修改');top.closeWindow('审价任务详情')" value="取消">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+    </form>
+    <%--
+    <div id="tt" style="width:100%;">
+        <div title="送审资料" class="subWrap">
+            <table id="songshen" style="width: 100%">
+            </table>
+
+            <div id="tit1">
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="getDialog('songshen')">添加文件夹</a>
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="delFile('songshen')">删除</a>
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-upload" plain="false" onclick="uploadFile('songshen')">上传文件</a>
+            </div>
+
+        </div>
+        <div title="审定资料" class="subWrap">
+            <table id="shending" style="width: 100%">
+            </table>
+
+            <div id="tit2">
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="getDialog('shending')">添加文件夹</a>
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="delFile('shending')">删除</a>
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-upload" plain="false" onclick="uploadFile('shending')">上传文件</a>
+            </div>
+
+        </div>
+        <div title="往来文件" class="subWrap">
+            <table id="wlfile" style="width: 100%">
+            </table>
+        </div>
+        <div title="协调事项" class="subWrap">
+            <table id="coordinationMatters" style="width: 100%">
+            </table>
+            <div id="tit4">
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="getTaskCoordinageDialog('添加协调事项')">新增</a>
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-edit" plain="false" onclick="getTaskCoordinageDialog('修改协调事项')">修改</a>
+                <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="deleteTc()">删除</a>
+            </div>
+        </div>
+    </div>
+--%>
+</div>
+<div id="taskDialog" style="background: #f4f8fb"></div>
+<div id="taskCoordinateDialog"></div>
+<div id="dlg"></div>
+<div id="info_add"></div>
+<div id="dialog"></div>
+<div id="project"></div>
+<div id="contract"></div>
+<div id="document"></div>
+<div id="person"></div>
+<div id="unitEnterprise"></div>
+<script>
+	var url="${url}";
+	var taskId="${obj.id }";
+	var auditPriceType="${obj.auditPriceType}";
+	var deliveryFlag ="${obj.deliveryFlag}";
+    <!-- 禁用所有Form表单 -->
+    function disableForm(formId,isDisabled) {
+        var attr="disable";
+        if(!isDisabled){
+            attr="enable";
+        }
+        $("form[id='"+formId+"'] :text").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] textarea").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] select").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :radio").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :checkbox").attr("readonly",isDisabled);
+    }
+    $(function(){
+    	$("#show_3feiyong").hide();
+    	$("#show_acceptance").hide();
+    	if(deliveryFlag=='否'){
+    		$("#entrustNumber_star").text("");
+  			$("#auditPriceUnit_star").text("");
+    	}
+	    $("#save").click(function(){
+	    	var name= $("input[name='name']").val();
+	    	var code= $("input[name='code']").val();
+	    	var entrustNumber= $("input[name='entrustNumber']").val();
+	    	var auditPriceUnit= $("input[name='auditPriceUnit']").val();
+	    	var personLiable= $("input[name='personLiable']").val();
+	    	var receiveTimeStr= $("input[name='receiveTimeStr']").val();
+	    	var containProjectId=$("#containProjectId").val();
+	    	var containDocumentId=$("#containDocumentId").val();
+	    	
+	    	var status=$("#status").val();
+	    	var decideTimeStr=$("#decideTimeStr").val();
+	    	var decideAmount=$("#decideAmount").val();
+	    	var auditPriceType=$("#auditPriceType").val();
+	    	
+	    	var isAllProcess=$("isAllProcess").val();
+	    	
+	    	if(containProjectId==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请选择所属项目！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(containDocumentId==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请选择所属往来文件！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(name==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写审价任务名称！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(code==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写审价编号！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(auditPriceType==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请选择审价类型！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	var deliveryFlag=$("#deliveryFlag").val();
+	    	if(deliveryFlag=="是"){
+	    		$.messager.alert({title:'温馨提示', msg:'请填写审价单位！', icon: 'error', top:100});
+	          	return;
+		    	/* if(entrustNumber==""){
+		          	//$.messager.alert({title:'温馨提示', msg:'请填写委托单号！', icon: 'error', top:100});
+		          	//return;
+			    } */
+	    	}
+	    	if(isAllProcess=="是"){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写审价单位！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(status=="请选择"){
+	          	$.messager.alert({title:'温馨提示', msg:'请选择当前状态！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	else if(status=="审结"){
+	    		if(decideTimeStr==""){
+	    			$.messager.alert({title:'温馨提示', msg:'请填写定审日期！', icon: 'error', top:100});
+		          	return;
+	    		}
+	    		if(decideAmount==""){
+	    			$.messager.alert({title:'温馨提示', msg:'请填写定审金额！', icon: 'error', top:100});
+		          	return;
+	    		}
+	    		if(finalizeNumber==""){
+	    			$.messager.alert({title:'温馨提示', msg:'请填写定案文号！', icon: 'error', top:100});
+		          	return;
+	    		}
+	    	}
+	    	if(personLiable==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写负责人！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	if(receiveTimeStr==""){
+	          	$.messager.alert({title:'温馨提示', msg:'请填写接收日期！', icon: 'error', top:100});
+	          	return;
+		    }
+	    	
+			$.ajax({
+				  url: url,
+				  dataType: "json",
+				  type:"post",
+				  async: false,
+				  data: $("#formId").serialize(),
+				  success: function(result){
+					  if(result.status==200){
+						  url="/costTask/upd2";
+					  	  window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+						  var json1={tabTitle:'估概预结',url:'/forward_task_estimatePrefix'};
+						  window.parent.refreshTab(json1);
+						  editInfo(taskId);
+						  top.closeWindow('审价任务添加')
+					  }else if(result.status==600){
+					  	  $.messager.alert("温馨提示","系统已有该审价任务名称,请不要重复!", "error");
+					  }else if(result.status==800){
+						  $.messager.alert("温馨提示","系统已有该审价任务编号,请不要重复!", "error");
+					  }else if(result.status==900){
+						  $.messager.alert("温馨提示","该合同下只能有一条结算审核任务,请不要重复添加!", "error");
+					  }else{
+						  $.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+					  }
+				  }
+			});
+		});
+	    //汇总
+	    $("#gcfAmount").next("span").children().first().blur(function(){
+            //blur事件处理代码
+	    	var gcf=$('#gcfAmount').val();
+            var elfy=$('#elfyAmount').val();
+            var slfy=$('#slfyAmount').val();
+            var decideAmount=Number(gcf)+Number(elfy)+Number(slfy);
+            $('#decideAmount').numberbox('setValue',decideAmount);
+        });
+	    $("#elfyAmount").next("span").children().first().blur(function(){
+            //blur事件处理代码
+	    	var gcf=$('#gcfAmount').val();
+            var elfy=$('#elfyAmount').val();
+            var slfy=$('#slfyAmount').val();
+            var decideAmount=Number(gcf)+Number(elfy)+Number(slfy);
+            $('#decideAmount').numberbox('setValue',decideAmount);
+        });
+	    $("#slfyAmount").next("span").children().first().blur(function(){
+            //blur事件处理代码
+	    	var gcf=$('#gcfAmount').val();
+            var elfy=$('#elfyAmount').val();
+            var slfy=$('#slfyAmount').val();
+            var decideAmount=Number(gcf)+Number(elfy)+Number(slfy);
+            $('#decideAmount').numberbox('setValue',decideAmount);
+        });
+	    
+    });
+    function editInfo(zjkClId) {
+        var href = "/costTask/toEdit?editFlag=y&id="+zjkClId;
+        var title = "审价任务修改";
+        top.addTabGrid(title, href);
+    }
+    //关联项目
+    function agreeToProject() {
+        $('#project').dialog({
+            title: '关联项目',
+            width: 805,
+            height: 520,
+            closed: false,
+            cache: false,
+            top:50,
+            content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_task_containProject'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+            modal: true
+        });
+    }
+    //关联合同
+    function agreeToContract() {
+    	var projectId=$("#containProjectId").val();
+    	if(projectId){
+	        $('#contract').dialog({
+	            title: '关联合同',
+	            width: 805,
+	            height: 520,
+	            closed: false,
+	            cache: false,
+	            top:50,
+	            content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_task_containContract?projectId='+projectId+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+	            modal: true
+	        });
+    	}else{
+    		$.messager.alert("温馨提示","请先选择所属项目!", "error");
+    	}
+    }
+  	//关联往来文件
+    function agreeToDocument() {
+  		var projId=$("#containProjectId").val();
+        $('#document').dialog({
+            title: '关联往来文件',
+            width: 805,
+            height: 520,
+            closed: false,
+            cache: false,
+            top:50,
+            content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_task_containDocument?projId='+projId+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+            modal: true
+        });
+    }
+  		
+  	function deliveryFlagChange(){
+  		var deliveryFlag=$("#deliveryFlag").val();
+  		if(deliveryFlag=='是'){
+  			//$("#entrustNumber_star").text("*");
+  			$("#auditPriceUnit_star").text("*");
+  		}else if(deliveryFlag=='否'){
+  			//$("#entrustNumber_star").text("");
+  			$("#auditPriceUnit_star").text("");
+  			//$("input[name='entrustNumber']").val("");
+	    	//$("#auditPriceUnitName").val("");
+  		}
+  	}
+  	function statusChange(){
+  		var status=$("#status").val();
+  		if(status=="审结"){
+  			$("#decideTimeStr_star").text("*");
+  			$("#decideAmount_star").text("*");
+  			$("#finalizeNumber_star").text("*");
+  			//$("#finalizeNumber").attr("placeholder","财局文号或结算结果确认表");
+  		}else if(status=="退审"){
+  			$("#finalizeNumber_star").text("");
+  			//$("#finalizeNumber").attr("placeholder","财局/业主批发文号/发函财局备案文号");
+  			//$("#show_retrial").show();
+  		}else if(status=="办内审核完"){
+  			$("#submissionTime").show();
+  			$("#submissionTimeStr").show();
+  			$("#fixedFinancial").show();
+  			$("#fixedFinancialStr").show();
+  			$("#finalizeNumber_star").text("");
+  			//$("#finalizeNumber").attr("placeholder","财局/业主批发文号/发函财局备案文号表");
+  		}else{
+  			$("#decideTimeStr_star").text("");
+  			$("#decideAmount_star").text("");
+  			$("#submissionTime").hide();
+  			$("#submissionTimeStr").hide();
+  			$("#fixedFinancial").hide();
+  			$("#fixedFinancialStr").hide();
+  			$("#finalizeNumber_star").text("");
+  			//$("#finalizeNumber").attr("placeholder","财局/业主批发文号/发函财局备案文号");
+  			//$("#show_retrial").hide();
+  		}
+  	}
+  	//项目负责人
+    function person() {
+        $('#person').dialog({
+            title: '系统用户',
+            width: 805,
+            height: 520,
+            closed: false,
+            cache: false,
+            top:50,
+            content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_project_person'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+            modal: true
+        });
+    }
+  	//审价单位
+    function unitEnterprise() {
+        $('#unitEnterprise').dialog({
+            title: '审价单位',
+            width: 805,
+            height: 520,
+            closed: false,
+            cache: false,
+            top:50,
+            content:"<iframe name=\"fileFramePro\" frameborder=\"0\" src="+'/forward_task_containEnterprise'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+            modal: true
+        });
+    }
+    //删除审价单位
+    function clearUnitEnterprise(){
+    	//$("#auditPriceUnitName").val("");
+    	$("#auditPriceUnit").val("");
+    }
+    //删除合同
+    function clearUnitContract(){
+    	$("#containContractShowName").val("");
+    	$("#contractName").val("");
+    }
+    //控制显示3类费用
+    function show3feiyong(){
+    	var auditPriceType=$("#auditPriceType").val();
+    	if(auditPriceType=='概算审核'){
+    		$("#show_3feiyong").show();
+    		$("#gcfy").html("");
+    		$("#elfy").html("");
+    		$("#slfy").html("");
+    		$("#ss").html("送审金额（元）：");
+    		$("#zj").html("中介初审金额（元）：");
+    		$("#wb").html("我办审核金额（元）：");
+    		$("#ds").html("定审金额（元）：");
+    		$("#gcfy").html("定审工程费（元）：");
+    		$("#elfy").html("定审二类费用（元）：");
+    		$("#slfy").html("定审三类费用（元）：");
+    	}else if(auditPriceType=='项建估算审核'){
+    		$("#ss").html("");
+    		$("#zj").html("");
+    		$("#wb").html("");
+    		$("#ds").html("");
+    		$("#gcfy").html("");
+    		$("#elfy").html("");
+    		$("#slfy").html("");
+    		$("#ss").html("送审项建估算（万元）：");
+    		$("#zj").html("中介初审项建估算（万元）：");
+    		$("#wb").html("我办审核项建估算（万元）：");
+    		$("#ds").html("定审项建估算（万元）：");
+    		$("#gcfy").html("定审工程费（万元）：");
+    		$("#elfy").html("定审二类费用（万元）：");
+    		$("#slfy").html("定审三类费用（万元）：");
+    		$("#show_3feiyong").show();
+    	}else if(auditPriceType=='可研估算审核'){
+    		$("#show_3feiyong").show();
+    		$("#ss").html("");
+    		$("#zj").html("");
+    		$("#wb").html("");
+    		$("#ds").html("");
+    		$("#gcfy").html("");
+    		$("#elfy").html("");
+    		$("#slfy").html("");
+    		$("#ss").html("送审可研估算（万元）：");
+    		$("#zj").html("中介初审可研估算（万元）：");
+    		$("#wb").html("我办审核可研估算（万元）：");
+    		$("#ds").html("定审可研估算（万元）：");
+    		$("#gcfy").html("定审工程费（万元）：");
+    		$("#elfy").html("定审二类费用（万元）：");
+    		$("#slfy").html("定审三类费用（万元）：");
+    	}else if(auditPriceType=='结算审核'){
+    		$("#show_acceptance").show();
+    		$("#show_3feiyong").hide();
+    		$("#ss").html("");
+    		$("#zj").html("");
+    		$("#wb").html("");
+    		$("#ds").html("");
+    		$("#ss").html("送审金额（元）：");
+    		$("#zj").html("中介初审金额（元）：");
+    		$("#wb").html("我办审核金额（元）：");
+    		$("#ds").html("定审金额（元）：");
+    	}else{
+    		$("#show_acceptance").hide();
+    		$("#show_3feiyong").hide();
+    		$("#ss").html("");
+    		$("#zj").html("");
+    		$("#wb").html("");
+    		$("#ds").html("");
+    		$("#ss").html("送审金额（元）：");
+    		$("#zj").html("中介初审金额（元）：");
+    		$("#wb").html("我办审核金额（元）：");
+    		$("#ds").html("定审金额（元）：");
+    	}
+    	//控制定案文号提示语
+    	if(auditPriceType=='结算审核'){
+    		$("#finalizeNumber").attr("placeholder","财局文号或结算结果确认表");
+    	}else{
+    		$("#finalizeNumber").attr("placeholder","财局/业主批发文号/发函财局备案文号");
+    	}
+    }
+   //汇总审定金额
+   function sumDecideAmount(){
+	   //var gcfAmount = $('#gcfAmount').numberbox('getValue');
+	   var elfyAmount = $('#elfyAmount').numberbox('getText');
+	   //var slfyAmount = $('#slfyAmount').numberbox('getValue');
+	   
+	  var gcfAmount=$("#gcfAmount").val();
+	  //var elfyAmount=$("#elfyAmount").val();
+	  var slfyAmount=$("#slfyAmount").val();
+	  alert(gcfAmount+"-"+elfyAmount+"-"+slfyAmount);
+   }
+</script>
+</body>
+</html>

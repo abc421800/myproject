@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.yaohao.YaohaoAssessMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.yaohao.YaohaoAssess" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="enterprise_code" property="enterpriseCode" jdbcType="VARCHAR" />
+    <result column="work_enterprise_id" property="workEnterpriseId" jdbcType="VARCHAR" />
+    <result column="year" property="year" jdbcType="VARCHAR" />
+    <result column="winbid_num" property="winbidNum" jdbcType="INTEGER" />
+    <result column="reward_num" property="rewardNum" jdbcType="INTEGER" />
+    <result column="punish_num" property="punishNum" jdbcType="INTEGER" />
+    <result column="join_assess_flag" property="joinAssessFlag" jdbcType="VARCHAR" />
+    <result column="assess_score" property="assessScore" jdbcType="VARCHAR" />
+    <result column="score_rank" property="scoreRank" jdbcType="INTEGER" />
+    <result column="assess_result" property="assessResult" jdbcType="VARCHAR" />
+    <result column="ruku_status" property="rukuStatus" jdbcType="VARCHAR" />
+    <result column="yaohao_grade" property="yaohaoGrade" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="rater" property="rater" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, enterprise_code, work_enterprise_id, year, winbid_num, reward_num, punish_num, 
+    join_assess_flag, assess_score, score_rank, assess_result, ruku_status, yaohao_grade, 
+    create_time, rater, creater, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoAssessExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yaohao_assess
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from yaohao_assess
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from yaohao_assess
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoAssessExample" >
+    delete from yaohao_assess
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoAssess" >
+    insert into yaohao_assess (id, enterprise_code, work_enterprise_id, 
+      year, winbid_num, reward_num, 
+      punish_num, join_assess_flag, assess_score, 
+      score_rank, assess_result, ruku_status, 
+      yaohao_grade, create_time, rater, 
+      creater, remark)
+    values (#{id,jdbcType=VARCHAR}, #{enterpriseCode,jdbcType=VARCHAR}, #{workEnterpriseId,jdbcType=VARCHAR}, 
+      #{year,jdbcType=VARCHAR}, #{winbidNum,jdbcType=INTEGER}, #{rewardNum,jdbcType=INTEGER}, 
+      #{punishNum,jdbcType=INTEGER}, #{joinAssessFlag,jdbcType=VARCHAR}, #{assessScore,jdbcType=VARCHAR}, 
+      #{scoreRank,jdbcType=INTEGER}, #{assessResult,jdbcType=VARCHAR}, #{rukuStatus,jdbcType=VARCHAR}, 
+      #{yaohaoGrade,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{rater,jdbcType=VARCHAR}, 
+      #{creater,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoAssess" >
+    insert into yaohao_assess
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="enterpriseCode != null" >
+        enterprise_code,
+      </if>
+      <if test="workEnterpriseId != null" >
+        work_enterprise_id,
+      </if>
+      <if test="year != null" >
+        year,
+      </if>
+      <if test="winbidNum != null" >
+        winbid_num,
+      </if>
+      <if test="rewardNum != null" >
+        reward_num,
+      </if>
+      <if test="punishNum != null" >
+        punish_num,
+      </if>
+      <if test="joinAssessFlag != null" >
+        join_assess_flag,
+      </if>
+      <if test="assessScore != null" >
+        assess_score,
+      </if>
+      <if test="scoreRank != null" >
+        score_rank,
+      </if>
+      <if test="assessResult != null" >
+        assess_result,
+      </if>
+      <if test="rukuStatus != null" >
+        ruku_status,
+      </if>
+      <if test="yaohaoGrade != null" >
+        yaohao_grade,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="rater != null" >
+        rater,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseCode != null" >
+        #{enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="workEnterpriseId != null" >
+        #{workEnterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null" >
+        #{year,jdbcType=VARCHAR},
+      </if>
+      <if test="winbidNum != null" >
+        #{winbidNum,jdbcType=INTEGER},
+      </if>
+      <if test="rewardNum != null" >
+        #{rewardNum,jdbcType=INTEGER},
+      </if>
+      <if test="punishNum != null" >
+        #{punishNum,jdbcType=INTEGER},
+      </if>
+      <if test="joinAssessFlag != null" >
+        #{joinAssessFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="assessScore != null" >
+        #{assessScore,jdbcType=VARCHAR},
+      </if>
+      <if test="scoreRank != null" >
+        #{scoreRank,jdbcType=INTEGER},
+      </if>
+      <if test="assessResult != null" >
+        #{assessResult,jdbcType=VARCHAR},
+      </if>
+      <if test="rukuStatus != null" >
+        #{rukuStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="yaohaoGrade != null" >
+        #{yaohaoGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rater != null" >
+        #{rater,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoAssessExample" resultType="java.lang.Integer" >
+    select count(*) from yaohao_assess
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update yaohao_assess
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.enterpriseCode != null" >
+        enterprise_code = #{record.enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workEnterpriseId != null" >
+        work_enterprise_id = #{record.workEnterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.year != null" >
+        year = #{record.year,jdbcType=VARCHAR},
+      </if>
+      <if test="record.winbidNum != null" >
+        winbid_num = #{record.winbidNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.rewardNum != null" >
+        reward_num = #{record.rewardNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.punishNum != null" >
+        punish_num = #{record.punishNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.joinAssessFlag != null" >
+        join_assess_flag = #{record.joinAssessFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.assessScore != null" >
+        assess_score = #{record.assessScore,jdbcType=VARCHAR},
+      </if>
+      <if test="record.scoreRank != null" >
+        score_rank = #{record.scoreRank,jdbcType=INTEGER},
+      </if>
+      <if test="record.assessResult != null" >
+        assess_result = #{record.assessResult,jdbcType=VARCHAR},
+      </if>
+      <if test="record.rukuStatus != null" >
+        ruku_status = #{record.rukuStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yaohaoGrade != null" >
+        yaohao_grade = #{record.yaohaoGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.rater != null" >
+        rater = #{record.rater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creater != null" >
+        creater = #{record.creater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update yaohao_assess
+    set id = #{record.id,jdbcType=VARCHAR},
+      enterprise_code = #{record.enterpriseCode,jdbcType=VARCHAR},
+      work_enterprise_id = #{record.workEnterpriseId,jdbcType=VARCHAR},
+      year = #{record.year,jdbcType=VARCHAR},
+      winbid_num = #{record.winbidNum,jdbcType=INTEGER},
+      reward_num = #{record.rewardNum,jdbcType=INTEGER},
+      punish_num = #{record.punishNum,jdbcType=INTEGER},
+      join_assess_flag = #{record.joinAssessFlag,jdbcType=VARCHAR},
+      assess_score = #{record.assessScore,jdbcType=VARCHAR},
+      score_rank = #{record.scoreRank,jdbcType=INTEGER},
+      assess_result = #{record.assessResult,jdbcType=VARCHAR},
+      ruku_status = #{record.rukuStatus,jdbcType=VARCHAR},
+      yaohao_grade = #{record.yaohaoGrade,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      rater = #{record.rater,jdbcType=VARCHAR},
+      creater = #{record.creater,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoAssess" >
+    update yaohao_assess
+    <set >
+      <if test="enterpriseCode != null" >
+        enterprise_code = #{enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="workEnterpriseId != null" >
+        work_enterprise_id = #{workEnterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="year != null" >
+        year = #{year,jdbcType=VARCHAR},
+      </if>
+      <if test="winbidNum != null" >
+        winbid_num = #{winbidNum,jdbcType=INTEGER},
+      </if>
+      <if test="rewardNum != null" >
+        reward_num = #{rewardNum,jdbcType=INTEGER},
+      </if>
+      <if test="punishNum != null" >
+        punish_num = #{punishNum,jdbcType=INTEGER},
+      </if>
+      <if test="joinAssessFlag != null" >
+        join_assess_flag = #{joinAssessFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="assessScore != null" >
+        assess_score = #{assessScore,jdbcType=VARCHAR},
+      </if>
+      <if test="scoreRank != null" >
+        score_rank = #{scoreRank,jdbcType=INTEGER},
+      </if>
+      <if test="assessResult != null" >
+        assess_result = #{assessResult,jdbcType=VARCHAR},
+      </if>
+      <if test="rukuStatus != null" >
+        ruku_status = #{rukuStatus,jdbcType=VARCHAR},
+      </if>
+      <if test="yaohaoGrade != null" >
+        yaohao_grade = #{yaohaoGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="rater != null" >
+        rater = #{rater,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoAssess" >
+    update yaohao_assess
+    set enterprise_code = #{enterpriseCode,jdbcType=VARCHAR},
+      work_enterprise_id = #{workEnterpriseId,jdbcType=VARCHAR},
+      year = #{year,jdbcType=VARCHAR},
+      winbid_num = #{winbidNum,jdbcType=INTEGER},
+      reward_num = #{rewardNum,jdbcType=INTEGER},
+      punish_num = #{punishNum,jdbcType=INTEGER},
+      join_assess_flag = #{joinAssessFlag,jdbcType=VARCHAR},
+      assess_score = #{assessScore,jdbcType=VARCHAR},
+      score_rank = #{scoreRank,jdbcType=INTEGER},
+      assess_result = #{assessResult,jdbcType=VARCHAR},
+      ruku_status = #{rukuStatus,jdbcType=VARCHAR},
+      yaohao_grade = #{yaohaoGrade,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      rater = #{rater,jdbcType=VARCHAR},
+      creater = #{creater,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <select id="selectListByMap" parameterType="map" resultType="com.cost168.costaudit.pojo.yaohao.param.AssessParam">
+    SELECT w.name AS enterpriseName,ya.ruku_status AS rukuStatus,ya.year,assess_score AS assessScore,score_rank AS
+    scoreRank,assess_result AS assessResult,
+    yaohao_grade AS yaohaoGrade,ya.create_time AS createTime,ya.creater AS creater
+    FROM yaohao_assess ya
+    INNER JOIN work_enterprise w ON ya.work_enterprise_id=w.id
+    <where>
+      <if test="enterpriseName != null and enterpriseName!=''">
+        w.name LIKE concat('%',#{enterpriseName},'%')
+      </if>
+      <if test="rukuStatus != null and rukuStatus!=''">
+        and ya.ruku_status=#{rukuStatus}
+      </if>
+      <if test="year!=null and year!=''">
+        and ya.year=#{year}
+      </if>
+      <if test="assessResult!=null and assessResult!=''">
+        and ya.assess_result=#{assessResult}
+      </if>
+      <if test="yaohaoGrade!=null and yaohaoGrade!=''">
+        and ya.yaohao_grade=#{yaohaoGrade}
+      </if>
+      <if test="startTime!=null and startTime!=''">
+        and <![CDATA[ ya.create_time>=#{startTime} ]]>
+      </if>
+      <if test="endTime!=null and endTime!=''">
+        and <![CDATA[ ya.create_time<=#{endTime} ]]>
+      </if>
+    </where>
+    <if test="isPage==true">
+      limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" parameterType="map" resultType="int">
+    SELECT count(ya.id) FROM yaohao_assess ya INNER JOIN work_enterprise w ON ya.work_enterprise_id=w.id
+    <where>
+      <if test="enterpriseName != null and enterpriseName!=''">
+        w.name LIKE concat('%',#{enterpriseName},'%')
+      </if>
+      <if test="rukuStatus != null and rukuStatus!=''">
+        and ya.ruku_status=#{rukuStatus}
+      </if>
+      <if test="year!=null and year!=''">
+        and ya.year=#{year}
+      </if>
+      <if test="assessResult!=null and assessResult!=''">
+        and ya.assess_result=#{assessResult}
+      </if>
+      <if test="yaohaoGrade!=null and yaohaoGrade!=''">
+        and ya.yaohao_grade=#{yaohaoGrade}
+      </if>
+      <if test="startTime!=null and startTime!=''">
+        and <![CDATA[ ya.create_time>=#{startTime} ]]>
+      </if>
+      <if test="endTime!=null and endTime!=''">
+        and <![CDATA[ ya.create_time<=#{endTime} ]]>
+      </if>
+    </where>
+  </select>
+</mapper>

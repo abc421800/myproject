@@ -1,0 +1,474 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.yaohao.YaohaoCandidateMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.yaohao.YaohaoCandidate" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="enterprise_code" property="enterpriseCode" jdbcType="VARCHAR" />
+    <result column="year_assess" property="yearAssess" jdbcType="VARCHAR" />
+    <result column="year_win_numA" property="yearWinNuma" jdbcType="INTEGER" />
+    <result column="year_win_numB" property="yearWinNumb" jdbcType="INTEGER" />
+    <result column="yaohao_year" property="yaohaoYear" jdbcType="VARCHAR" />
+    <result column="yaohao_grade" property="yaohaoGrade" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="round_num" property="roundNum" jdbcType="INTEGER" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="bid_flag" property="bidFlag" jdbcType="VARCHAR" />
+    <result column="removeFlag" property="removeFlag" jdbcType="VARCHAR" />
+    
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, enterprise_code, year_assess, year_win_numA, year_win_numB, yaohao_year, yaohao_grade, 
+    create_time, creater, round_num, remark, bid_flag,removeFlag
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoCandidateExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from yaohao_candidate
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByBidflag" resultMap="BaseResultMap" parameterType="java.lang.String" >
+  		SELECT * from  yaohao_candidate c where c.bid_flag = #{bidFlag}
+  </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+		
+		SELECT IFNULL(a.winNum,0) as 'winNum',m.* FROM (
+		SELECT 
+		CASE WHEN c.removeFlag ='1' and c.bid_flag IS NOT NULL AND c.bid_flag !=''   THEN '已中签' 
+			WHEN c.removeFlag ='1' and c.bid_flag IS NULL or c.bid_flag ='' THEN '正在参与'   
+			WHEN c.removeFlag ='1' IS NULL AND c.bid_flag ='' THEN '正在参与'  
+			WHEN c.removeFlag ='2' THEN '回避'    
+			END AS 'remarkStr' ,er.`status`,
+		e.id as 'enterpriseId', a.assess_result as 'assessResult',e.`name` as 'enterpriseName',e.simple_name as 'simpleName',c.*,a.`year` 
+		FROM yaohao_candidate c 
+		INNER JOIN cost_enterprise e ON c.enterprise_code=e.`code` 
+		LEFT JOIN cost_enterprise_record er ON e.id=er.enterprise_id AND er.`year`=c.yaohao_year 
+		LEFT JOIN yaohao_assess a ON a.enterprise_code=c.enterprise_code AND a.`year`=c.yaohao_year-1
+     	<where>
+     		<choose>
+   				<when test="yaohaoJoin =='cy'">
+		     		and c.removeFlag ='1' and (c.bid_flag IS NULL or c.bid_flag ='')
+   				</when>
+   				<otherwise>
+   					and ((c.bid_flag IS NOT NULL and c.bid_flag !='') or c.removeFlag ='2')
+   				</otherwise>
+   			</choose>
+     	
+     		<if test="id != null and id !=''" >
+     			and c.id = #{id}
+   			</if>
+   			<!-- <if test="removeFlag != null and removeFlag !=''" >
+     			and c.removeFlag = #{removeFlag}
+   			</if> -->
+   			<if test="enterpriseName != null and enterpriseName !=''" >
+     			and e.name like concat('%',#{enterpriseName},'%')
+   			</if>
+   			<if test="yaohaoGrade != null and yaohaoGrade !=''" >
+     			and c.yaohao_grade = #{yaohaoGrade}
+   			</if>
+   			<if test="yaohaoYear != null and yaohaoYear !=''" >
+     			and c.yaohao_year = #{yaohaoYear}
+   			</if>
+   			<if test="yearAssess != null and yearAssess !=''" >
+   				<choose>
+   					<when test="yearAssess=='未评定'">
+   						and a.assess_result is null
+   					</when>
+   					<otherwise>
+		     			and a.assess_result = #{yearAssess}
+   					</otherwise>
+   				</choose>
+   			</if>
+   			<if test="roundNum != null and roundNum !=''" >
+     			and c.round_num = #{roundNum}
+   			</if>
+   			<!-- <if test="bidFlagNull != null and bidFlagNull !=''" >
+     			and  (c.bid_flag IS NULL or c.bid_flag ='')
+   			</if> -->
+   			<if test="noEntId != null and noEntId !=''" >
+     			AND NOT FIND_IN_SET(e.id,#{noEntId})
+   			</if>
+        </where>
+        	ORDER BY e.name
+        )m LEFT JOIN(
+			SELECT COUNT(w.id) as 'winNum',enterprise_code FROM yaohao_winbid w LEFT JOIN yaohao_order o ON o.code=w.order_code
+			<where>
+				<if test="yaohaoGrade != null and yaohaoGrade !=''" >
+	     			and o.yaohao_grade = #{yaohaoGrade}
+	   			</if>
+			</where>
+			 GROUP BY w.enterprise_code
+		)a ON a.enterprise_code=m.enterprise_code
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map" >
+	    SELECT COUNT(*) FROM (
+		SELECT e.id as 'enterpriseId', a.assess_result as 'assessResult',e.`name` as 'enterpriseName',e.simple_name as 'simpleName',c.*,a.`year` 
+		FROM yaohao_candidate c 
+		INNER JOIN cost_enterprise e ON c.enterprise_code=e.`code` 
+		LEFT JOIN cost_enterprise_record er ON e.id=er.enterprise_id AND er.`year`=c.yaohao_year 
+		LEFT JOIN yaohao_assess a ON a.enterprise_code=c.enterprise_code AND a.`year`=c.yaohao_year-1
+     	<where>
+     		<choose>
+   				<when test="yaohaoJoin =='cy'">
+		     		and c.removeFlag ='1' and (c.bid_flag IS NULL or c.bid_flag ='')
+   				</when>
+   				<otherwise>
+   					and ((c.bid_flag IS NOT NULL and c.bid_flag !='') or c.removeFlag ='2')
+   				</otherwise>
+   			</choose>
+     		<if test="id != null and id !=''" >
+     			and c.id = #{id}
+   			</if>
+   			<!-- <if test="removeFlag != null and removeFlag !=''" >
+     			and c.removeFlag = #{removeFlag}
+   			</if> -->
+   			<if test="enterpriseName != null and enterpriseName !=''" >
+     			and e.name like concat('%',#{enterpriseName},'%')
+   			</if>
+   			<if test="yaohaoGrade != null and yaohaoGrade !=''" >
+     			and c.yaohao_grade = #{yaohaoGrade}
+   			</if>
+   			<if test="yaohaoYear != null and yaohaoYear !=''" >
+     			and c.yaohao_year = #{yaohaoYear}
+   			</if>
+   			<if test="yearAssess != null and yearAssess !=''" >
+     			<choose>
+   					<when test="yearAssess=='未评定'">
+   						and a.assess_result is null
+   					</when>
+   					<otherwise>
+		     			and a.assess_result = #{yearAssess}
+   					</otherwise>
+   				</choose>
+   			</if>
+   			<if test="roundNum != null and roundNum !=''" >
+     			and c.round_num = #{roundNum}
+   			</if>
+   			<!-- <if test="bidFlagNull != null and bidFlagNull !=''" >
+     			and  (c.bid_flag IS NULL or c.bid_flag ='')
+   			</if> -->
+   			<if test="noEntId != null and noEntId !=''" >
+     			AND NOT FIND_IN_SET(e.id,#{noEntId})
+   			</if>
+        </where>
+         ORDER BY e.name
+        )m LEFT JOIN(
+			SELECT COUNT(w.id) as 'winNum',enterprise_code FROM yaohao_winbid w LEFT JOIN yaohao_order o ON o.code=w.order_code
+			<where>
+				<if test="yaohaoGrade != null and yaohaoGrade !=''" >
+	     			and o.yaohao_grade = #{yaohaoGrade}
+	   			</if>
+			</where>
+			 GROUP BY w.enterprise_code
+		)a ON a.enterprise_code=m.enterprise_code
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from yaohao_candidate
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from yaohao_candidate
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoCandidateExample" >
+    delete from yaohao_candidate
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoCandidate" >
+    insert into yaohao_candidate (id, enterprise_code, year_assess, 
+      year_win_numA, year_win_numB, yaohao_year, 
+      yaohao_grade, create_time, creater, 
+      round_num, remark, bid_flag
+      )
+    values (#{id,jdbcType=VARCHAR}, #{enterpriseCode,jdbcType=VARCHAR}, #{yearAssess,jdbcType=VARCHAR}, 
+      #{yearWinNuma,jdbcType=INTEGER}, #{yearWinNumb,jdbcType=INTEGER}, #{yaohaoYear,jdbcType=VARCHAR}, 
+      #{yaohaoGrade,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{creater,jdbcType=VARCHAR}, 
+      #{roundNum,jdbcType=INTEGER}, #{remark,jdbcType=VARCHAR}, #{bidFlag,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoCandidate" >
+    insert into yaohao_candidate
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="enterpriseCode != null" >
+        enterprise_code,
+      </if>
+      <if test="yearAssess != null" >
+        year_assess,
+      </if>
+      <if test="yearWinNuma != null" >
+        year_win_numA,
+      </if>
+      <if test="yearWinNumb != null" >
+        year_win_numB,
+      </if>
+      <if test="yaohaoYear != null" >
+        yaohao_year,
+      </if>
+      <if test="yaohaoGrade != null" >
+        yaohao_grade,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="roundNum != null" >
+        round_num,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="bidFlag != null" >
+        bid_flag,
+      </if>
+      <if test="removeFlag != null" >
+        removeFlag,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseCode != null" >
+        #{enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="yearAssess != null" >
+        #{yearAssess,jdbcType=VARCHAR},
+      </if>
+      <if test="yearWinNuma != null" >
+        #{yearWinNuma,jdbcType=INTEGER},
+      </if>
+      <if test="yearWinNumb != null" >
+        #{yearWinNumb,jdbcType=INTEGER},
+      </if>
+      <if test="yaohaoYear != null" >
+        #{yaohaoYear,jdbcType=VARCHAR},
+      </if>
+      <if test="yaohaoGrade != null" >
+        #{yaohaoGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="roundNum != null" >
+        #{roundNum,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="bidFlag != null" >
+        #{bidFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="removeFlag != null" >
+        #{removeFlag,jdbcType=VARCHAR},
+      </if>
+      
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoCandidateExample" resultType="java.lang.Integer" >
+    select count(*) from yaohao_candidate
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update yaohao_candidate
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.enterpriseCode != null" >
+        enterprise_code = #{record.enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yearAssess != null" >
+        year_assess = #{record.yearAssess,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yearWinNuma != null" >
+        year_win_numA = #{record.yearWinNuma,jdbcType=INTEGER},
+      </if>
+      <if test="record.yearWinNumb != null" >
+        year_win_numB = #{record.yearWinNumb,jdbcType=INTEGER},
+      </if>
+      <if test="record.yaohaoYear != null" >
+        yaohao_year = #{record.yaohaoYear,jdbcType=VARCHAR},
+      </if>
+      <if test="record.yaohaoGrade != null" >
+        yaohao_grade = #{record.yaohaoGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.creater != null" >
+        creater = #{record.creater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.roundNum != null" >
+        round_num = #{record.roundNum,jdbcType=INTEGER},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.bidFlag != null" >
+        bid_flag = #{record.bidFlag,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update yaohao_candidate
+    set id = #{record.id,jdbcType=VARCHAR},
+      enterprise_code = #{record.enterpriseCode,jdbcType=VARCHAR},
+      year_assess = #{record.yearAssess,jdbcType=VARCHAR},
+      year_win_numA = #{record.yearWinNuma,jdbcType=INTEGER},
+      year_win_numB = #{record.yearWinNumb,jdbcType=INTEGER},
+      yaohao_year = #{record.yaohaoYear,jdbcType=VARCHAR},
+      yaohao_grade = #{record.yaohaoGrade,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      creater = #{record.creater,jdbcType=VARCHAR},
+      round_num = #{record.roundNum,jdbcType=INTEGER},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      bid_flag = #{record.bidFlag,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoCandidate" >
+    update yaohao_candidate
+    <set >
+      <if test="enterpriseCode != null" >
+        enterprise_code = #{enterpriseCode,jdbcType=VARCHAR},
+      </if>
+      <if test="yearAssess != null" >
+        year_assess = #{yearAssess,jdbcType=VARCHAR},
+      </if>
+      <if test="yearWinNuma != null" >
+        year_win_numA = #{yearWinNuma,jdbcType=INTEGER},
+      </if>
+      <if test="yearWinNumb != null" >
+        year_win_numB = #{yearWinNumb,jdbcType=INTEGER},
+      </if>
+      <if test="yaohaoYear != null" >
+        yaohao_year = #{yaohaoYear,jdbcType=VARCHAR},
+      </if>
+      <if test="yaohaoGrade != null" >
+        yaohao_grade = #{yaohaoGrade,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="roundNum != null" >
+        round_num = #{roundNum,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="bidFlag != null" >
+        bid_flag = #{bidFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="removeFlag != null" >
+        removeFlag = #{removeFlag,jdbcType=VARCHAR},
+      </if>
+      
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.yaohao.YaohaoCandidate" >
+    update yaohao_candidate
+    set enterprise_code = #{enterpriseCode,jdbcType=VARCHAR},
+      year_assess = #{yearAssess,jdbcType=VARCHAR},
+      year_win_numA = #{yearWinNuma,jdbcType=INTEGER},
+      year_win_numB = #{yearWinNumb,jdbcType=INTEGER},
+      yaohao_year = #{yaohaoYear,jdbcType=VARCHAR},
+      yaohao_grade = #{yaohaoGrade,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      creater = #{creater,jdbcType=VARCHAR},
+      round_num = #{roundNum,jdbcType=INTEGER},
+      remark = #{remark,jdbcType=VARCHAR},
+      bid_flag = #{bidFlag,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

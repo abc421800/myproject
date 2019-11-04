@@ -1,0 +1,37 @@
+package com.cost168.costaudit.service.work.impl;
+
+import com.cost168.costaudit.mapper.work.WorkEnterpriseMapper;
+import com.cost168.costaudit.mapper.work.WorkPersonMapper;
+import com.cost168.costaudit.mapper.work.WorkRegisterMapper;
+import com.cost168.costaudit.pojo.work.vo.WorkAttendanceParam;
+import com.cost168.costaudit.service.work.WorkAttendancePersonService;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @description: 考勤人员台账实现层
+ * @author: ZYL
+ * @create: 2019-05-24
+ */
+@Service
+public class WorkAttendancePersonServiceImpl implements WorkAttendancePersonService {
+    @Resource
+    private WorkEnterpriseMapper workEnterpriseMapper;
+    @Resource
+    private WorkPersonMapper workPersonMapper;
+    @Resource
+    private WorkRegisterMapper workRegisterMapper;
+
+    @Override
+    public List<WorkAttendanceParam> selectWorkAttendancePerson(Map<String, Object> map) {
+        return workRegisterMapper.selectWorkAttendancePerson(map);
+    }
+
+    @Override
+    public int selectCountAttendancePersonByMap(Map<String, Object> map) {
+        return workRegisterMapper.selectCountAttendancePersonByMap(map);
+    }
+}

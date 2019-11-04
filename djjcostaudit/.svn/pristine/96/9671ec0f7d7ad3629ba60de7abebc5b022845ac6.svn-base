@@ -1,0 +1,73 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>添加奖惩记录</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+</head>
+<body>
+<div class="dialog-file">
+    <form name="pageForm" action="" method="post" id="form1">
+        <div class="tabox table-responsive float-table">
+            <table class="table table-condensed table-bordered">
+                <tbody>
+                <tr>
+                    <th><strong style="color:red">*</strong>奖惩类型：</th>
+                    <td>
+                        <select class="form-control input-sm" id="rewardsPunishType" style="width: 100%">
+                            <option value="">请选择</option>
+                            <option value="" >奖励</option>
+                            <option value="" >惩罚</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">*</strong>奖惩事由：</th>
+                    <td>
+                        <input name="cause" id="cause" type="text" style="width:100%;" class="form-control input-sm " />
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">*</strong>处理意见：</th>
+                    <td>
+                        <input name="cause" id="processingOpinion" type="text" style="width:100%;" class="form-control input-sm " />
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">*</strong>执行时间：</th>
+                    <td>
+                        <input class="Wdate search_text_form" name="planOverTimeStr" value="" type="text" onClick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd'})"/>
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">&nbsp;</strong>履行状态：</th>
+                    <td>
+                        <select class="form-control input-sm" id="status" style="width: 100%">
+                            <option value="">请选择</option>
+                            <option value="" >正在执行</option>
+                            <option value="" >结束</option>
+                            <option value="" >取消</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr >
+                    <th><strong style="color:red">&nbsp;</strong>备注：</th>
+                    <td style="padding-top:4px;padding-bottom: 4px">
+                        <textarea class="form-control input-sm" rows="3" ></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group text-center">
+            <input type="button" value="保存" class="btn btn-primary" onclick="saveFileName()" />
+            <input type="button" name="Submit22" class="btn btn-danger" value="取消" onclick="$('#dlg').dialog('close');" />
+        </div>
+    </form>
+</div>
+</body>
+<script>
+
+</script>
+</html>

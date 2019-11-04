@@ -1,0 +1,89 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>添加奖惩记录</title>
+<jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/plugin/layui-master/src/css/layui.css">
+</head>
+<script src="${pageContext.request.contextPath}/res/plugin/layui-master/src/layui.js"></script>
+<script>
+    layui.use('laydate', function(){
+        var laydate = layui.laydate;
+        //时间范围
+        laydate.render({
+            elem: '#punishTime',range: '至'
+        });
+    });
+</script>
+<body>
+<div class="dialog-file">
+    <form action="" method="post" id="formId2">
+    	<c:if test="${!empty obj.id}">
+	    	<input type="hidden" value="${obj.id}" name="id" id="punishId">
+    	</c:if>
+    	<input type="hidden" name="enterpriseCode" value="${param.rukuEnId }" >
+        <div class="tabox table-responsive float-table">
+            <table class="table table-condensed table-bordered">
+                <tbody>
+                <tr>
+                    <th><strong style="color:red">*</strong>执行时间：</th>
+                    <td>
+                    	<input class="Wdate search_text_form" type="text" name="punishTimeStr" id="punishTime" value="<fmt:formatDate value="${obj.executeStartTime}" pattern="yyyy-MM-dd"/><c:if test="${!empty obj.executeStartTime and !empty obj.executeEndTime}"> 至 </c:if><fmt:formatDate value="${obj.executeEndTime}" pattern="yyyy-MM-dd"/>" style="width:50%;margin-right:20px">
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">*</strong>奖惩类型：</th>
+                    <td>
+                        <select id="punishFlag" name="punishFlag" class="form-control input-sm easyui-validatebox">
+	                        <c:forTokens items="请选择,奖励,惩罚" delims="," var="i">
+	                        	<option <c:if test="${i eq obj.punishFlag}">selected = "selected"</c:if>  value="${i}">${i}</option>
+	                        </c:forTokens>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">*</strong>奖惩事由：</th>
+                    <td>
+                        <input name="content" id="content" value="${obj.content}" type="text" style="width:100%;" placeholder="请输入奖惩事由" class="form-control input-sm " />
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">*</strong>处理意见：</th>
+                    <td>
+                        <input name="handleOpinion" id="handleOpinion" value="${obj.handleOpinion}" type="text" style="width:100%;" placeholder="请输入处理意见" class="form-control input-sm " />
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">&nbsp;</strong>履行状态：</th>
+                    <td>
+                       <select id="status" name="status" class="form-control input-sm easyui-validatebox">
+	                        <c:forTokens items="请选择,正在执行,结束,取消" delims="," var="i">
+	                        	<option <c:if test="${i eq obj.status}">selected = "selected"</c:if>  value="${i}">${i}</option>
+	                        </c:forTokens>
+                       </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th><strong style="color:red">&nbsp;</strong>备注：</th>
+                    <td style="padding-top:4px;padding-bottom: 4px">
+                        <textarea class="form-control input-sm" name="remark" rows="5" value="${obj.remark}" placeholder="请输入备注"></textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="form-group text-center">
+            <input type="button" value="保存" class="btn btn-primary" onclick="parent.savePunish();" />
+            <input type="button" name="Submit22" class="btn btn-danger" value="取消" onclick="parent.$('#dlgjc').dialog('close');" />
+        </div>
+    </form>
+</div>
+</body>
+<script>
+
+</script>
+</html>

@@ -1,0 +1,452 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.work.WorkEnterpriseMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.work.WorkEnterprise" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="person_liable" property="personLiable" jdbcType="VARCHAR" />
+    <result column="address" property="address" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="telephone" property="telephone" jdbcType="VARCHAR" />
+    <result column="fax" property="fax" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="service_start" property="serviceStart" jdbcType="TIMESTAMP" />
+    <result column="service_end" property="serviceEnd" jdbcType="TIMESTAMP" />
+    <result column="effective_flag" property="effectiveFlag" jdbcType="VARCHAR" />
+    <result column="send_person" property="sendPerson" jdbcType="INTEGER" />
+    <result column="send_person_effective" property="sendPersonEffective" jdbcType="INTEGER" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, name, type, person_liable, address, phone, telephone, fax, email, service_start, 
+    service_end, effective_flag, send_person, send_person_effective, creater, create_time, 
+    remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.work.WorkEnterpriseExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from work_enterprise
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+  	select
+    <include refid="Base_Column_List" />
+    from work_enterprise e
+     <where>
+     		<if test="id != null and id !=''" >
+     			and e.id = #{id}
+   			</if>
+     		<if test="name != null and name !=''" >
+     			and e.name like concat('%',#{name},'%')
+   			</if>
+     		<if test="type != null and type !=''" >
+     			and e.type = #{type}
+   			</if>
+  			<if test="startTime != null and startTime !=''" >
+    			and <![CDATA[ e.service_start>=#{startTime} ]]>
+  			</if>
+  			<if test="endTime != null and endTime !=''" >
+    			and <![CDATA[ e.service_start<=#{endTime} ]]>
+  			</if>
+   			<if test="effectiveFlag != null and effectiveFlag !=''" >
+     			and e.effective_flag = #{effectiveFlag}
+   			</if>
+        </where>
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map" >
+    select count(*)  from work_enterprise e
+     <where>
+     		<if test="id != null and id !=''" >
+     			and e.id = #{id}
+   			</if>
+     		<if test="name != null and name !=''" >
+     			and e.name like concat('%',#{name},'%')
+   			</if>
+     		<if test="type != null and type !=''" >
+     			and e.type = #{type}
+   			</if>
+   			<if test="startTime != null and startTime !=''" >
+    			and <![CDATA[ e.service_start>=#{startTime} ]]>
+  			</if>
+  			<if test="endTime != null and endTime !=''" >
+    			and <![CDATA[ e.service_start<=#{endTime} ]]>
+  			</if>
+   			<if test="effectiveFlag != null and effectiveFlag !=''" >
+     			and e.effective_flag = #{effectiveFlag}
+   			</if>
+        </where>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from work_enterprise
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from work_enterprise
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.work.WorkEnterpriseExample" >
+    delete from work_enterprise
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.work.WorkEnterprise" >
+    insert into work_enterprise (id, name, type, 
+      person_liable, address, phone, 
+      telephone, fax, email, 
+      service_start, service_end, effective_flag, 
+      send_person, send_person_effective, creater, 
+      create_time, remark)
+    values (#{id,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{personLiable,jdbcType=VARCHAR}, #{address,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, 
+      #{telephone,jdbcType=VARCHAR}, #{fax,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{serviceStart,jdbcType=TIMESTAMP}, #{serviceEnd,jdbcType=TIMESTAMP}, #{effectiveFlag,jdbcType=VARCHAR}, 
+      #{sendPerson,jdbcType=INTEGER}, #{sendPersonEffective,jdbcType=INTEGER}, #{creater,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.work.WorkEnterprise" >
+    insert into work_enterprise
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="personLiable != null" >
+        person_liable,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="telephone != null" >
+        telephone,
+      </if>
+      <if test="fax != null" >
+        fax,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="serviceStart != null" >
+        service_start,
+      </if>
+      <if test="serviceEnd != null" >
+        service_end,
+      </if>
+      <if test="effectiveFlag != null" >
+        effective_flag,
+      </if>
+      <if test="sendPerson != null" >
+        send_person,
+      </if>
+      <if test="sendPersonEffective != null" >
+        send_person_effective,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="telephone != null" >
+        #{telephone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceStart != null" >
+        #{serviceStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="serviceEnd != null" >
+        #{serviceEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="effectiveFlag != null" >
+        #{effectiveFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="sendPerson != null" >
+        #{sendPerson,jdbcType=INTEGER},
+      </if>
+      <if test="sendPersonEffective != null" >
+        #{sendPersonEffective,jdbcType=INTEGER},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.work.WorkEnterpriseExample" resultType="java.lang.Integer" >
+    select count(*) from work_enterprise
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update work_enterprise
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=VARCHAR},
+      </if>
+      <if test="record.personLiable != null" >
+        person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="record.address != null" >
+        address = #{record.address,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phone != null" >
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.telephone != null" >
+        telephone = #{record.telephone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.fax != null" >
+        fax = #{record.fax,jdbcType=VARCHAR},
+      </if>
+      <if test="record.email != null" >
+        email = #{record.email,jdbcType=VARCHAR},
+      </if>
+      <if test="record.serviceStart != null" >
+        service_start = #{record.serviceStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.serviceEnd != null" >
+        service_end = #{record.serviceEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.effectiveFlag != null" >
+        effective_flag = #{record.effectiveFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sendPerson != null" >
+        send_person = #{record.sendPerson,jdbcType=INTEGER},
+      </if>
+      <if test="record.sendPersonEffective != null" >
+        send_person_effective = #{record.sendPersonEffective,jdbcType=INTEGER},
+      </if>
+      <if test="record.creater != null" >
+        creater = #{record.creater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update work_enterprise
+    set id = #{record.id,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=VARCHAR},
+      person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      address = #{record.address,jdbcType=VARCHAR},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      telephone = #{record.telephone,jdbcType=VARCHAR},
+      fax = #{record.fax,jdbcType=VARCHAR},
+      email = #{record.email,jdbcType=VARCHAR},
+      service_start = #{record.serviceStart,jdbcType=TIMESTAMP},
+      service_end = #{record.serviceEnd,jdbcType=TIMESTAMP},
+      effective_flag = #{record.effectiveFlag,jdbcType=VARCHAR},
+      send_person = #{record.sendPerson,jdbcType=INTEGER},
+      send_person_effective = #{record.sendPersonEffective,jdbcType=INTEGER},
+      creater = #{record.creater,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.work.WorkEnterprise" >
+    update work_enterprise
+    <set >
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        person_liable = #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        address = #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="telephone != null" >
+        telephone = #{telephone,jdbcType=VARCHAR},
+      </if>
+      <if test="fax != null" >
+        fax = #{fax,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="serviceStart != null" >
+        service_start = #{serviceStart,jdbcType=TIMESTAMP},
+      </if>
+      <if test="serviceEnd != null" >
+        service_end = #{serviceEnd,jdbcType=TIMESTAMP},
+      </if>
+      <if test="effectiveFlag != null" >
+        effective_flag = #{effectiveFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="sendPerson != null" >
+        send_person = #{sendPerson,jdbcType=INTEGER},
+      </if>
+      <if test="sendPersonEffective != null" >
+        send_person_effective = #{sendPersonEffective,jdbcType=INTEGER},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.work.WorkEnterprise" >
+    update work_enterprise
+    set name = #{name,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      person_liable = #{personLiable,jdbcType=VARCHAR},
+      address = #{address,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      telephone = #{telephone,jdbcType=VARCHAR},
+      fax = #{fax,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      service_start = #{serviceStart,jdbcType=TIMESTAMP},
+      service_end = #{serviceEnd,jdbcType=TIMESTAMP},
+      effective_flag = #{effectiveFlag,jdbcType=VARCHAR},
+      send_person = #{sendPerson,jdbcType=INTEGER},
+      send_person_effective = #{sendPersonEffective,jdbcType=INTEGER},
+      creater = #{creater,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

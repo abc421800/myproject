@@ -1,0 +1,115 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>考勤管理</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+<style type="text/css">
+
+</style>
+</head>
+<body>
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+<div class="row">
+    <div class="filter">
+        <div class="form-inline">
+            <div class="form-group">
+                <label for="">申请人：</label>
+                <input type="text" id="proposerName"  value="" placeholder="请输入关键字" class="form-control input-sm">
+            </div>
+            <div class="form-group">
+                <label for="">申请日期：</label>
+                <input id="createStartTime" class="Wdate form-control input-sm" type="text" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd',maxDate:'#F{$dp.$D(\'createEndTime\')}'})"})">
+                <label for="">至</label>
+                <input id="createEndTime" class="Wdate form-control input-sm" type="text" onclick="WdatePicker({el:this,dateFmt:'yyyy-MM-dd',minDate:'#F{$dp.$D(\'createStartTime\')}'})">
+            </div>
+            <div class="form-group">
+                <label for="">请假类型：</label>
+                <select id="type" onchange="searchPro()" class="form-control input-sm" style="width: 100px">
+                    <option value="">请选择</option>
+                    <option value="年休假">年休假</option>
+                    <option value="探亲假">探亲假</option>
+                    <option value="事假">事假</option>
+                    <option value="生育假">生育假</option>
+                    <option value="计生假">计生假</option>
+                    <option value="病假">病假</option>
+                    <option value="婚假">婚假</option>
+                    <option value="丧假">丧假</option>
+                    <option value="离岗学习">离岗学习</option>
+                    <option value="出差">出差</option>
+                    <option value="其他">其他</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">当前状态：</label>
+                <select id="status" onchange="searchPro()" class="form-control input-sm" style="width: 100px">
+                    <option value="">请选择</option>
+                    <option value="审批中">审批中</option>
+                    <option value="驳回">驳回</option>
+                    <option value="结束">结束 </option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" name="Submit11" value="查询" class="btn btn-primary" onclick="searchPro()">&nbsp;
+                <input type="reset" name="reset" value="重置" class="btn btn btn-success" onclick="refresh()">&nbsp;
+                <input type="button" name="reset" value="导出" class="btn btn-danger" onclick="exportDate()">&nbsp;
+            </div>
+        </div>
+    </div>
+    <a href="javascript:void(0);" class="switchBtn"></a>
+</div>
+<div class="row">
+    <table id="leaveRequestCreat" style="width: 100%;">
+    </table>
+    <div id="tit1" >
+        <div class="row">
+        	<shiro:hasPermission name="leave:add">
+            	<a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="add()">添加</a>
+           	</shiro:hasPermission>
+            <span style="color:#969696;font-size: 14px">（右键表格表头设置显示隐藏列）</span>
+        </div>
+
+    </div>
+</div>
+<script src="${pageContext.request.contextPath}/res/js/work/processApply/list.js"></script>
+<script type="text/javascript">
+var currentUser="${user.account}";
+function add(){
+	$.ajax({
+		  url: "/workProcessApply/checkPerson",
+		  dataType: "json",
+		  type:"post",
+		  async: false,
+		  data: {"account":currentUser},
+		  success: function(result){
+			  if(result.status==200){
+			    var href = "/workProcessApply/toEdit?editFlag=y";
+			    var title = "添加请假申请";
+			    top.addTabGrid(title, href);
+			  }else if(result.status==500){
+				  $.messager.alert("温馨提示","抱歉您不是驻场人员不能申请请假,请联系管理员!", "error");
+			  }else{
+				  $.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+			  }
+		  }
+	});
+}
+//导出
+function exportDate() {
+    window.location.href = "/workProcessApply/exportWorkProcess";
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,243 @@
+package com.cost168.costaudit.controller.work;
+
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkPerson;
+import com.cost168.costaudit.pojo.work.vo.WorkAttendanceParam;
+import com.cost168.costaudit.pojo.work.vo.WorkAttendancePersonExportParam;
+import com.cost168.costaudit.service.work.WorkAttendancePersonService;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.work.WorkPersonService;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.Global;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+
+/**
+ * @description: 考勤人员台账控制器
+ * @author: ZYL
+ * @create: 2019-05-24
+ */
+@Controller
+@RequestMapping("/workAttendancePerson")
+public class WorkAttendancePersonController {
+    @Resource
+    private WorkAttendancePersonService workAttendancePersonService;
+    @Resource
+    private WorkPersonService workPersonService;
+    @Resource
+    private WorkEnterpriseService workEnterpriseService;
+    @Autowired
+    private WorkRegisterService workRegisterService;
+
+    @RequestMapping("/toAttendancePerson")
+    public String toAttendancePerson(HttpServletRequest request) {
+        String pageYear = workRegisterService.selectYearList();
+        request.setAttribute("pageYear", pageYear);
+        return "/attendanceManager/attendanceManager";
+    }
+
+    @ResponseBody
+    @RequestMapping("/listPerson")
+    public EUDataGridResult selectOne(HttpServletRequest request, int page, int rows) {
+        EUDataGridResult result = new EUDataGridResult();
+        String name = request.getParameter("name");
+        String enterpriseName = request.getParameter("enterpriseName");
+        String morningOrAfternoon = request.getParameter("morningOrAfternoon");
+        String status = request.getParameter("status");
+        String attStarttime = request.getParameter("attStarttime");
+        String attEndtime = request.getParameter("attEndtime");
+        String regYear = request.getParameter("regYear");
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("name", name);
+        map.put("enterpriseName", enterpriseName);
+        map.put("morningOrAfternoon", morningOrAfternoon);
+        map.put("status", status);
+        map.put("year", regYear);
+        map.put("attStarttime", attStarttime);
+        map.put("attEndtime", attEndtime);
+        List<WorkAttendanceParam> person = workAttendancePersonService.selectWorkAttendancePerson(map);
+        int total = workAttendancePersonService.selectCountAttendancePersonByMap(map);
+        //汇总
+        List<WorkAttendanceParam> footer = new ArrayList<WorkAttendanceParam>();
+        WorkAttendanceParam w1 = new WorkAttendanceParam();
+        w1.setName("汇总");
+        w1.setAnnual("0.0");
+        w1.setMonthOfWorkday1("0.0");
+        w1.setMonthOfWorkday2("0.0");
+        w1.setMonthOfWorkday3("0.0");
+        w1.setMonthOfWorkday4("0.0");
+        w1.setMonthOfWorkday5("0.0");
+        w1.setMonthOfWorkday6("0.0");
+        w1.setMonthOfWorkday7("0.0");
+        w1.setMonthOfWorkday8("0.0");
+        w1.setMonthOfWorkday9("0.0");
+        w1.setMonthOfWorkday10("0.0");
+        w1.setMonthOfWorkday11("0.0");
+        w1.setMonthOfWorkday12("0.0");
+        w1.setMonthOfLeave1("0.0");
+        w1.setMonthOfLeave2("0.0");
+        w1.setMonthOfLeave3("0.0");
+        w1.setMonthOfLeave4("0.0");
+        w1.setMonthOfLeave5("0.0");
+        w1.setMonthOfLeave6("0.0");
+        w1.setMonthOfLeave7("0.0");
+        w1.setMonthOfLeave8("0.0");
+        w1.setMonthOfLeave9("0.0");
+        w1.setMonthOfLeave10("0.0");
+        w1.setMonthOfLeave11("0.0");
+        w1.setMonthOfLeave12("0.0");
+        w1.setMonthOfRestday1("0.0");
+        w1.setMonthOfRestday2("0.0");
+        w1.setMonthOfRestday3("0.0");
+        w1.setMonthOfRestday4("0.0");
+        w1.setMonthOfRestday5("0.0");
+        w1.setMonthOfRestday6("0.0");
+        w1.setMonthOfRestday7("0.0");
+        w1.setMonthOfRestday8("0.0");
+        w1.setMonthOfRestday9("0.0");
+        w1.setMonthOfRestday10("0.0");
+        w1.setMonthOfRestday11("0.0");
+        w1.setMonthOfRestday12("0.0");
+        w1.setMonthOfOvertime1("0.0");
+        w1.setMonthOfOvertime2("0.0");
+        w1.setMonthOfOvertime3("0.0");
+        w1.setMonthOfOvertime4("0.0");
+        w1.setMonthOfOvertime5("0.0");
+        w1.setMonthOfOvertime6("0.0");
+        w1.setMonthOfOvertime7("0.0");
+        w1.setMonthOfOvertime8("0.0");
+        w1.setMonthOfOvertime9("0.0");
+        w1.setMonthOfOvertime10("0.0");
+        w1.setMonthOfOvertime11("0.0");
+        w1.setMonthOfOvertime12("0.0");
+        w1.setYearOfWork("0.0");
+        w1.setYearOfRest("0.0");
+        w1.setYearOfLeave("0.0");
+        w1.setYearOvertime("0.0");
+        int temp = 1;
+        for (WorkAttendanceParam w2 : person) {
+            //
+
+
+
+            w2.setRaking("" + temp);
+            w2.setAttendanceRate(w2.getAttendanceRate() + "%");
+            w1.setAnnual(w2.getAnnual().equals("") || w2.getAnnual() == null ? w1.getAnnual() : String.valueOf((Double.parseDouble(w1.getAnnual()) + Double.parseDouble(w2.getAnnual()))));
+            w1.setMonthOfWorkday1(w2.getMonthOfWorkday1().equals("0.0") ? w1.getMonthOfWorkday1() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday1()) + Double.parseDouble(w2.getMonthOfWorkday1()))));
+            w1.setMonthOfWorkday2(w2.getMonthOfWorkday2().equals("0.0") ? w1.getMonthOfWorkday2() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday2()) + Double.parseDouble(w2.getMonthOfWorkday2()))));
+            w1.setMonthOfWorkday3(w2.getMonthOfWorkday3().equals("0.0") ? w1.getMonthOfWorkday3() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday3()) + Double.parseDouble(w2.getMonthOfWorkday3()))));
+            w1.setMonthOfWorkday4(w2.getMonthOfWorkday4().equals("0.0") ? w1.getMonthOfWorkday4() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday4()) + Double.parseDouble(w2.getMonthOfWorkday4()))));
+            w1.setMonthOfWorkday5(w2.getMonthOfWorkday5().equals("0.0") ? w1.getMonthOfWorkday5() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday5()) + Double.parseDouble(w2.getMonthOfWorkday5()))));
+            w1.setMonthOfWorkday6(w2.getMonthOfWorkday6().equals("0.0") ? w1.getMonthOfWorkday6() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday6()) + Double.parseDouble(w2.getMonthOfWorkday6()))));
+            w1.setMonthOfWorkday7(w2.getMonthOfWorkday7().equals("0.0") ? w1.getMonthOfWorkday7() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday7()) + Double.parseDouble(w2.getMonthOfWorkday7()))));
+            w1.setMonthOfWorkday8(w2.getMonthOfWorkday8().equals("0.0") ? w1.getMonthOfWorkday8() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday8()) + Double.parseDouble(w2.getMonthOfWorkday8()))));
+            w1.setMonthOfWorkday9(w2.getMonthOfWorkday9().equals("0.0") ? w1.getMonthOfWorkday9() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday9()) + Double.parseDouble(w2.getMonthOfWorkday9()))));
+            w1.setMonthOfWorkday10(w2.getMonthOfWorkday10().equals("0.0") ? w1.getMonthOfWorkday10() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday10()) + Double.parseDouble(w2.getMonthOfWorkday10()))));
+            w1.setMonthOfWorkday11(w2.getMonthOfWorkday11().equals("0.0") ? w1.getMonthOfWorkday11() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday11()) + Double.parseDouble(w2.getMonthOfWorkday11()))));
+            w1.setMonthOfWorkday12(w2.getMonthOfWorkday12().equals("0.0") ? w1.getMonthOfWorkday12() : String.valueOf((Double.parseDouble(w1.getMonthOfWorkday12()) + Double.parseDouble(w2.getMonthOfWorkday11()))));
+            w1.setMonthOfLeave1(w2.getMonthOfLeave1().equals("0.0") ? w1.getMonthOfLeave1() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave1()) + Double.parseDouble(w2.getMonthOfLeave1()))));
+            w1.setMonthOfLeave2(w2.getMonthOfLeave2().equals("0.0") ? w1.getMonthOfLeave2() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave2()) + Double.parseDouble(w2.getMonthOfLeave2()))));
+            w1.setMonthOfLeave3(w2.getMonthOfLeave3().equals("0.0") ? w1.getMonthOfLeave3() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave3()) + Double.parseDouble(w2.getMonthOfLeave3()))));
+            w1.setMonthOfLeave4(w2.getMonthOfLeave4().equals("0.0") ? w1.getMonthOfLeave4() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave4()) + Double.parseDouble(w2.getMonthOfLeave4()))));
+            w1.setMonthOfLeave5(w2.getMonthOfLeave5().equals("0.0") ? w1.getMonthOfLeave5() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave5()) + Double.parseDouble(w2.getMonthOfLeave5()))));
+            w1.setMonthOfLeave6(w2.getMonthOfLeave6().equals("0.0") ? w1.getMonthOfLeave6() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave6()) + Double.parseDouble(w2.getMonthOfLeave6()))));
+            w1.setMonthOfLeave7(w2.getMonthOfLeave7().equals("0.0") ? w1.getMonthOfLeave7() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave7()) + Double.parseDouble(w2.getMonthOfLeave7()))));
+            w1.setMonthOfLeave8(w2.getMonthOfLeave8().equals("0.0") ? w1.getMonthOfLeave8() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave8()) + Double.parseDouble(w2.getMonthOfLeave8()))));
+            w1.setMonthOfLeave9(w2.getMonthOfLeave9().equals("0.0") ? w1.getMonthOfLeave9() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave9()) + Double.parseDouble(w2.getMonthOfLeave9()))));
+            w1.setMonthOfLeave10(w2.getMonthOfLeave10().equals("0.0") ? w1.getMonthOfLeave10() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave10()) + Double.parseDouble(w2.getMonthOfLeave10()))));
+            w1.setMonthOfLeave11(w2.getMonthOfLeave11().equals("0.0") ? w1.getMonthOfLeave11() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave11()) + Double.parseDouble(w2.getMonthOfLeave11()))));
+            w1.setMonthOfLeave12(w2.getMonthOfLeave12().equals("0.0") ? w1.getMonthOfLeave12() : String.valueOf((Double.parseDouble(w1.getMonthOfLeave12()) + Double.parseDouble(w2.getMonthOfLeave12()))));
+            w1.setMonthOfRestday1(w2.getMonthOfRestday1().equals("0.0") ? w1.getMonthOfRestday1() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday1()) + Double.parseDouble(w2.getMonthOfRestday1()))));
+            w1.setMonthOfRestday2(w2.getMonthOfRestday2().equals("0.0") ? w1.getMonthOfRestday2() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday2()) + Double.parseDouble(w2.getMonthOfRestday2()))));
+            w1.setMonthOfRestday3(w2.getMonthOfRestday3().equals("0.0") ? w1.getMonthOfRestday3() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday3()) + Double.parseDouble(w2.getMonthOfRestday3()))));
+            w1.setMonthOfRestday4(w2.getMonthOfRestday4().equals("0.0") ? w1.getMonthOfRestday4() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday4()) + Double.parseDouble(w2.getMonthOfRestday4()))));
+            w1.setMonthOfRestday5(w2.getMonthOfRestday5().equals("0.0") ? w1.getMonthOfRestday5() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday5()) + Double.parseDouble(w2.getMonthOfRestday5()))));
+            w1.setMonthOfRestday6(w2.getMonthOfRestday6().equals("0.0") ? w1.getMonthOfRestday6() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday6()) + Double.parseDouble(w2.getMonthOfRestday6()))));
+            w1.setMonthOfRestday7(w2.getMonthOfRestday7().equals("0.0") ? w1.getMonthOfRestday7() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday7()) + Double.parseDouble(w2.getMonthOfRestday7()))));
+            w1.setMonthOfRestday8(w2.getMonthOfRestday8().equals("0.0") ? w1.getMonthOfRestday8() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday8()) + Double.parseDouble(w2.getMonthOfRestday8()))));
+            w1.setMonthOfRestday9(w2.getMonthOfRestday9().equals("0.0") ? w1.getMonthOfRestday9() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday9()) + Double.parseDouble(w2.getMonthOfRestday9()))));
+            w1.setMonthOfRestday10(w2.getMonthOfRestday10().equals("0.0") ? w1.getMonthOfRestday10() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday10()) + Double.parseDouble(w2.getMonthOfRestday10()))));
+            w1.setMonthOfRestday11(w2.getMonthOfRestday11().equals("0.0") ? w1.getMonthOfRestday11() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday11()) + Double.parseDouble(w2.getMonthOfRestday11()))));
+            w1.setMonthOfRestday12(w2.getMonthOfRestday12().equals("0.0") ? w1.getMonthOfRestday12() : String.valueOf((Double.parseDouble(w1.getMonthOfRestday12()) + Double.parseDouble(w2.getMonthOfRestday12()))));
+            w1.setMonthOfOvertime1(w2.getMonthOfOvertime1().equals("0.0") ? w1.getMonthOfOvertime1() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime1()) + Double.parseDouble(w2.getMonthOfOvertime1()))));
+            w1.setMonthOfOvertime2(w2.getMonthOfOvertime2().equals("0.0") ? w1.getMonthOfOvertime2() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime2()) + Double.parseDouble(w2.getMonthOfOvertime2()))));
+            w1.setMonthOfOvertime3(w2.getMonthOfOvertime3().equals("0.0") ? w1.getMonthOfOvertime3() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime3()) + Double.parseDouble(w2.getMonthOfOvertime3()))));
+            w1.setMonthOfOvertime4(w2.getMonthOfOvertime4().equals("0.0") ? w1.getMonthOfOvertime4() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime4()) + Double.parseDouble(w2.getMonthOfOvertime4()))));
+            w1.setMonthOfOvertime5(w2.getMonthOfOvertime5().equals("0.0") ? w1.getMonthOfOvertime5() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime5()) + Double.parseDouble(w2.getMonthOfOvertime5()))));
+            w1.setMonthOfOvertime6(w2.getMonthOfOvertime6().equals("0.0") ? w1.getMonthOfOvertime6() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime6()) + Double.parseDouble(w2.getMonthOfOvertime6()))));
+            w1.setMonthOfOvertime7(w2.getMonthOfOvertime7().equals("0.0") ? w1.getMonthOfOvertime7() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime7()) + Double.parseDouble(w2.getMonthOfOvertime7()))));
+            w1.setMonthOfOvertime8(w2.getMonthOfOvertime8().equals("0.0") ? w1.getMonthOfOvertime8() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime8()) + Double.parseDouble(w2.getMonthOfOvertime8()))));
+            w1.setMonthOfOvertime9(w2.getMonthOfOvertime9().equals("0.0") ? w1.getMonthOfOvertime9() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime9()) + Double.parseDouble(w2.getMonthOfOvertime9()))));
+            w1.setMonthOfOvertime10(w2.getMonthOfOvertime10().equals("0.0") ? w1.getMonthOfOvertime10() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime10()) + Double.parseDouble(w2.getMonthOfOvertime10()))));
+            w1.setMonthOfOvertime11(w2.getMonthOfOvertime11().equals("0.0") ? w1.getMonthOfOvertime11() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime11()) + Double.parseDouble(w2.getMonthOfOvertime11()))));
+            w1.setMonthOfOvertime12(w2.getMonthOfOvertime12().equals("0.0") ? w1.getMonthOfOvertime12() : String.valueOf((Double.parseDouble(w1.getMonthOfOvertime12()) + Double.parseDouble(w2.getMonthOfOvertime12()))));
+            w1.setYearOfWork(w2.getYearOfWork().equals("0.0") ? w1.getYearOfWork() : String.valueOf((Double.parseDouble(w1.getYearOfWork()) + Double.parseDouble(w2.getYearOfWork()))));
+            w1.setYearOfRest(w2.getYearOfRest().equals("0.0") ? w1.getYearOfRest() : String.valueOf((Double.parseDouble(w1.getYearOfRest()) + Double.parseDouble(w2.getYearOfRest()))));
+            w1.setYearOfLeave(w2.getYearOfLeave().equals("0.0") ? w1.getYearOfLeave() : String.valueOf((Double.parseDouble(w1.getYearOfLeave()) + Double.parseDouble(w2.getYearOfLeave()))));
+            w1.setYearOvertime(w2.getYearOvertime().equals("0.0") ? w1.getYearOvertime() : String.valueOf((Double.parseDouble(w1.getYearOvertime()) + Double.parseDouble(w2.getYearOvertime()))));
+            temp++;
+        }
+        footer.add(w1);
+        result.setRows(person);
+        result.setTotal(total);
+        result.setFooter(footer);
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/6/6
+     * 考勤人员详情页
+     */
+    @RequestMapping("/toPersonEdit")
+    public String residentPersonDetail(HttpServletRequest request) {
+        String id = request.getParameter("id");
+        WorkPerson person = workPersonService.selectByPrimaryKey(id);
+        WorkEnterprise workEnterprise = workEnterpriseService.selectByPrimaryKey(person.getEnterpriseId());
+        person.setEnterpriseName(workEnterprise.getName());
+        request.setAttribute("obj", person);
+        return "/register/personEdit";
+    }
+
+    /**
+     * created by ZYL on 2019/6/6
+     * 考勤人员台账导出
+     */
+    @RequestMapping("/exportData")
+    public void exportData(HttpServletRequest request, HttpServletResponse response) {
+        List<WorkAttendancePersonExportParam> list = new ArrayList<WorkAttendancePersonExportParam>();
+        Map<String, Object> selectMap = new HashMap<String, Object>();
+        try {
+            ServletOutputStream out = response.getOutputStream();
+            list = workAttendancePersonService.selectDataList(selectMap);
+            String startTime = Global.PRO_START_TIME;
+            String endTime = Global.PRO_END_TIME;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            String regYear = "2019";
+            String path = request.getSession().getServletContext().getRealPath("/template/report/attendance_template.xlsx");
+            String fileName = "";
+            if (null != startTime && !"".equals(startTime) && null != endTime && !"".equals(endTime)) {
+                fileName = regYear + "年度考勤台账导出_" + startTime + "-" + endTime + ".xlsx";
+            } else {
+                String dateString = formatter.format(new Date());
+                fileName = regYear + "年度考勤台账导出_" + dateString + ".xlsx";
+            }
+            String downloadFileName = new String(fileName.getBytes(), "ISO8859-1");
+            response.setContentType("application/octet-stream");
+            response.setHeader("Content-disposition", "attactment; fileName=" + downloadFileName);
+            workAttendancePersonService.exportWorkAttendancePerson(path, out, list,regYear);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

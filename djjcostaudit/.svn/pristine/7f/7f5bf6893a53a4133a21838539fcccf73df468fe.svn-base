@@ -1,0 +1,2989 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.cost.CostProjectMapper">
+    <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.cost.CostProject">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="pid" property="pid" jdbcType="VARCHAR"/>
+        <result column="code" property="code" jdbcType="VARCHAR"/>
+        <result column="name" property="name" jdbcType="VARCHAR"/>
+        <result column="project_owner" property="projectOwner" jdbcType="VARCHAR"/>
+        <result column="person_liable_id" property="personLiableId" jdbcType="VARCHAR"/>
+        <result column="lxpf_number" property="lxpfNumber" jdbcType="VARCHAR"/>
+        <result column="project_category_id" property="projectCategoryId" jdbcType="VARCHAR"/>
+        <result column="project_classification_id" property="projectClassificationId" jdbcType="VARCHAR"/>
+        <result column="project_node" property="projectNode" jdbcType="VARCHAR"/>
+        <result column="node_memo" property="nodeMemo" jdbcType="VARCHAR"/>
+        <result column="node_time" property="nodeTime" jdbcType="TIMESTAMP"/>
+        <result column="xj_gs_je" property="xjGsJe" jdbcType="DECIMAL"/>
+        <result column="ky_gs_je" property="kyGsJe" jdbcType="DECIMAL"/>
+        <result column="plan_over_time" property="planOverTime" jdbcType="TIMESTAMP"/>
+        <result column="project_management_agreement" property="projectManagementAgreement" jdbcType="VARCHAR"/>
+        <result column="settlement_agreement" property="settlementAgreement" jdbcType="VARCHAR"/>
+        <result column="settlement_reivew_method" property="settlementReivewMethod" jdbcType="VARCHAR"/>
+        <result column="project_location" property="projectLocation" jdbcType="VARCHAR"/>
+        <result column="audit_price_unit" property="auditPriceUnit" jdbcType="VARCHAR"/>
+        <result column="project_introduction" property="projectIntroduction" jdbcType="VARCHAR"/>
+        <result column="sum_gs_je" property="sumGsJe" jdbcType="DECIMAL"/>
+        <result column="sum_ys_je" property="sumYsJe" jdbcType="DECIMAL"/>
+        <result column="sum_kzj_je" property="sumKzjJe" jdbcType="DECIMAL"/>
+        <result column="sum_htj_je" property="sumHtjJe" jdbcType="DECIMAL"/>
+        <result column="sum_bgj_je" property="sumBgjJe" jdbcType="DECIMAL"/>
+        <result column="sum_jsj_je" property="sumJsjJe" jdbcType="DECIMAL"/>
+        <result column="creator" property="creator" jdbcType="VARCHAR"/>
+        <result column="creator_time" property="creatorTime" jdbcType="TIMESTAMP"/>
+        <result column="all_process" property="allProcess" jdbcType="VARCHAR"/>
+        <result column="ky_gs_gcf" property="kyGsGcf" jdbcType="DECIMAL"/>
+        <result column="ky_gs_elfy" property="kyGsElfy" jdbcType="DECIMAL"/>
+        <result column="ky_gs_slfy" property="kyGsSlfy" jdbcType="DECIMAL"/>
+        <result column="xj_gs_gcf" property="xjGsGcf" jdbcType="DECIMAL"/>
+        <result column="xj_gs_elfy" property="xjGsElfy" jdbcType="DECIMAL"/>
+        <result column="xj_gs_slfy" property="xjGsSlfy" jdbcType="DECIMAL"/>
+        <result column="gs_gcf" property="gsGcf" jdbcType="DECIMAL"/>
+        <result column="gs_elfy" property="gsElfy" jdbcType="DECIMAL"/>
+        <result column="gs_slfy" property="gsSlfy" jdbcType="DECIMAL"/>
+        <result column="description" property="description" jdbcType="VARCHAR"/>
+        <result column="project_owner_phone" property="projectOwnerPhone" jdbcType="VARCHAR"/>
+        <result column="unit" property="unit" jdbcType="VARCHAR"/>
+        <result column="area" property="area" jdbcType="VARCHAR"/>
+        <result column="illustration" property="illustration" jdbcType="VARCHAR"/>
+        <result column="xj_gs_project_scale" property="xjGsProjectScale" jdbcType="DECIMAL"/>
+        <result column="xj_gs_cost" property="xjGsCost" jdbcType="DECIMAL"/>
+        <result column="xj_gs_architectural" property="xjGsArchitectural" jdbcType="DECIMAL"/>
+        <result column="xj_gs_installation" property="xjGsInstallation" jdbcType="DECIMAL"/>
+        <result column="xj_gs_rebar" property="xjGsRebar" jdbcType="DECIMAL"/>
+        <result column="xj_gs_concrete" property="xjGsConcrete" jdbcType="DECIMAL"/>
+        <result column="xj_gs_template" property="xjGsTemplate" jdbcType="DECIMAL"/>
+        <result column="xj_gs_scaffolding" property="xjGsScaffolding" jdbcType="DECIMAL"/>
+        <result column="ky_gs_project_scale" property="kyGsProjectScale" jdbcType="DECIMAL"/>
+        <result column="ky_gs_cost" property="kyGsCost" jdbcType="DECIMAL"/>
+        <result column="ky_gs_architectural" property="kyGsArchitectural" jdbcType="DECIMAL"/>
+        <result column="ky_gs_installation" property="kyGsInstallation" jdbcType="DECIMAL"/>
+        <result column="ky_gs_rebar" property="kyGsRebar" jdbcType="DECIMAL"/>
+        <result column="ky_gs_concrete" property="kyGsConcrete" jdbcType="DECIMAL"/>
+        <result column="ky_gs_template" property="kyGsTemplate" jdbcType="DECIMAL"/>
+        <result column="ky_gs_scaffolding" property="kyGsScaffolding" jdbcType="DECIMAL"/>
+        <result column="gs_project_scale" property="gsProjectScale" jdbcType="DECIMAL"/>
+        <result column="gs_cost" property="gsCost" jdbcType="DECIMAL"/>
+        <result column="gs_architectural" property="gsArchitectural" jdbcType="DECIMAL"/>
+        <result column="gs_installation" property="gsInstallation" jdbcType="DECIMAL"/>
+        <result column="gs_rebar" property="gsRebar" jdbcType="DECIMAL"/>
+        <result column="gs_concrete" property="gsConcrete" jdbcType="DECIMAL"/>
+        <result column="gs_template" property="gsTemplate" jdbcType="DECIMAL"/>
+        <result column="gs_scaffolding" property="gsScaffolding" jdbcType="DECIMAL"/>
+        <result column="kzj_project_scale" property="kzjProjectScale" jdbcType="DECIMAL"/>
+        <result column="kzj_cost" property="kzjCost" jdbcType="DECIMAL"/>
+        <result column="kzj_architectural" property="kzjArchitectural" jdbcType="DECIMAL"/>
+        <result column="kzj_installation" property="kzjInstallation" jdbcType="DECIMAL"/>
+        <result column="kzj_rebar" property="kzjRebar" jdbcType="DECIMAL"/>
+        <result column="kzj_concrete" property="kzjConcrete" jdbcType="DECIMAL"/>
+        <result column="kzj_template" property="kzjTemplate" jdbcType="DECIMAL"/>
+        <result column="kzj_scaffolding" property="kzjScaffolding" jdbcType="DECIMAL"/>
+        <result column="htj_project_scale" property="htjProjectScale" jdbcType="DECIMAL"/>
+        <result column="htj_cost" property="htjCost" jdbcType="DECIMAL"/>
+        <result column="htj_architectural" property="htjArchitectural" jdbcType="DECIMAL"/>
+        <result column="htj_installation" property="htjInstallation" jdbcType="DECIMAL"/>
+        <result column="htj_rebar" property="htjRebar" jdbcType="DECIMAL"/>
+        <result column="htj_concrete" property="htjConcrete" jdbcType="DECIMAL"/>
+        <result column="htj_template" property="htjTemplate" jdbcType="DECIMAL"/>
+        <result column="htj_scaffolding" property="htjScaffolding" jdbcType="DECIMAL"/>
+        <result column="cost_unit" property="costUnit" jdbcType="VARCHAR"/>
+        <result column="architectural_unit" property="architecturalUnit" jdbcType="VARCHAR"/>
+        <result column="installation_unit" property="installationUnit" jdbcType="VARCHAR"/>
+        <result column="rebar_unit" property="rebarUnit" jdbcType="VARCHAR"/>
+        <result column="concrete_unit" property="concreteUnit" jdbcType="VARCHAR"/>
+        <result column="template_unit" property="templateUnit" jdbcType="VARCHAR"/>
+        <result column="scaffolding_unit" property="scaffoldingUnit" jdbcType="VARCHAR"/>
+        <result column="sum_tzbg_je" property="sumTzBgJe" jdbcType="DECIMAL"/>
+        <result column="sum_jy_je" property="sumJyJe" jdbcType="DECIMAL"/>
+        <result column="show_flag2" property="showFlag2" jdbcType="VARCHAR"/>
+        <result column="outdoorCost" property="outdoorCost" jdbcType="DECIMAL"/>
+        <result column="outdoorKyGs" property="outdoorKyGs" jdbcType="DECIMAL"/>
+        <result column="outdoorGsCost" property="outdoorGsCost" jdbcType="DECIMAL"/>
+        <result column="outdoor_unit" property="outdoorUnit" jdbcType="DECIMAL"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, pid, code, name, project_owner, person_liable_id, lxpf_number, project_category_id, 
+    project_classification_id, project_node, node_memo, node_time, xj_gs_je, ky_gs_je, 
+    plan_over_time, project_management_agreement, settlement_agreement, settlement_reivew_method, 
+    project_location, audit_price_unit, project_introduction, sum_gs_je, sum_ys_je, sum_kzj_je, 
+    sum_htj_je, sum_bgj_je, sum_jsj_je, creator, creator_time,all_process,xj_gs_gcf,xj_gs_elfy,
+    xj_gs_slfy,ky_gs_gcf,ky_gs_elfy,ky_gs_slfy,gs_gcf,gs_elfy,gs_slfy,description,project_owner_phone,unit,area,
+     illustration, xj_gs_project_scale,xj_gs_cost,
+    xj_gs_architectural,xj_gs_installation,xj_gs_rebar,xj_gs_concrete,xj_gs_template,xj_gs_scaffolding,ky_gs_project_scale,ky_gs_cost,
+    ky_gs_architectural,ky_gs_installation,ky_gs_rebar,ky_gs_concrete,ky_gs_template,ky_gs_scaffolding,gs_project_scale,gs_cost,
+    gs_architectural,gs_installation,gs_rebar,gs_concrete,gs_template,gs_scaffolding,kzj_project_scale,kzj_cost,
+    kzj_architectural,kzj_installation,kzj_rebar,kzj_concrete,kzj_template,kzj_scaffolding,htj_project_scale,htj_cost,
+    htj_architectural,htj_installation,htj_rebar,htj_concrete,htj_template,htj_scaffolding,cost_unit,architectural_unit,installation_unit,rebar_unit,
+    concrete_unit,template_unit,scaffolding_unit,sum_tzbg_je,sum_jy_je,outdoorCost,outdoorKyGs,outdoorGsCost,outdoor_unit
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.cost168.costaudit.pojo.cost.CostProjectExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from cost_project
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="getTaskSumDecideAmount" resultType="java.math.BigDecimal" parameterType="map">
+        SELECT sum(t.decide_amount) as 'decideAmount' FROM cost_task t
+        <where>
+            <if test="projectId != null and projectId !='' ">
+                and t.project_id = #{projectId}
+            </if>
+            <if test="contractId != null and contractId !='' ">
+                and t.contract_id = #{contractId}
+            </if>
+            <if test="auditPriceType != null and auditPriceType !='' ">
+                and t.audit_price_type = #{auditPriceType}
+            </if>
+            <if test="auditPriceTypeCn != null and auditPriceTypeCn !='' ">
+                and t.audit_price_typecn = #{auditPriceTypeCn}
+            </if>
+            AND ( t.contract_cong_id IS NULL OR t.contract_cong_id = '')
+        </where>
+    </select>
+    <select id="getContractSumAmount" resultType="java.math.BigDecimal" parameterType="map">
+        SELECT SUM(c.contract_amount) as 'contract_amount' FROM cost_contract c
+        <where>
+            <if test="projectId != null and projectId !='' ">
+                and c.project_id = #{projectId}
+            </if>
+            <if test="mainFlag != null and mainFlag !='' ">
+                and c.mainFlag = #{mainFlag}
+            </if>
+        </where>
+    </select>
+
+    <select id="getList" resultMap="BaseResultMap" parameterType="map">
+        select p.* FROM cost_project p where 1=1
+            <if test="name != null and name !='' ">
+                and p.name like concat('%',#{name},'%')
+            </if>
+            <if test="code != null and code !='' ">
+                and p.code like concat('%',#{code},'%')
+            </if>
+            <if test="creator != null and creator !='' ">
+                and (p.creator =#{creator} or p.person_liable_id=#{creator} )
+            </if>
+            <if test="projectManagementAgreement != null and projectManagementAgreement !='' ">
+                and p.project_management_agreement=#{projectManagementAgreement}
+            </if>
+            <if test="personLiableId != null and personLiableId !='' ">
+                and p.person_liable_id like concat('%',#{personLiableId},'%')
+            </if>
+            <if test="projectCategoryId != null  and projectCategoryId !='' ">
+                and p.project_category_id=#{projectCategoryId}
+            </if>
+            <if test="projectLocation != null  and projectLocation !='' ">
+                and p.project_location like concat('%',#{projectLocation},'%')
+            </if>
+            <if test="projectNode != null and projectNode !='' ">
+                and p.project_node=#{projectNode}
+            </if>
+            <if test="projClassificationId !=null and projClassificationId !='' ">
+                <foreach collection="projClassificationId" index="index" item="item">
+                    <choose>
+                        <when test="projClassificationIdLength==1">
+                           AND FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                            FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <otherwise>
+                            AND FIND_IN_SET(#{item},p.project_classification_id) or
+                        </otherwise>
+                    </choose>
+                </foreach>
+            </if>
+            <if test="startTime != null and startTime !=''">
+                and <![CDATA[ p.creator_time>=#{startTime} ]]>
+            </if>
+            <if test="endTime != null and endTime !=''">
+                and <![CDATA[ p.creator_time<=#{endTime} ]]>
+            </if>
+            <if test="area != null and area !='' ">
+                and p.area=#{area}
+            </if>
+            <if test="showFlag2 != null and showFlag2 !='' ">
+                and p.show_flag2=#{showFlag2}
+            </if>
+        order by p.creator_time desc
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <select id="getCount" resultType="java.lang.Integer" parameterType="map">
+        SELECT COUNT(*) from cost_project p
+        <where>
+            <if test="name != null and name !='' ">
+                and p.name like concat('%',#{name},'%')
+            </if>
+            <if test="code != null and code !='' ">
+                and p.code like concat('%',#{code},'%')
+            </if>
+            <if test="creator != null and creator !='' ">
+                and (p.creator =#{creator} or p.person_liable_id=#{creator} )
+            </if>
+            <if test="projectManagementAgreement != null and projectManagementAgreement !='' ">
+                and p.project_management_agreement=#{projectManagementAgreement}
+            </if>
+            <if test="personLiableId != null and personLiableId !='' ">
+                and p.person_liable_id like concat('%',#{personLiableId},'%')
+            </if>
+            <if test="projectCategoryId != null  and projectCategoryId !='' ">
+                and p.project_category_id=#{projectCategoryId}
+            </if>
+            <if test="projectLocation != null  and projectLocation !='' ">
+                and p.project_location like concat('%',#{projectLocation},'%')
+            </if>
+            <if test="projectNode != null and projectNode !='' ">
+                and p.project_node=#{projectNode}
+            </if>
+            <if test="projClassificationId !=null and projClassificationId !='' ">
+                <foreach collection="projClassificationId" index="index" item="item">
+                    <choose>
+                        <when test="projClassificationIdLength==1">
+                            AND FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                            FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <otherwise>
+                            AND FIND_IN_SET(#{item},p.project_classification_id) or
+                        </otherwise>
+                    </choose>
+                </foreach>
+            </if>
+            <if test="startTime != null and startTime !=''">
+                and <![CDATA[ p.creator_time>=#{startTime} ]]>
+            </if>
+
+            <if test="endTime != null and endTime !=''">
+                and <![CDATA[ p.creator_time<=#{endTime} ]]>
+            </if>
+            <if test="area != null and area !='' ">
+                and p.area=#{area}
+            </if>
+            <if test="showFlag2 != null and showFlag2 !='' ">
+                and p.show_flag2=#{showFlag2}
+            </if>
+        </where>
+
+    </select>
+    <!-- 只查结算 -->
+    <select id="getProjectJsList" resultType="com.cost168.costaudit.vo.cost.ProjectJsCountVo" parameterType="map">
+        SELECT p.id as 'projectId',p.`name` as 'projectName',p.`code` as 'projectCode',count(m.cid) as
+        'number',sum(m.contract_amount) as 'contractAmount',sum(m.give_amount) as 'giveAmount',sum(m.my_audit_amount) as
+        'myAuditAmount',sum(m.agency_audit_amount) as 'agencyAuditAmount',sum(m.decide_amount) as
+        'decideAmount',sum(case when m.decide_amount>0 then 1 else 0 end)/count(m.tid)*100 as 'jsCountPercent',
+        (case when m.settlement ='需要' then sum(m.decide_amount)/sum(m.contract_amount )*100 else 0 end) as
+        'decideAmountPercent',
+        p.person_liable_id as 'personLiable',m.* FROM (
+        SELECT c.id as 'cid',c.mainFlagAmount AS 'contract_amount',c.settlement as 'settlement',t.project_id as
+        'project_id',t.id AS 'tid',t.decide_amount,t.give_amount,t.my_audit_amount,t.agency_audit_amount,c.name AS 'name',
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent2'
+        FROM cost_contract c ,cost_task t where c.id=t.contract_id and t.audit_price_type='结算审核'
+
+        <if test="contractCode != null and contractCode !=''">
+            and c.code like concat('%',#{contractCode},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and c.party_b like concat('%',#{partyB},'%')
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ t.decide_time>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ t.decide_time<=#{endTime} ]]>
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and c.contract_type = #{contractType}
+        </if>
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(c.executive_department,#{selectDepartMent})
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !=''">
+            and t.delivery_flag = #{deliveryFlag}
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and t.decide_amount>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (t.decide_amount is null or t.decide_amount=0)
+            </if>
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and t.give_amount>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (t.give_amount is null or t.give_amount=0)
+            </if>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ t.receive_time>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ t.receive_time<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and t.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and t.finalize_number like concat('%',#{ownerApproval},'%')
+        </if>
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having decideAmountPercent2 &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having decideAmountPercent2=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having decideAmountPercent2 &gt; 100
+            </if>
+        </if>
+        )m
+        INNER JOIN cost_project p ON m.project_id=p.id and p.show_flag2='是' where 1=1
+        <if test="projectName != null and projectName !=''">
+           AND p.name like concat('%',#{projectName},'%')
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and m.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="projClassificationId !=null and projClassificationId !='' ">
+            <foreach collection="projClassificationId" index="index" item="item">
+                <choose>
+                    <when test="projClassificationIdLength==1">
+                        AND FIND_IN_SET(#{item},p.project_classification_id)
+                    </when>
+                    <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                        FIND_IN_SET(#{item},p.project_classification_id)
+                    </when>
+                    <otherwise>
+                        AND FIND_IN_SET(#{item},p.project_classification_id) or
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+        GROUP BY p.id
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+
+    <!-- 最新结算台账 -->
+    <select id="getProjectJsListAll" resultType="com.cost168.costaudit.vo.cost.ProjectJsCountVo" parameterType="map">
+        SELECT p.id AS 'projectId',p.`name` as 'projectName',p.`code` as 'projectCode', p.person_liable_id as
+        'personLiable' ,m2.* FROM(
+        SELECT sum(m.contract_amount) as 'contractAmount',sum(m.give_amount) as 'giveAmount',sum(m.my_audit_amount) as
+        'myAuditAmount',sum(m.agency_audit_amount) as 'agencyAuditAmount',sum(m.decide_amount) as
+        'decideAmount',sum(case when m.decide_amount>0 then 1 else 0 end)/count(m.tid)*100 as 'jsCountPercent',
+        (case when m.settlement ='需要' then sum(m.decide_amount)/sum(m.contract_amount )*100 else 0 end) as
+        'decideAmountPercent',
+        m.* FROM (
+        SELECT c.id as 'cid',c.code AS 'code',c.project_id as 'c_projectId',c.mainFlagAmount AS
+        'contract_amount',c.settlement as 'settlement',c.name AS 'name',
+        t.id AS 'tid',t.decide_amount,t.give_amount,t.my_audit_amount,t.agency_audit_amount ,
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent2'
+        FROM cost_contract c LEFT JOIN cost_task t ON c.id=t.contract_id and t.audit_price_type='结算审核'
+        <where>
+            <if test="contractCode != null and contractCode !=''">
+                and c.code like concat('%',#{contractCode},'%')
+            </if>
+            <if test="partyB != null and partyB !=''">
+                and c.party_b like concat('%',#{partyB},'%')
+            </if>
+            <if test="startTime != null and startTime !=''">
+                and <![CDATA[ t.decide_time>=#{startTime} ]]>
+            </if>
+            <if test="endTime != null and endTime !=''">
+                and <![CDATA[ t.decide_time<=#{endTime} ]]>
+            </if>
+            <if test="contractType != null and contractType !=''">
+                and c.contract_type = #{contractType}
+            </if>
+            <if test="selectDepartMent != null and selectDepartMent !=''">
+                and FIND_IN_SET(c.executive_department,#{selectDepartMent})
+            </if>
+            <if test="deliveryFlag != null and deliveryFlag !=''">
+                and t.delivery_flag = #{deliveryFlag}
+            </if>
+            <if test="decideFlag != null and decideFlag !=''">
+                <if test="decideFlag =='是'.toString()">
+                    and t.decide_amount>0
+                </if>
+                <if test="decideFlag =='否'.toString()">
+                    and (t.decide_amount is null or t.decide_amount=0)
+                </if>
+            </if>
+            <if test="giveFlag != null and giveFlag !=''">
+                <if test="giveFlag =='有'.toString()">
+                    and t.give_amount>0
+                </if>
+                <if test="giveFlag =='无'.toString()">
+                    and (t.give_amount is null or t.give_amount=0)
+                </if>
+            </if>
+            <if test="receiveTimeStart != null and receiveTimeStart !=''">
+                and <![CDATA[ t.receive_time>=#{receiveTimeStart} ]]>
+            </if>
+            <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+                and <![CDATA[ t.receive_time<=#{receiveTimeEnd} ]]>
+            </if>
+            <if test="recordNumber != null and recordNumber !=''">
+                and t.fixedFinancial like concat('%',#{recordNumber},'%')
+            </if>
+            <if test="ownerApproval != null and ownerApproval !=''">
+                and t.finalize_number like concat('%',#{ownerApproval},'%')
+            </if>
+        </where>
+        GROUP BY c.id
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having decideAmountPercent2 &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having decideAmountPercent2=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having decideAmountPercent2 &gt; 100
+            </if>
+        </if>
+        )m WHERE 1=1
+        <if test="contractName != null and contractName !=''">
+            and m.name LIKE concat('%',#{contractName},'%')
+        </if>
+        GROUP BY m.c_projectId
+        )m2
+        <choose>
+            <when test="contractCode != null and contractCode !=''">
+                INNER JOIN cost_project p ON p.id=m2.c_projectId
+            </when>
+            <when test="contractName != null and contractName !=''">
+                INNER JOIN cost_project p ON p.id=m2.c_projectId
+            </when>
+            <otherwise>
+                RIGHT JOIN cost_project p ON p.id=m2.c_projectId
+            </otherwise>
+        </choose>
+        <where>
+            p.show_flag2='是'
+            <if test="projectName != null and projectName !=''">
+                and p.name like concat('%',#{projectName},'%')
+            </if>
+            <if test="contractCode != null and contractCode !=''">
+                and m2.code like concat('%',#{contractCode},'%')
+            </if>
+            <if test="projClassificationId !=null and projClassificationId !='' ">
+                <foreach collection="projClassificationId" index="index" item="item">
+                    <choose>
+                        <when test="projClassificationIdLength==1">
+                            AND FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                            FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <otherwise>
+                            AND FIND_IN_SET(#{item},p.project_classification_id) or
+                        </otherwise>
+                    </choose>
+                </foreach>
+            </if>
+        </where>
+        ORDER BY m2.code DESC
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <!-- 最新结算统计总数 -->
+    <select id="getProjectJsCountAll" resultType="java.lang.Integer" parameterType="map">
+        SELECT COUNT(m3.p_id) FROM (
+        SELECT p.id AS 'p_id',p.`name` as 'projectName',p.`code` as 'projectCode', p.person_liable_id as 'personLiable'
+        ,m2.* FROM(
+        SELECT sum(m.contract_amount) as 'contractAmount',sum(m.give_amount) as 'giveAmount',sum(m.my_audit_amount) as
+        'myAuditAmount',sum(m.agency_audit_amount) as 'agencyAuditAmount',sum(m.decide_amount) as
+        'decideAmount',sum(case when m.decide_amount>0 then 1 else 0 end)/count(m.tid)*100 as 'jsCountPercent',
+        (case when m.settlement ='需要' then sum(m.decide_amount)/sum(m.contract_amount )*100 else 0 end) as
+        'decideAmountPercent',
+        m.* FROM (
+        SELECT c.id as 'cid',c.code AS 'code',c.project_id as 'c_projectId',c.mainFlagAmount AS
+        'contract_amount',c.settlement as 'settlement',
+        t.id AS 'tid',t.decide_amount,t.give_amount,t.my_audit_amount,t.agency_audit_amount,
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent2'
+        FROM cost_contract c LEFT JOIN cost_task t ON c.id=t.contract_id and t.audit_price_type='结算审核'
+        <where>
+            <if test="contractCode != null and contractCode !=''">
+                and c.code like concat('%',#{contractCode},'%')
+            </if>
+            <if test="contractName != null and contractName !=''">
+                and c.name LIKE concat('%',#{contractName},'%')
+            </if>
+            <if test="partyB != null and partyB !=''">
+                and c.party_b like concat('%',#{partyB},'%')
+            </if>
+            <if test="startTime != null and startTime !=''">
+                and <![CDATA[ t.decide_time>=#{startTime} ]]>
+            </if>
+            <if test="endTime != null and endTime !=''">
+                and <![CDATA[ t.decide_time<=#{endTime} ]]>
+            </if>
+            <if test="contractType != null and contractType !=''">
+                and c.contract_type = #{contractType}
+            </if>
+            <if test="selectDepartMent != null and selectDepartMent !=''">
+                and FIND_IN_SET(c.executive_department,#{selectDepartMent})
+            </if>
+            <if test="deliveryFlag != null and deliveryFlag !=''">
+                and t.delivery_flag = #{deliveryFlag}
+            </if>
+            <if test="decideFlag != null and decideFlag !=''">
+                <if test="decideFlag =='是'.toString()">
+                    and t.decide_amount>0
+                </if>
+                <if test="decideFlag =='否'.toString()">
+                    and (t.decide_amount is null or t.decide_amount=0)
+                </if>
+            </if>
+            <if test="giveFlag != null and giveFlag !=''">
+                <if test="giveFlag =='有'.toString()">
+                    and t.give_amount>0
+                </if>
+                <if test="giveFlag =='无'.toString()">
+                    and (t.give_amount is null or t.give_amount=0)
+                </if>
+            </if>
+            <if test="receiveTimeStart != null and receiveTimeStart !=''">
+                and <![CDATA[ t.receive_time>=#{receiveTimeStart} ]]>
+            </if>
+            <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+                and <![CDATA[ t.receive_time<=#{receiveTimeEnd} ]]>
+            </if>
+            <if test="recordNumber != null and recordNumber !=''">
+                and t.fixedFinancial like concat('%',#{recordNumber},'%')
+            </if>
+            <if test="ownerApproval != null and ownerApproval !=''">
+                and t.finalize_number like concat('%',#{ownerApproval},'%')
+            </if>
+        </where>
+        GROUP BY c.id
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having decideAmountPercent2 &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having decideAmountPercent2=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having decideAmountPercent2 &gt; 100
+            </if>
+        </if>
+        )m GROUP BY m.c_projectId
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having m.decideAmountPercent2 &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having m.decideAmountPercent2=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having m.decideAmountPercent2 &gt; 100
+            </if>
+        </if>
+        )m2
+        <choose>
+            <when test="contractCode != null and contractCode !=''">
+                INNER JOIN cost_project p ON p.id=m2.c_projectId
+            </when>
+            <when test="contractName != null and contractName !=''">
+                INNER JOIN cost_project p ON p.id=m2.c_projectId
+            </when>
+            <otherwise>
+                RIGHT JOIN cost_project p ON p.id=m2.c_projectId
+            </otherwise>
+        </choose>
+        <where>
+            p.show_flag2='是'
+            <if test="projectName != null and projectName !=''">
+                and p.name like concat('%',#{projectName},'%')
+            </if>
+            <if test="contractCode != null and contractCode !=''">
+                and m2.code like concat('%',#{contractCode},'%')
+            </if>
+            <if test="projClassificationId !=null and projClassificationId !='' ">
+                <foreach collection="projClassificationId" index="index" item="item">
+                    <choose>
+                        <when test="projClassificationIdLength==1">
+                            AND FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                            FIND_IN_SET(#{item},p.project_classification_id)
+                        </when>
+                        <otherwise>
+                            AND FIND_IN_SET(#{item},p.project_classification_id) or
+                        </otherwise>
+                    </choose>
+                </foreach>
+            </if>
+        </where>
+        )m3
+    </select>
+
+    <!--只查结算  -->
+    <select id="getProjectJsCount" resultType="java.lang.Integer" parameterType="map">
+        SELECT count(a.project_id) FROM(
+        SELECT p.id as 'projectId',p.`name` as 'projectName',p.`code` as 'projectCode',count(m.cid) as
+        'number',sum(m.contract_amount) as 'contractAmount',sum(m.give_amount) as 'giveAmount',sum(m.my_audit_amount) as
+        'myAuditAmount',sum(m.agency_audit_amount) as 'agencyAuditAmount',sum(m.decide_amount) as
+        'decideAmount',sum(case when m.decide_amount>0 then 1 else 0 end)/count(m.tid)*100 as 'jsCountPercent',
+        (case when m.settlement ='需要' then sum(m.decide_amount)/sum(m.contract_amount )*100 else 0 end) as
+        'decideAmountPercent',
+        p.person_liable_id as 'personLiable',m.* FROM (
+        SELECT c.id as 'cid',c.mainFlagAmount AS 'contract_amount',c.settlement as 'settlement',t.project_id as
+        'project_id',t.id AS 'tid',t.decide_amount,t.give_amount,t.my_audit_amount,t.agency_audit_amount,c.name AS 'name',
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent2'
+        FROM cost_contract c ,cost_task t where c.id=t.contract_id and t.audit_price_type='结算审核'
+        <if test="contractCode != null and contractCode !=''">
+            and c.code like concat('%',#{contractCode},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and c.party_b like concat('%',#{partyB},'%')
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ t.decide_time>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ t.decide_time<=#{endTime} ]]>
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and c.contract_type = #{contractType}
+        </if>
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(c.executive_department,#{selectDepartMent})
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !=''">
+            and t.delivery_flag = #{deliveryFlag}
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and t.decide_amount>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (t.decide_amount is null or t.decide_amount=0)
+            </if>
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and t.give_amount>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (t.give_amount is null or t.give_amount=0)
+            </if>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ t.receive_time>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ t.receive_time<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and t.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and t.finalize_number like concat('%',#{ownerApproval},'%')
+        </if>
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having decideAmountPercent2 &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having decideAmountPercent2=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having decideAmountPercent2 &gt; 100
+            </if>
+        </if>
+        )m
+        INNER JOIN cost_project p ON m.project_id=p.id and p.show_flag2='是'
+        <if test="projectName != null and projectName !=''">
+            where p.name like concat('%',#{projectName},'%')
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and m.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="projClassificationId !=null and projClassificationId !='' ">
+            <foreach collection="projClassificationId" index="index" item="item">
+                <choose>
+                    <when test="projClassificationIdLength==1">
+                        AND FIND_IN_SET(#{item},p.project_classification_id)
+                    </when>
+                    <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                        FIND_IN_SET(#{item},p.project_classification_id)
+                    </when>
+                    <otherwise>
+                        AND FIND_IN_SET(#{item},p.project_classification_id) or
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+        GROUP BY p.id) a
+    </select>
+    <!--所有-->
+    <select id="getProjectJsContractListAll" resultType="com.cost168.costaudit.vo.cost.ProjectJsCountVo"
+            parameterType="map">
+        select b.checkExplain,c.main_flag as 'mainFlag',c.id as 'contractId',t.id as 'taskId', c.name as
+        'contractName',c.code as 'contractCode',c.party_b as 'partyB',c.mainFlagAmount as 'contractAmount',c.settlement
+        AS settlement,
+        t.give_amount as 'giveAmount',t.my_audit_amount as 'myAuditAmount',t.agency_audit_amount as 'agencyAuditAmount',
+        t.decide_amount as'decideAmount',t.finalize_number as 'ownerApproval',t.decide_time as
+        'decideTime',t.review_reportn as 'reviewReport',
+        sum(case when t.decide_amount>0 then 1 else 0 end)*100 as 'jsCountPercent',
+        (case when c.settlement ='需要' then t.decide_amount/c.mainFlagAmount*100 else 0 end) as 'decideAmountPercent',
+        case when c.party_b_contacts!='' or c.party_b_phone!='' then CONCAT(c.party_b_contacts,',',c.party_b_phone) else
+        '' end as 'partyBContacts',org.`name` as 'executiveDepartment',
+        case when c.operator!='' or c.operator_phone!='' then concat(c.operator,'/',c.operator_phone) else '' end as
+        'executiveDepartmentContacts',
+        t.acceptanceTime as 'acceptanceTime',
+        t.delivery_flag as 'deliveryFlag',case when t.decide_amount>0 then '是' else '否'end as 'decideFlag',
+        t.fixedFinancial as 'recordNumber',c.contract_type as 'contractType',t.entrust_number as 'entrustNumber',e.name
+        as 'auditPriceUnit',
+        case when e.contacts!='' or e.contacts_phone!='' then CONCAT(e.contacts,',',e.contacts_phone) else '' end as
+        'auditPriceUnitContacts',t.submissionTime as 'sendTime',
+        t.receive_time as 'acceptTime',t.person_liable as 'personLiable',
+        d.number as 'number',
+        (case when t.`status`='退审' then t.retrial else '' end) as 'returnReason',
+        t.`status` as 'status',t.check_explain as 'checkExplain1',t.progress_description as 'progressDescription'
+        from cost_contract c left join cost_task t on t.contract_id=c.id AND t.audit_price_type ='结算审核' 
+        left join cost_document d on d.id=t.document_id
+        LEFT JOIN cost_enterprise e on e.name=t.audit_price_unit
+        LEFT JOIN sys_org org on org.id=c.executive_department
+        left join
+        (select o.task_id,o.status,o.opinion as'checkExplain' from cost_task_opinion o ) b on t.id= b.task_id and
+        t.`status`=b.status
+        where (c.parent_id is null OR c.parent_id='') and (t.contract_cong_id is null OR
+        t.contract_cong_id='')
+
+        <if test="projectId != null and projectId !=''">
+            and c.project_id =#{projectId}
+        </if>
+        <if test="contractCode != null and contractCode !=''">
+            and c.code like concat('%',#{contractCode},'%')
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and c.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and c.party_b like concat('%',#{partyB},'%')
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ t.decide_time>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ t.decide_time<=#{endTime} ]]>
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and c.contract_type = #{contractType}
+        </if>
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(c.executive_department,#{selectDepartMent})
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !=''">
+            and t.delivery_flag = #{deliveryFlag}
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and t.give_amount>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (t.give_amount is null or t.give_amount=0)
+            </if>
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and t.decide_amount>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (t.decide_amount is null or t.decide_amount=0)
+            </if>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ t.receive_time>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ t.receive_time<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and t.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and t.finalize_number like concat('%',#{ownerApproval},'%')
+        </if>
+        GROUP BY c.id
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having decideAmountPercent &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having decideAmountPercent=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having decideAmountPercent &gt; 100
+            </if>
+        </if>
+        ORDER BY c.code
+    </select>
+    <!--已结算-->
+    <select id="getProjectJsContractList" resultType="com.cost168.costaudit.vo.cost.ProjectJsCountVo"
+            parameterType="map">
+        select b.checkExplain,c.main_flag as 'mainFlag',c.id as 'contractId',t.id as 'taskId', c.name as
+        'contractName',c.code as 'contractCode',c.party_b as 'partyB',c.mainFlagAmount as 'contractAmount',c.settlement
+        AS settlement,
+        t.give_amount as 'giveAmount',t.my_audit_amount as 'myAuditAmount',t.agency_audit_amount as 'agencyAuditAmount',
+        t.decide_amount as'decideAmount',t.finalize_number as 'ownerApproval',t.decide_time as
+        'decideTime',t.review_reportn as 'reviewReport',
+        sum(case when t.decide_amount>0 then 1 else 0 end)*100 as 'jsCountPercent',
+        (case when c.settlement ='需要' then t.decide_amount/c.mainFlagAmount*100 else 0 end) as 'decideAmountPercent',
+        case when c.party_b_contacts!='' or c.party_b_phone!='' then CONCAT(c.party_b_contacts,',',c.party_b_phone) else
+        '' end as 'partyBContacts',org.`name` as 'executiveDepartment',
+        case when c.operator!='' or c.operator_phone!='' then concat(c.operator,'/',c.operator_phone) else '' end as
+        'executiveDepartmentContacts',
+        t.acceptanceTime as 'acceptanceTime',
+        t.delivery_flag as 'deliveryFlag',case when t.decide_amount>0 then '是' else '否'end as 'decideFlag',
+        t.fixedFinancial as 'recordNumber',c.contract_type as 'contractType',t.entrust_number as 'entrustNumber',e.name
+        as 'auditPriceUnit',
+        case when e.contacts!='' or e.contacts_phone!='' then CONCAT(e.contacts,',',e.contacts_phone) else '' end as
+        'auditPriceUnitContacts',t.submissionTime as 'sendTime',
+        t.receive_time as 'acceptTime',t.person_liable as 'personLiable',
+        d.number as 'number',
+        (case when t.`status`='退审' then t.retrial else '' end) as 'returnReason',
+        t.`status` as 'status',t.check_explain as 'checkExplain1',t.progress_description as 'progressDescription'
+        from cost_task t left join cost_contract c on t.contract_id=c.id left join cost_document d on d.id=t.document_id
+        LEFT JOIN cost_enterprise e on e.name=t.audit_price_unit
+        LEFT JOIN sys_org org on org.id=c.executive_department
+        left join
+        (select o.task_id,o.status,o.opinion as'checkExplain' from cost_task_opinion o ) b on t.id= b.task_id and
+        t.`status`=b.status
+        where t.audit_price_type ='结算审核' and (c.parent_id is null OR c.parent_id='') and (t.contract_cong_id is null OR
+        t.contract_cong_id='')
+
+        <if test="projectId != null and projectId !=''">
+            and c.project_id =#{projectId}
+        </if>
+        <if test="contractCode != null and contractCode !=''">
+            and c.code like concat('%',#{contractCode},'%')
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and c.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and c.party_b like concat('%',#{partyB},'%')
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ t.decide_time>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ t.decide_time<=#{endTime} ]]>
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and c.contract_type = #{contractType}
+        </if>
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(c.executive_department,#{selectDepartMent})
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !=''">
+            and t.delivery_flag = #{deliveryFlag}
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and t.give_amount>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (t.give_amount is null or t.give_amount=0)
+            </if>
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and t.decide_amount>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (t.decide_amount is null or t.decide_amount=0)
+            </if>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ t.receive_time>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ t.receive_time<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and t.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and t.finalize_number like concat('%',#{ownerApproval},'%')
+        </if>
+        GROUP BY c.id
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having decideAmountPercent &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having decideAmountPercent=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having decideAmountPercent &gt; 100
+            </if>
+        </if>
+        ORDER BY c.code
+    </select>
+    <select id="getProjectJsContractChildrenList" resultType="com.cost168.costaudit.vo.cost.ProjectJsCountVo"
+            parameterType="map">
+        select c.main_flag as 'mainFlag',c.id as 'contractId',t.id as 'taskId',c.name as 'contractName',c.code as
+        'contractCode',c.party_b as 'partyB',c.contract_amount as 'contractAmount',
+        t.give_amount as 'giveAmount',t.my_audit_amount as 'myAuditAmount',t.agency_audit_amount as 'agencyAuditAmount',
+        t.decide_amount as 'decideAmount', t.finalize_number as 'ownerApproval',t.decide_time as
+        'decideTime',t.review_reportn as 'reviewReport',
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent',
+        case when c.party_b_contacts!='' or c.party_b_phone!='' then CONCAT(c.party_b_contacts,',',c.party_b_phone) else
+        '' end as 'partyBContacts',org.`name` as 'executiveDepartment',
+        case when c.operator!='' or c.operator_phone!='' then concat(c.operator,'/',c.operator_phone) else '' end as
+        'executiveDepartmentContacts',
+        t.acceptanceTime as 'acceptanceTime',
+        t.financial as 'financial',
+        t.delivery_flag as 'deliveryFlag',case when t.decide_amount>0 then '是' else '否'end as 'decideFlag',
+        t.fixedFinancial as 'recordNumber',c.contract_type as 'contractType',t.entrust_number as 'entrustNumber',e.name
+        as 'auditPriceUnit',
+        case when e.contacts!='' or e.contacts_phone!='' then CONCAT(e.contacts,',',e.contacts_phone) else '' end as
+        'auditPriceUnitContacts',t.submissionTime as 'sendTime',
+        t.receive_time as 'acceptTime',t.person_liable as 'personLiable',
+        d.number as 'number',
+        (case when t.`status`='退审' then t.retrial else '' end) as 'returnReason',
+        t.`status` as 'status',t.check_explain as 'checkExplain',t.progress_description as 'progressDescription'
+        from cost_contract c left join cost_task t on t.contract_id=c.id
+        left join cost_document d on
+        d.id=t.document_id LEFT JOIN cost_enterprise e on e.name=t.audit_price_unit
+        LEFT JOIN sys_org org on org.id=c.executive_department
+        where 1=1
+        <if test="projectId != null and projectId !=''">
+            and c.project_id =#{projectId}
+        </if>
+        <if test="parentId != null and parentId !=''">
+            and c.parent_id =#{parentId}
+        </if>
+        GROUP BY c.id ORDER BY c.code
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <select id="getContractJsList" resultType="com.cost168.costaudit.vo.cost.ContractJsCountVo" parameterType="map">
+        select *,a2.dsContractCount/a1.contractCount*100 as htJsPercent from
+        (select pro.id as 'projectId',pro.name as 'projectName' , sum(case when con.main_flag='主合同' then 1 else 0 end)
+        as 'contractCount' ,sum(con.contract_amount)/10000 as 'contractAmount',pro.description as 'memo',pro.project_classification_id AS projectClassificationId
+        from
+        cost_project pro
+        LEFT JOIN cost_contract con on pro.id=con.project_id where 1=1 and pro.show_flag2='是'
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(con.executive_department,#{selectDepartMent})
+        </if>
+        <if test="orgId != null and orgId !=''">
+            and con.executive_department=#{orgId}
+        </if>
+        <if test="contractCode != null and contractCode !=''">
+            and con.code=#{contractCode}
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and con.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and con.party_b=#{partyB}
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and con.contract_type=#{contractType}
+        </if>
+        group by pro.id) a1
+        left join
+        (select p.id as 'projectId2', sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END)+
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END ) AS 'ssContractCount' ,
+        sum(t.my_audit_amount)/10000 as 'ssContractAmount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END) as 'ssWsContractCount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' then t.my_audit_amount else 0 end)/10000 as
+        'ssWsContractAmount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END )as 'ssZsContractCount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' then t.my_audit_amount else 0 end)/10000 as
+        'ssZsContractAmount',
+        sum(case when t.decide_amount>0 THEN 1 ELSE 0 END) as 'dsContractCount',
+        sum(case when t.decide_amount>0 then t.decide_amount else 0 end)/10000 as 'dsContractAmount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END) as 'dsWsContractCount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '是' then t.decide_amount else 0 end)/10000 as
+        'dsWsContractAmount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END )as 'dsZsContractCount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '否' then t.decide_amount else 0 end)/10000 as
+        'dsZsContractAmount',
+        CASE WHEN sum(case when t.my_audit_amount>0 then t.my_audit_amount else 0 end)>0 then sum(case when
+        t.decide_amount>0 then t.decide_amount else 0 end)/sum(case when t.my_audit_amount>0 then t.my_audit_amount else
+        0 end)*100 else 0 end as 'ssJePercent',
+        CASE WHEN sum(CASE WHEN t.my_audit_amount>0 THEN 1 ELSE 0 END)>0 then sum(CASE WHEN t.decide_amount>0 THEN 1
+        ELSE 0 END)/sum(CASE WHEN t.my_audit_amount>0 THEN 1 ELSE 0 END)*100 else 0 end as 'ssCountPercent',
+        org.name as 'orgName',t.receive_time as 'receiveTime',t.give_amount AS 'giveAmount2',t.decide_amount AS 'decideAmount2',
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent',t.delivery_flag AS 'deliveryFlag',
+        t.decide_time AS  'decideTime',t.fixedFinancial AS 'fixedFinancial',t.finalize_number as 'ownerApproval'
+        from cost_project p
+        LEFT JOIN cost_contract c on p.id=c.project_id
+        left join cost_task t on c.id=t.contract_id
+        LEFT JOIN sys_org org on org.id=c.executive_department where t.audit_price_type='结算审核'
+        group by p.id) a2
+        on a1.projectId= a2.projectId2
+        where 1=1
+        <if test="projClassificationId !=null and projClassificationId !='' ">
+            <foreach collection="projClassificationId" index="index" item="item">
+                <choose>
+                    <when test="projClassificationIdLength==1">
+                        AND FIND_IN_SET(#{item},a1.projectClassificationId)
+                    </when>
+                    <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                        FIND_IN_SET(#{item},a1.projectClassificationId)
+                    </when>
+                    <otherwise>
+                        AND FIND_IN_SET(#{item},a1.projectClassificationId) or
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+        <if test="projectName != null and projectName !='' ">
+            and a1.projectName like concat('%',#{projectName},'%')
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !='' ">
+            and a2.deliveryFlag =#{deliveryFlag}
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and a2.decideAmount2>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (a2.decideAmount2 is null or a2.decideAmount=0)
+            </if>
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and a2.giveAmount2>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (a2.giveAmount2 is null or t.giveAmount2=0)
+            </if>
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ a2.receiveTime>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ a2.receiveTime<=#{endTime} ]]>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ a2.receiveTime>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ a2.receiveTime<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="startTime2 != null and startTime2 !=''">
+            and <![CDATA[ a2.decideTime>=#{startTime2} ]]>
+        </if>
+        <if test="endTime2 != null and endTime2 !=''">
+            and <![CDATA[ a2.decideTime<=#{endTime2} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and a2.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and a2.ownerApproval like concat('%',#{ownerApproval},'%')
+        </if>
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having a2.decideAmountPercent &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having a2.decideAmountPercent=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having a2.decideAmountPercent &gt; 100
+            </if>
+        </if>
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <select id="getContractJsCount" resultType="java.lang.Integer" parameterType="map">
+        select count(*) from
+        (select pro.id as 'projectId' ,pro.name as 'projectName' from cost_project pro
+        LEFT JOIN cost_contract con on pro.id=con.project_id where 1=1
+        and pro.show_flag2='是'
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(con.executive_department,#{selectDepartMent})
+        </if>
+        <if test="orgId != null and orgId !=''">
+            and con.executive_department=#{orgId}
+        </if>
+        <if test="contractCode != null and contractCode !=''">
+            and con.code=#{contractCode}
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and con.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and con.party_b=#{partyB}
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and con.contract_type=#{contractType}
+        </if>
+        <if test="projClassificationId !=null and projClassificationId !='' ">
+            <foreach collection="projClassificationId" index="index" item="item">
+                <choose>
+                    <when test="projClassificationIdLength==1">
+                        AND FIND_IN_SET(#{item},pro.project_classification_id)
+                    </when>
+                    <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                        FIND_IN_SET(#{item},pro.project_classification_id)
+                    </when>
+                    <otherwise>
+                        AND FIND_IN_SET(#{item},pro.project_classification_id) or
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+        group by pro.id ) a1
+        left join
+        (select p.id as 'projectId2',org.name as 'orgName',t.receive_time as 'receiveTime',t.give_amount AS 'giveAmount2',t.decide_amount AS 'decideAmount2',
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent',t.delivery_flag AS 'deliveryFlag',
+        t.decide_time AS  'decideTime',t.fixedFinancial AS 'fixedFinancial',t.finalize_number as 'ownerApproval',p.project_classification_id AS projectClassificationId
+        from cost_project p
+        LEFT JOIN cost_contract c on p.id=c.project_id
+        left join cost_task t on c.id=t.contract_id
+        LEFT JOIN sys_org org on org.id=c.executive_department where t.audit_price_type='结算审核'
+        group by p.id) a2 on a1.projectId= a2.projectId2 where 1=1
+        <if test="projectName != null and projectName !='' ">
+            and a1.projectName like concat('%',#{projectName},'%')
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !='' ">
+            and a2.deliveryFlag =#{deliveryFlag}
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and a2.decideAmount2>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (a2.decideAmount2 is null or a2.decideAmount=0)
+            </if>
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and a2.giveAmount2>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (a2.giveAmount2 is null or t.giveAmount2=0)
+            </if>
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ a2.receiveTime>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ a2.receiveTime<=#{endTime} ]]>
+        </if>
+        <if test="startTime2 != null and startTime2 !=''">
+            and <![CDATA[ a2.decideTime>=#{startTime2} ]]>
+        </if>
+        <if test="endTime2 != null and endTime2 !=''">
+            and <![CDATA[ a2.decideTime<=#{endTime2} ]]>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ a2.receiveTime>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ a2.receiveTime<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and a2.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and a2.ownerApproval like concat('%',#{ownerApproval},'%')
+        </if>
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having a2.decideAmountPercent &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having a2.decideAmountPercent=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having a2.decideAmountPercent &gt; 100
+            </if>
+        </if>
+    </select>
+    <select id="getContractJsGroup" resultType="com.cost168.costaudit.vo.cost.ContractJsCountVo" parameterType="map">
+        select * ,a2.dsContractCount/a1.contractCount*100 as htJsPercent from
+        ( select pro.id as 'projectId',con.executive_department as 'dept1', org1.`name` as'executiveDepartment',
+        sum(case when con.main_flag='主合同' then 1 else 0 end) as 'contractCount',
+        sum(con.contract_amount)/10000 as 'contractAmount'
+        from cost_project pro
+        LEFT JOIN cost_contract con on pro.id=con.project_id
+        LEFT JOIN sys_org org1 on org1.id=con.executive_department
+        where pro.id=#{projectId}
+        GROUP BY con.executive_department
+        order by con.executive_department desc
+        ) a1
+        left join
+        (select p.id as 'projectId2',t.my_audit_amount AS 'myAuditAmont',t.decide_amount AS 'decideAmount',c.executive_department as 'dept2',org.`name` as 'executiveDepartment2',
+        sum(CASE WHEN t.my_audit_amount>0 then 1 ELSE 0 END) AS 'ssContractCount' ,
+        sum(t.my_audit_amount)/10000 as 'ssContractAmount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END) as 'ssWsContractCount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' then t.my_audit_amount else 0 end)/10000 as
+        'ssWsContractAmount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END )as 'ssZsContractCount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' then t.my_audit_amount else 0 end)/10000 as
+        'ssZsContractAmount',
+        sum(case when t.decide_amount>0 THEN 1 ELSE 0 END) as 'dsContractCount',
+        sum(case when t.decide_amount>0 then t.decide_amount else 0 end)/10000 as 'dsContractAmount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END) as 'dsWsContractCount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '是' then t.decide_amount else 0 end)/10000 as
+        'dsWsContractAmount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END )as 'dsZsContractCount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '否' then t.decide_amount else 0 end)/10000 as
+        'dsZsContractAmount',
+        CASE WHEN sum(case when t.my_audit_amount>0 then t.my_audit_amount else 0 end)>0 then sum(case when
+        t.decide_amount>0 then t.decide_amount else 0 end)/sum(case when t.my_audit_amount>0 then t.my_audit_amount else
+        0 end)*100 else 0 end as 'ssJePercent',
+        CASE WHEN sum(CASE WHEN t.my_audit_amount>0 THEN 1 ELSE 0 END)>0 then sum(CASE WHEN t.decide_amount>0 THEN 1
+        ELSE 0 END)/sum(CASE WHEN t.my_audit_amount>0 THEN 1 ELSE 0 END)*100 else 0 end as 'ssCountPercent',
+        org.name as 'orgName',t.receive_time as 'receiveTime'
+        from cost_project p
+        LEFT JOIN cost_contract c on p.id=c.project_id
+        LEFT join cost_task t on c.id=t.contract_id
+        LEFT JOIN sys_org org on org.id=c.executive_department
+        where t.audit_price_type='结算审核' and p.id=#{projectId}
+        GROUP BY c.executive_department ) a2 on a1.projectId= a2.projectId2
+        and a1.dept1=a2.dept2
+        <!--  <if test="projectId != null and projectId !=''" >
+                   where a1.projectId =#{projectId}
+                 </if>
+                 GROUP BY a1.executiveDepartment-->
+    </select>
+    <select id="getContractJsList2" resultType="com.cost168.costaudit.vo.cost.ContractJsCountVo" parameterType="map">
+        select *,a2.dsContractCount/a1.contractCount*100 as htJsPercent from
+        (select pro.id as 'projectId',pro.name as 'projectName' , sum(case when con.main_flag='主合同' then 1 else 0 end)
+        as 'contractCount' ,sum(con.contract_amount)/10000 as 'contractAmount',pro.description as 'memo',pro.project_classification_id AS projectClassificationId
+        from
+        cost_project pro
+        LEFT JOIN cost_contract con on pro.id=con.project_id
+        where pro.id in (select t.project_id from cost_task t where t.audit_price_type='结算审核' group by t.project_id)
+        AND  pro.show_flag2='是'
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(con.executive_department,#{selectDepartMent})
+        </if>
+        <if test="orgId != null and orgId !=''">
+            and con.executive_department=#{orgId}
+        </if>
+        <if test="contractCode != null and contractCode !=''">
+            and con.code=#{contractCode}
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and con.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and con.party_b=#{partyB}
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and con.contract_type=#{contractType}
+        </if>
+        group by pro.id) a1
+        left join
+
+        (select p.id as 'projectId2', sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END)+
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END ) AS 'ssContractCount' ,
+        sum(t.my_audit_amount)/10000 as 'ssContractAmount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END) as 'ssWsContractCount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '是' then t.my_audit_amount else 0 end)/10000 as
+        'ssWsContractAmount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END )as 'ssZsContractCount',
+        sum(case when t.my_audit_amount>0 and t.delivery_flag = '否' then t.my_audit_amount else 0 end)/10000 as
+        'ssZsContractAmount',
+        sum(case when t.decide_amount>0 THEN 1 ELSE 0 END) as 'dsContractCount',
+        sum(case when t.decide_amount>0 then t.decide_amount else 0 end)/10000 as 'dsContractAmount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '是' THEN 1 ELSE 0 END) as 'dsWsContractCount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '是' then t.decide_amount else 0 end)/10000 as
+        'dsWsContractAmount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '否' THEN 1 ELSE 0 END )as 'dsZsContractCount',
+        sum(case when t.decide_amount>0 and t.delivery_flag = '否' then t.decide_amount else 0 end)/10000 as
+        'dsZsContractAmount',
+        CASE WHEN sum(case when t.my_audit_amount>0 then t.my_audit_amount else 0 end)>0 then sum(case when
+        t.decide_amount>0 then t.decide_amount else 0 end)/sum(case when t.my_audit_amount>0 then t.my_audit_amount else
+        0 end)*100 else 0 end as 'ssJePercent',
+        CASE WHEN sum(CASE WHEN t.my_audit_amount>0 THEN 1 ELSE 0 END)>0 then sum(CASE WHEN t.decide_amount>0 THEN 1
+        ELSE 0 END)/sum(CASE WHEN t.my_audit_amount>0 THEN 1 ELSE 0 END)*100 else 0 end as 'ssCountPercent',
+        org.name as 'orgName',t.receive_time as 'receiveTime',t.give_amount AS 'giveAmount2',t.decide_amount AS 'decideAmount2',
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent',t.delivery_flag AS 'deliveryFlag',
+        t.decide_time AS  'decideTime',t.fixedFinancial AS 'fixedFinancial',t.finalize_number as 'ownerApproval',p.project_classification_id AS projectClassificationId
+        from cost_project p
+        LEFT JOIN cost_contract c on p.id=c.project_id
+        left join cost_task t on c.id=t.contract_id
+        LEFT JOIN sys_org org on org.id=c.executive_department where t.audit_price_type='结算审核'
+        group by p.id) a2
+        on a1.projectId= a2.projectId2
+        where 1=1
+        <if test="projClassificationId !=null and projClassificationId !='' ">
+            <foreach collection="projClassificationId" index="index" item="item">
+                <choose>
+                    <when test="projClassificationIdLength==1">
+                        AND FIND_IN_SET(#{item},a1.projectClassificationId)
+                    </when>
+                    <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                        FIND_IN_SET(#{item},a1.projectClassificationId)
+                    </when>
+                    <otherwise>
+                        AND FIND_IN_SET(#{item},a1.projectClassificationId) or
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+        <if test="projectName != null and projectName !='' ">
+            and a1.projectName like concat('%',#{projectName},'%')
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !='' ">
+            and a2.deliveryFlag =#{deliveryFlag}
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and a2.decideAmount2>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (a2.decideAmount2 is null or a2.decideAmount=0)
+            </if>
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and a2.giveAmount2>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (a2.giveAmount2 is null or t.giveAmount2=0)
+            </if>
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ a2.receiveTime>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ a2.receiveTime<=#{endTime} ]]>
+        </if>
+        <if test="startTime2 != null and startTime2 !=''">
+            and <![CDATA[ a2.decideTime>=#{startTime2} ]]>
+        </if>
+        <if test="endTime2 != null and endTime2 !=''">
+            and <![CDATA[ a2.decideTime<=#{endTime2} ]]>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ a2.receiveTime>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ a2.receiveTime<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and a2.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and a2.ownerApproval like concat('%',#{ownerApproval},'%')
+        </if>
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having a2.decideAmountPercent &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having a2.decideAmountPercent=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having a2.decideAmountPercent &gt; 100
+            </if>
+        </if>
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <select id="getContractJsCount2" resultType="java.lang.Integer" parameterType="map">
+        select count(*) from
+        (select pro.id as 'projectId',pro.name as 'projectName' from cost_project pro
+        LEFT JOIN cost_contract con on pro.id=con.project_id
+        where pro.id in (select t.project_id from cost_task t where t.audit_price_type='结算审核' group by t.project_id)
+        and pro.show_flag2='是'
+        <if test="selectDepartMent != null and selectDepartMent !=''">
+            and FIND_IN_SET(con.executive_department,#{selectDepartMent})
+        </if>
+        <if test="orgId != null and orgId !=''">
+            and con.executive_department=#{orgId}
+        </if>
+        <if test="contractCode != null and contractCode !=''">
+            and con.code=#{contractCode}
+        </if>
+        <if test="contractName != null and contractName !=''">
+            and con.name like concat('%',#{contractName},'%')
+        </if>
+        <if test="partyB != null and partyB !=''">
+            and con.party_b=#{partyB}
+        </if>
+        <if test="contractType != null and contractType !=''">
+            and con.contract_type=#{contractType}
+        </if>
+        <if test="projClassificationId !=null and projClassificationId !='' ">
+            <foreach collection="projClassificationId" index="index" item="item">
+                <choose>
+                    <when test="projClassificationIdLength==1">
+                        AND FIND_IN_SET(#{item},pro.project_classification_id)
+                    </when>
+                    <when test="projClassificationIdLength>0 and index==projClassificationIdLength-1 and projClassificationIdLength!=1">
+                        FIND_IN_SET(#{item},pro.project_classification_id)
+                    </when>
+                    <otherwise>
+                        AND FIND_IN_SET(#{item},pro.project_classification_id) or
+                    </otherwise>
+                </choose>
+            </foreach>
+        </if>
+        group by pro.id ) a1
+        left join
+        (select p.id as 'projectId2',org.name as 'orgName',t.receive_time as 'receiveTime',t.give_amount AS 'giveAmount2',t.decide_amount AS 'decideAmount2',
+        (case when c.settlement ='需要' then t.decide_amount/c.contract_amount*100 else 0 end) as 'decideAmountPercent',t.delivery_flag AS 'deliveryFlag',
+        t.decide_time AS  'decideTime',t.fixedFinancial AS 'fixedFinancial',t.finalize_number as 'ownerApproval'
+        from cost_project p
+        LEFT JOIN cost_contract c on p.id=c.project_id
+        left join cost_task t on c.id=t.contract_id
+        LEFT JOIN sys_org org on org.id=c.executive_department where t.audit_price_type='结算审核'
+        group by p.id) a2 on a1.projectId= a2.projectId2 where 1=1
+        <if test="projectName != null and projectName !='' ">
+            and a1.projectName like concat('%',#{projectName},'%')
+        </if>
+        <if test="deliveryFlag != null and deliveryFlag !='' ">
+            and a2.deliveryFlag =#{deliveryFlag}
+        </if>
+        <if test="decideFlag != null and decideFlag !=''">
+            <if test="decideFlag =='是'.toString()">
+                and a2.decideAmount2>0
+            </if>
+            <if test="decideFlag =='否'.toString()">
+                and (a2.decideAmount2 is null or a2.decideAmount=0)
+            </if>
+        </if>
+        <if test="giveFlag != null and giveFlag !=''">
+            <if test="giveFlag =='有'.toString()">
+                and a2.giveAmount2>0
+            </if>
+            <if test="giveFlag =='无'.toString()">
+                and (a2.giveAmount2 is null or t.giveAmount2=0)
+            </if>
+        </if>
+        <if test="startTime != null and startTime !=''">
+            and <![CDATA[ a2.receiveTime>=#{startTime} ]]>
+        </if>
+        <if test="endTime != null and endTime !=''">
+            and <![CDATA[ a2.receiveTime<=#{endTime} ]]>
+        </if>
+        <if test="startTime2 != null and startTime2 !=''">
+            and <![CDATA[ a2.decideTime>=#{startTime2} ]]>
+        </if>
+        <if test="endTime2 != null and endTime2 !=''">
+            and <![CDATA[ a2.decideTime<=#{endTime2} ]]>
+        </if>
+        <if test="receiveTimeStart != null and receiveTimeStart !=''">
+            and <![CDATA[ a2.receiveTime>=#{receiveTimeStart} ]]>
+        </if>
+        <if test="receiveTimeEnd != null and receiveTimeEnd !=''">
+            and <![CDATA[ a2.receiveTime<=#{receiveTimeEnd} ]]>
+        </if>
+        <if test="recordNumber != null and recordNumber !=''">
+            and a2.fixedFinancial like concat('%',#{recordNumber},'%')
+        </if>
+        <if test="ownerApproval != null and ownerApproval !=''">
+            and a2.ownerApproval like concat('%',#{ownerApproval},'%')
+        </if>
+        <if test="decideAmountPercentFlag != null and decideAmountPercentFlag !=''">
+            <if test="decideAmountPercentFlag=='＜100%'.toString()">
+                having a2.decideAmountPercent &lt; 100
+            </if>
+            <if test="decideAmountPercentFlag=='=100%'.toString()">
+                having a2.decideAmountPercent=100
+            </if>
+            <if test="decideAmountPercentFlag=='＞100%'.toString()">
+                having a2.decideAmountPercent &gt; 100
+            </if>
+        </if>
+    </select>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from cost_project
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from cost_project
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+    <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.cost.CostProjectExample">
+        delete from cost_project
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.cost168.costaudit.pojo.cost.CostProject">
+    insert into cost_project (id, pid, code, 
+      name, project_owner, person_liable_id, 
+      lxpf_number, project_category_id, project_classification_id, 
+      project_node, node_memo, node_time, 
+      xj_gs_je, ky_gs_je, plan_over_time, 
+      project_management_agreement, settlement_agreement, 
+      settlement_reivew_method, project_location, 
+      audit_price_unit, project_introduction, sum_gs_je, 
+      sum_ys_je, sum_kzj_je, sum_htj_je, 
+      sum_bgj_je, sum_jsj_je, creator, 
+      creator_time,all_process,xj_gs_gcf,xj_gs_elfy,xj_gs_slfy,
+      ky_gs_gcf,xj_gs_elfy,xj_gs_slfy,gs_gcf,gs_elfy,gs_slfy,
+      description,project_owner_phone,unit,area,illustration,xj_gs_project_scale,xj_gs_cost,
+    xj_gs_architectural,xj_gs_installation,xj_gs_rebar,xj_gs_concrete,xj_gs_template,xj_gs_scaffolding,ky_gs_project_scale,ky_gs_cost,
+    ky_gs_architectural,ky_gs_installation,ky_gs_rebar,ky_gs_concrete,ky_gs_template,ky_gs_scaffolding,gs_project_scale,gs_cost,
+    gs_architectural,gs_installation,gs_rebar,gs_concrete,gs_template,gs_scaffolding,kzj_project_scale,kzj_cost,
+    kzj_architectural,kzj_installation,kzj_rebar,kzj_concrete,kzj_template,kzj_scaffolding,htj_project_scale,htj_cost,
+    htj_architectural,htj_installation,htj_rebar,htj_concrete,htj_template,htj_scaffolding,cost_unit,architectural_unit,installation_unit,rebar_unit,
+    concrete_unit,template_unit,scaffolding_unit,sum_tzbg_je)
+    values (#{id,jdbcType=VARCHAR}, #{pid,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{name,jdbcType=VARCHAR}, #{projectOwner,jdbcType=VARCHAR}, #{personLiableId,jdbcType=VARCHAR}, 
+      #{lxpfNumber,jdbcType=VARCHAR}, #{projectCategoryId,jdbcType=VARCHAR}, #{projectClassificationId,jdbcType=VARCHAR}, 
+      #{projectNode,jdbcType=VARCHAR}, #{nodeMemo,jdbcType=VARCHAR}, #{nodeTime,jdbcType=TIMESTAMP}, 
+      #{xjGsJe,jdbcType=DECIMAL}, #{kyGsJe,jdbcType=DECIMAL}, #{planOverTime,jdbcType=TIMESTAMP}, 
+      #{projectManagementAgreement,jdbcType=VARCHAR}, #{settlementAgreement,jdbcType=VARCHAR}, 
+      #{settlementReivewMethod,jdbcType=VARCHAR}, #{projectLocation,jdbcType=VARCHAR}, 
+      #{auditPriceUnit,jdbcType=VARCHAR}, #{projectIntroduction,jdbcType=VARCHAR}, #{sumGsJe,jdbcType=DECIMAL}, 
+      #{sumYsJe,jdbcType=DECIMAL}, #{sumKzjJe,jdbcType=DECIMAL}, #{sumHtjJe,jdbcType=DECIMAL}, 
+      #{sumBgjJe,jdbcType=DECIMAL}, #{sumJsjJe,jdbcType=DECIMAL}, #{creator,jdbcType=VARCHAR}, 
+      #{creatorTime,jdbcType=TIMESTAMP},#{allProcess,jdbcType=VARCHAR}, #{xjGsGcf,jdbcType=DECIMAL},
+      #{xjGsElfy,jdbcType=DECIMAL}, #{xjGsSlfy,jdbcType=DECIMAL}, #{kyGsGcf,jdbcType=DECIMAL}, #{kyGsElfy,jdbcType=DECIMAL},
+      #{kyGsSlfy,jdbcType=DECIMAL}, #{gsGcf,jdbcType=DECIMAL}, #{gsElfy,jdbcType=DECIMAL}, #{gsSlfy,jdbcType=DECIMAL},
+      #{description,jdbcType=VARCHAR},#{projectOwnerPhone,jdbcType=VARCHAR},#{unit,jdbcType=VARCHAR},#{area,jdbcType=VARCHAR},#{illustration,jdbcType=VARCHAR},
+      #{xjGsProjectScale,jdbcType=DECIMAL}, #{xjGsCost,jdbcType=DECIMAL}, #{xjGsArchitectural,jdbcType=DECIMAL}, #{xjGsInstallation,jdbcType=DECIMAL},
+      #{xjGsRebar,jdbcType=DECIMAL}, #{xjGsConcrete,jdbcType=DECIMAL}, #{xjGsTemplate,jdbcType=DECIMAL}, #{xjGsScaffolding,jdbcType=DECIMAL},
+      #{kyGsProjectScale,jdbcType=DECIMAL}, #{kyGsCost,jdbcType=DECIMAL}, #{kyGsArchitectural,jdbcType=DECIMAL}, #{kyGsInstallation,jdbcType=DECIMAL},
+      #{kyGsRebar,jdbcType=DECIMAL}, #{kyGsConcrete,jdbcType=DECIMAL}, #{kyGsTemplate,jdbcType=DECIMAL}, #{kyGsScaffolding,jdbcType=DECIMAL},
+      #{gsProjectScale,jdbcType=DECIMAL}, #{gsCost,jdbcType=DECIMAL}, #{gsArchitectural,jdbcType=DECIMAL}, #{gsInstallation,jdbcType=DECIMAL},
+      #{gsRebar,jdbcType=DECIMAL}, #{gsConcrete,jdbcType=DECIMAL}, #{gsTemplate,jdbcType=DECIMAL}, #{gsScaffolding,jdbcType=DECIMAL},
+      #{kzjProjectScale,jdbcType=DECIMAL}, #{kzjCost,jdbcType=DECIMAL}, #{kzjArchitectural,jdbcType=DECIMAL}, #{kzjInstallation,jdbcType=DECIMAL},
+      #{kzjRebar,jdbcType=DECIMAL}, #{kzjConcrete,jdbcType=DECIMAL}, #{kzjTemplate,jdbcType=DECIMAL}, #{kzjScaffolding,jdbcType=DECIMAL},
+      #{htjProjectScale,jdbcType=DECIMAL}, #{htjCost,jdbcType=DECIMAL}, #{htjArchitectural,jdbcType=DECIMAL}, #{htjInstallation,jdbcType=DECIMAL},
+      #{htjRebar,jdbcType=DECIMAL}, #{htjConcrete,jdbcType=DECIMAL}, #{htjTemplate,jdbcType=DECIMAL}, #{htjScaffolding,jdbcType=DECIMAL},
+      #{cost_unit,jdbcType=VARCHAR},#{architectural_unit,jdbcType=VARCHAR},#{installation_unit,jdbcType=VARCHAR},#{rebar_unit,jdbcType=VARCHAR},
+      #{concrete_unit,jdbcType=VARCHAR},#{template_unit,jdbcType=VARCHAR},#{scaffolding_unit,jdbcType=VARCHAR},#{sum_tzbg_je,jdbcType=DECIMAL},#{sum_jy_je,jdbcType=DECIMAL}})
+  </insert>
+    <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.cost.CostProject">
+        insert into cost_project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="pid != null">
+                pid,
+            </if>
+            <if test="code != null">
+                code,
+            </if>
+            <if test="name != null">
+                name,
+            </if>
+            <if test="projectOwner != null">
+                project_owner,
+            </if>
+            <if test="personLiableId != null">
+                person_liable_id,
+            </if>
+            <if test="lxpfNumber != null">
+                lxpf_number,
+            </if>
+            <if test="projectCategoryId != null">
+                project_category_id,
+            </if>
+            <if test="projectClassificationId != null">
+                project_classification_id,
+            </if>
+            <if test="projectNode != null">
+                project_node,
+            </if>
+            <if test="nodeMemo != null">
+                node_memo,
+            </if>
+            <if test="nodeTime != null">
+                node_time,
+            </if>
+            <if test="xjGsJe != null">
+                xj_gs_je,
+            </if>
+            <if test="kyGsJe != null">
+                ky_gs_je,
+            </if>
+            <if test="planOverTime != null">
+                plan_over_time,
+            </if>
+            <if test="projectManagementAgreement != null">
+                project_management_agreement,
+            </if>
+            <if test="settlementAgreement != null">
+                settlement_agreement,
+            </if>
+            <if test="settlementReivewMethod != null">
+                settlement_reivew_method,
+            </if>
+            <if test="projectLocation != null">
+                project_location,
+            </if>
+            <if test="auditPriceUnit != null">
+                audit_price_unit,
+            </if>
+            <if test="projectIntroduction != null">
+                project_introduction,
+            </if>
+            <if test="sumGsJe != null">
+                sum_gs_je,
+            </if>
+            <if test="sumYsJe != null">
+                sum_ys_je,
+            </if>
+            <if test="sumKzjJe != null">
+                sum_kzj_je,
+            </if>
+            <if test="sumHtjJe != null">
+                sum_htj_je,
+            </if>
+            <if test="sumBgjJe != null">
+                sum_bgj_je,
+            </if>
+            <if test="sumJsjJe != null">
+                sum_jsj_je,
+            </if>
+            <if test="creator != null">
+                creator,
+            </if>
+            <if test="creatorTime != null">
+                creator_time,
+            </if>
+            <if test="allProcess != null">
+                all_process,
+            </if>
+            <if test="xjGsGcf != null">
+                xj_gs_gcf,
+            </if>
+            <if test="xjGsElfy != null">
+                xj_gs_elfy,
+            </if>
+            <if test="xjGsSlfy != null">
+                xj_gs_slfy,
+            </if>
+            <if test="kyGsGcf != null">
+                ky_gs_gcf,
+            </if>
+            <if test="kyGsElfy != null">
+                ky_gs_elfy,
+            </if>
+            <if test="kyGsSlfy != null">
+                ky_gs_slfy,
+            </if>
+            <if test="gsGcf != null">
+                gs_gcf,
+            </if>
+            <if test="gsElfy != null">
+                gs_elfy,
+            </if>
+            <if test="gsSlfy != null">
+                gs_slfy,
+            </if>
+            <if test="description != null">
+                description,
+            </if>
+            <if test="projectOwnerPhone != null">
+                project_owner_phone,
+            </if>
+            <if test="unit != null">
+                unit,
+            </if>
+            <if test="area != null">
+                area,
+            </if>
+            <if test="illustration != null">
+                illustration,
+            </if>
+            <if test="xjGsProjectScale != null">
+                xj_gs_project_scale,
+            </if>
+            <if test="xjGsCost != null">
+                xj_gs_cost,
+            </if>
+            <if test="xjGsArchitectural != null">
+                xj_gs_architectural,
+            </if>
+            <if test="xjGsInstallation != null">
+                xj_gs_installation,
+            </if>
+            <if test="xjGsRebar != null">
+                xj_gs_rebar,
+            </if>
+            <if test="xjGsConcrete != null">
+                xj_gs_Concrete,
+            </if>
+            <if test="xjGsTemplate != null">
+                xj_gs_template,
+            </if>
+            <if test="xjGsScaffolding != null">
+                xj_gs_scaffolding,
+            </if>
+            <if test="kyGsProjectScale != null">
+                ky_gs_project_scale,
+            </if>
+            <if test="kyGsCost != null">
+                ky_gs_cost,
+            </if>
+            <if test="kyGsArchitectural != null">
+                ky_gs_architectural,
+            </if>
+            <if test="kyGsInstallation != null">
+                ky_gs_installation,
+            </if>
+            <if test="kyGsRebar != null">
+                ky_gs_rebar,
+            </if>
+            <if test="kyGsConcrete != null">
+                ky_gs_Concrete,
+            </if>
+            <if test="kyGsTemplate != null">
+                ky_gs_template,
+            </if>
+            <if test="kyGsScaffolding != null">
+                ky_gs_scaffolding,
+            </if>
+            <if test="gsProjectScale != null">
+                gs_project_scale,
+            </if>
+            <if test="gsCost != null">
+                gs_cost,
+            </if>
+            <if test="gsArchitectural != null">
+                gs_architectural,
+            </if>
+            <if test="gsInstallation != null">
+                gs_installation,
+            </if>
+            <if test="gsRebar != null">
+                gs_rebar,
+            </if>
+            <if test="gsConcrete != null">
+                gs_Concrete,
+            </if>
+            <if test="gsTemplate != null">
+                gs_template,
+            </if>
+            <if test="gsScaffolding != null">
+                gs_scaffolding,
+            </if>
+            <if test="kzjProjectScale != null">
+                kzj_project_scale,
+            </if>
+            <if test="kzjCost != null">
+                kzj_cost,
+            </if>
+            <if test="kzjArchitectural != null">
+                kzj_architectural,
+            </if>
+            <if test="kzjInstallation != null">
+                kzj_installation,
+            </if>
+            <if test="kzjRebar != null">
+                kzj_rebar,
+            </if>
+            <if test="kzjConcrete != null">
+                kzj_Concrete,
+            </if>
+            <if test="kzjTemplate != null">
+                kzj_template,
+            </if>
+            <if test="kzjScaffolding != null">
+                kzj_scaffolding,
+            </if>
+            <if test="htjProjectScale != null">
+                htj_project_scale,
+            </if>
+            <if test="htjCost != null">
+                htj_cost,
+            </if>
+            <if test="htjArchitectural != null">
+                htj_architectural,
+            </if>
+            <if test="htjInstallation != null">
+                htj_installation,
+            </if>
+            <if test="htjRebar != null">
+                htj_rebar,
+            </if>
+            <if test="htjConcrete != null">
+                htj_Concrete,
+            </if>
+            <if test="htjTemplate != null">
+                htj_template,
+            </if>
+            <if test="htjScaffolding != null">
+                htj_scaffolding,
+            </if>
+            <if test="costUnit != null">
+                cost_unit,
+            </if>
+            <if test="architecturalUnit != null">
+                architectural_unit,
+            </if>
+            <if test="installationUnit != null">
+                installation_unit,
+            </if>
+            <if test="rebarUnit != null">
+                rebar_unit,
+            </if>
+            <if test="concreteUnit != null">
+                concrete_unit,
+            </if>
+            <if test="templateUnit != null">
+                template_unit,
+            </if>
+            <if test="scaffoldingUnit != null">
+                scaffolding_unit,
+            </if>
+            <if test="sumTzBgJe !=null">
+                sum_tzbg_je,
+            </if>
+            <if test="sumJyJe !=null">
+                sum_jy_je,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="pid != null">
+                #{pid,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="projectOwner != null">
+                #{projectOwner,jdbcType=VARCHAR},
+            </if>
+            <if test="personLiableId != null">
+                #{personLiableId,jdbcType=VARCHAR},
+            </if>
+            <if test="lxpfNumber != null">
+                #{lxpfNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="projectCategoryId != null">
+                #{projectCategoryId,jdbcType=VARCHAR},
+            </if>
+            <if test="projectClassificationId != null">
+                #{projectClassificationId,jdbcType=VARCHAR},
+            </if>
+            <if test="projectNode != null">
+                #{projectNode,jdbcType=VARCHAR},
+            </if>
+            <if test="nodeMemo != null">
+                #{nodeMemo,jdbcType=VARCHAR},
+            </if>
+            <if test="nodeTime != null">
+                #{nodeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="xjGsJe != null">
+                #{xjGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsJe != null">
+                #{kyGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="planOverTime != null">
+                #{planOverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="projectManagementAgreement != null">
+                #{projectManagementAgreement,jdbcType=VARCHAR},
+            </if>
+            <if test="settlementAgreement != null">
+                #{settlementAgreement,jdbcType=VARCHAR},
+            </if>
+            <if test="settlementReivewMethod != null">
+                #{settlementReivewMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="projectLocation != null">
+                #{projectLocation,jdbcType=VARCHAR},
+            </if>
+            <if test="auditPriceUnit != null">
+                #{auditPriceUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="projectIntroduction != null">
+                #{projectIntroduction,jdbcType=VARCHAR},
+            </if>
+            <if test="sumGsJe != null">
+                #{sumGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumYsJe != null">
+                #{sumYsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumKzjJe != null">
+                #{sumKzjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumHtjJe != null">
+                #{sumHtjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumBgjJe != null">
+                #{sumBgjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumJsjJe != null">
+                #{sumJsjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="creator != null">
+                #{creator,jdbcType=VARCHAR},
+            </if>
+            <if test="creatorTime != null">
+                #{creatorTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="allProcess != null">
+                #{allProcess,jdbcType=VARCHAR},
+            </if>
+            <if test="xjGsGcf != null">
+                #{xjGsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsElfy != null">
+                #{xjGsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsSlfy != null">
+                #{xjGsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsGcf != null">
+                #{kyGsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsElfy != null">
+                #{kyGsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsSlfy != null">
+                #{kyGsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="gsGcf != null">
+                #{gsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="gsElfy != null">
+                #{gsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="gsSlfy != null">
+                #{gsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="description != null">
+                #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="projectOwnerPhone != null">
+                #{projectOwnerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="unit != null">
+                #{unit,jdbcType=VARCHAR},
+            </if>
+            <if test="area != null">
+                #{area,jdbcType=VARCHAR},
+            </if>
+            <if test="illustration != null">
+                #{illustration,jdbcType=VARCHAR},
+            </if>
+            <if test="xjGsProjectScale != null">
+                #{xjGsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsCost != null">
+                #{xjGsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsArchitectural != null">
+                #{xjGsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsInstallation != null">
+                #{xjGsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsRebar != null">
+                #{xjGsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsConcrete != null">
+                #{xjGsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsTemplate != null">
+                #{xjGsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsScaffolding != null">
+                #{xjGsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsProjectScale != null">
+                #{kyGsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsCost != null">
+                #{kyGsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsArchitectural != null">
+                #{kyGsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsInstallation != null">
+                #{kyGsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsRebar != null">
+                #{kyGsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsConcrete != null">
+                #{kyGsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsTemplate != null">
+                #{kyGsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsScaffolding != null">
+                #{kyGsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="gsProjectScale != null">
+                #{gsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="gsCost != null">
+                #{gsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="gsArchitectural != null">
+                #{gsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="gsInstallation != null">
+                #{gsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="gsRebar != null">
+                #{gsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="gsConcrete != null">
+                #{gsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="gsTemplate != null">
+                #{gsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="gsScaffolding != null">
+                #{gsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjProjectScale != null">
+                #{kzjProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjCost != null">
+                #{kzjCost,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjArchitectural != null">
+                #{kzjArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjInstallation != null">
+                #{kzjInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjRebar != null">
+                #{kzjRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjConcrete != null">
+                #{kzjConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjTemplate != null">
+                #{kzjTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjScaffolding != null">
+                #{kzjScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="htjProjectScale != null">
+                #{htjProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="htjCost != null">
+                #{htjCost,jdbcType=DECIMAL},
+            </if>
+            <if test="htjArchitectural != null">
+                #{htjArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="htjInstallation != null">
+                #{htjInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="htjRebar != null">
+                #{htjRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="htjConcrete != null">
+                #{htjConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="htjTemplate != null">
+                #{htjTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="htjScaffolding != null">
+                #{htjScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="costUnit != null">
+                #{costUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="architecturalUnit != null">
+                #{architecturalUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="installationUnit != null">
+                #{installationUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="rebarUnit != null">
+                #{rebarUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="concreteUnit != null">
+                #{concreteUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="templateUnit != null">
+                #{templateUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="scaffoldingUnit != null">
+                #{scaffoldingUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="sumTzBgJe !=null">
+                #{sumTzBgJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumJyJe !=null">
+                #{sumJyJe,jdbcType=DECIMAL},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.cost168.costaudit.pojo.cost.CostProjectExample"
+            resultType="java.lang.Integer">
+        select count(*) from cost_project
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update cost_project
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=VARCHAR},
+            </if>
+            <if test="record.pid != null">
+                pid = #{record.pid,jdbcType=VARCHAR},
+            </if>
+            <if test="record.code != null">
+                code = #{record.code,jdbcType=VARCHAR},
+            </if>
+            <if test="record.name != null">
+                name = #{record.name,jdbcType=VARCHAR},
+            </if>
+            <if test="record.projectOwner != null">
+                project_owner = #{record.projectOwner,jdbcType=VARCHAR},
+            </if>
+            <if test="record.personLiableId != null">
+                person_liable_id = #{record.personLiableId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.lxpfNumber != null">
+                lxpf_number = #{record.lxpfNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="record.projectCategoryId != null">
+                project_category_id = #{record.projectCategoryId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.projectClassificationId != null">
+                project_classification_id = #{record.projectClassificationId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.projectNode != null">
+                project_node = #{record.projectNode,jdbcType=VARCHAR},
+            </if>
+            <if test="record.nodeMemo != null">
+                node_memo = #{record.nodeMemo,jdbcType=VARCHAR},
+            </if>
+            <if test="record.nodeTime != null">
+                node_time = #{record.nodeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.xjGsJe != null">
+                xj_gs_je = #{record.xjGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsJe != null">
+                ky_gs_je = #{record.kyGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.planOverTime != null">
+                plan_over_time = #{record.planOverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.projectManagementAgreement != null">
+                project_management_agreement = #{record.projectManagementAgreement,jdbcType=VARCHAR},
+            </if>
+            <if test="record.settlementAgreement != null">
+                settlement_agreement = #{record.settlementAgreement,jdbcType=VARCHAR},
+            </if>
+            <if test="record.settlementReivewMethod != null">
+                settlement_reivew_method = #{record.settlementReivewMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="record.projectLocation != null">
+                project_location = #{record.projectLocation,jdbcType=VARCHAR},
+            </if>
+            <if test="record.auditPriceUnit != null">
+                audit_price_unit = #{record.auditPriceUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.projectIntroduction != null">
+                project_introduction = #{record.projectIntroduction,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sumGsJe != null">
+                sum_gs_je = #{record.sumGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.sumYsJe != null">
+                sum_ys_je = #{record.sumYsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.sumKzjJe != null">
+                sum_kzj_je = #{record.sumKzjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.sumHtjJe != null">
+                sum_htj_je = #{record.sumHtjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.sumBgjJe != null">
+                sum_bgj_je = #{record.sumBgjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.sumJsjJe != null">
+                sum_jsj_je = #{record.sumJsjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.creator != null">
+                creator = #{record.creator,jdbcType=VARCHAR},
+            </if>
+            <if test="record.creatorTime != null">
+                creator_time = #{record.creatorTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.allProcess != null">
+                all_process = #{record.allProcess,jdbcType=VARCHAR},
+            </if>
+            <if test="record.xjGsGcf != null">
+                xj_gs_gcf = #{record.xjGsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsElfy != null">
+                xj_gs_elfy = #{record.xjGsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsSlfy != null">
+                xj_gs_slfy = #{record.xjGsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsGcf != null">
+                ky_gs_gcf = #{record.kyGsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsElfy != null">
+                ky_gs_elfy = #{record.kyGsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsSlfy != null">
+                ky_gs_slfy = #{record.kyGsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsGcf != null">
+                gs_gcf = #{record.gsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsElfy != null">
+                gs_elfy = #{record.gsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsSlfy != null">
+                gs_slfy = #{record.gsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="record.description != null">
+                description = #{record.description,jdbcType=VARCHAR},
+            </if>
+            <if test="record.projectOwnerPhone != null">
+                project_owner_phone = #{record.projectOwnerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="record.unit != null">
+                unit = #{record.unit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.area != null">
+                area = #{record.area,jdbcType=VARCHAR},
+            </if>
+            <if test="record.illustration != null">
+                illustration = #{record.illustration,jdbcType=VARCHAR},
+            </if>
+            <if test="record.xjGsProjectScale != null">
+                xj_gs_project_scale = #{record.xjGsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsCost != null">
+                xj_gs_cost = #{record.xjGsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsArchitectural != null">
+                xj_gs_architectural = #{record.xjGsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsInstallation != null">
+                xj_gs_installation = #{record.xjGsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsRebar != null">
+                xj_gs_rebar = #{record.xjGsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsConcrete != null">
+                xj_gs_concrete = #{record.xjGsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsTemplate != null">
+                xj_gs_template = #{record.xjGsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="record.xjGsScaffolding != null">
+                xj_gs_scaffolding = #{record.xjGsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsProjectScale != null">
+                ky_gs_project_scale = #{record.kyGsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsCost != null">
+                ky_gs_cost = #{record.kyGsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsArchitectural != null">
+                ky_gs_architectural = #{record.kyGsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsInstallation != null">
+                ky_gs_installation = #{record.kyGsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsRebar != null">
+                ky_gs_rebar = #{record.kyGsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsConcrete != null">
+                ky_gs_concrete = #{record.kyGsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsTemplate != null">
+                ky_gs_template = #{record.kyGsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kyGsScaffolding != null">
+                ky_gs_scaffolding = #{record.kyGsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsProjectScale != null">
+                gs_project_scale = #{record.gsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsCost != null">
+                gs_cost = #{record.gsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsArchitectural != null">
+                gs_architectural = #{record.gsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsInstallation != null">
+                gs_installation = #{record.gsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsRebar != null">
+                gs_rebar = #{record.gsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsConcrete != null">
+                gs_concrete = #{record.gsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsTemplate != null">
+                gs_template = #{record.gsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="record.gsScaffolding != null">
+                gs_scaffolding = #{record.gsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjProjectScale != null">
+                kzj_project_scale = #{record.kzjProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjCost != null">
+                kzj_cost = #{record.kzjCost,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjArchitectural != null">
+                kzj_architectural = #{record.kzjArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjInstallation != null">
+                kzj_installation = #{record.kzjInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjRebar != null">
+                kzj_rebar = #{record.kzjRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjConcrete != null">
+                kzj_concrete = #{record.kzjConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjTemplate != null">
+                kzj_template = #{record.kzjTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="record.kzjScaffolding != null">
+                kzj_scaffolding = #{record.kzjScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjProjectScale != null">
+                htj_project_scale = #{record.htjProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjCost != null">
+                kzj_cost = #{record.htjCost,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjArchitectural != null">
+                htj_architectural = #{record.htjArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjInstallation != null">
+                htj_installation = #{record.htjInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjRebar != null">
+                htj_rebar = #{record.htjRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjConcrete != null">
+                htj_concrete = #{record.htjConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjTemplate != null">
+                htj_template = #{record.htjTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="record.htjScaffolding != null">
+                htj_scaffolding = #{record.htjScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="record.costUnit != null">
+                cost_unit = #{record.costUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.architecturalUnit != null">
+                architectural_unit = #{record.architecturalUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.installationUnit != null">
+                installation_unit = #{record.installationUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.rebarUnit != null">
+                rebar_unit = #{record.rebarUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.concreteUnit != null">
+                concrete_unit = #{record.concreteUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.templateUnit != null">
+                template_unit = #{record.templateUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.scaffoldingUnit != null">
+                scaffolding_unit = #{record.scaffoldingUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sumTzBgJe !=null">
+                sum_tzbg_je= #{record.sumTzBgJe,jdbcType=DECIMAL},
+            </if>
+            <if test="record.sumJyJe !=null">
+                sum_jy_je = #{record.sum_jy_je,jdbcType=DECIMAL}
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update cost_project
+        set id = #{record.id,jdbcType=VARCHAR},
+        pid = #{record.pid,jdbcType=VARCHAR},
+        code = #{record.code,jdbcType=VARCHAR},
+        name = #{record.name,jdbcType=VARCHAR},
+        project_owner = #{record.projectOwner,jdbcType=VARCHAR},
+        person_liable_id = #{record.personLiableId,jdbcType=VARCHAR},
+        lxpf_number = #{record.lxpfNumber,jdbcType=VARCHAR},
+        project_category_id = #{record.projectCategoryId,jdbcType=VARCHAR},
+        project_classification_id = #{record.projectClassificationId,jdbcType=VARCHAR},
+        project_node = #{record.projectNode,jdbcType=VARCHAR},
+        node_memo = #{record.nodeMemo,jdbcType=VARCHAR},
+        node_time = #{record.nodeTime,jdbcType=TIMESTAMP},
+        xj_gs_je = #{record.xjGsJe,jdbcType=DECIMAL},
+        ky_gs_je = #{record.kyGsJe,jdbcType=DECIMAL},
+        plan_over_time = #{record.planOverTime,jdbcType=TIMESTAMP},
+        project_management_agreement = #{record.projectManagementAgreement,jdbcType=VARCHAR},
+        settlement_agreement = #{record.settlementAgreement,jdbcType=VARCHAR},
+        settlement_reivew_method = #{record.settlementReivewMethod,jdbcType=VARCHAR},
+        project_location = #{record.projectLocation,jdbcType=VARCHAR},
+        audit_price_unit = #{record.auditPriceUnit,jdbcType=VARCHAR},
+        project_introduction = #{record.projectIntroduction,jdbcType=VARCHAR},
+        sum_gs_je = #{record.sumGsJe,jdbcType=DECIMAL},
+        sum_ys_je = #{record.sumYsJe,jdbcType=DECIMAL},
+        sum_kzj_je = #{record.sumKzjJe,jdbcType=DECIMAL},
+        sum_htj_je = #{record.sumHtjJe,jdbcType=DECIMAL},
+        sum_bgj_je = #{record.sumBgjJe,jdbcType=DECIMAL},
+        sum_jsj_je = #{record.sumJsjJe,jdbcType=DECIMAL},
+        creator = #{record.creator,jdbcType=VARCHAR},
+        creator_time = #{record.creatorTime,jdbcType=TIMESTAMP},
+        all_process = #{record.allProcess,jdbcType=VARCHAR},
+        xj_gs_gcf = #{record.xjGsGcf,jdbcType=DECIMAL},
+        xj_gs_elfy = #{record.xjGsElfy,jdbcType=DECIMAL},
+        xj_gs_slfy = #{record.xjGsSlfy,jdbcType=DECIMAL},
+        ky_gs_gcf = #{record.kyGsGcf,jdbcType=DECIMAL},
+        ky_gs_elfy = #{record.kyGsElfy,jdbcType=DECIMAL},
+        ky_gs_slfy = #{record.kyGsSlfy,jdbcType=DECIMAL},
+        gs_gcf = #{record.gsGcf,jdbcType=DECIMAL},
+        gs_elfy = #{record.gsElfy,jdbcType=DECIMAL},
+        gs_slfy = #{record.gsSlfy,jdbcType=DECIMAL},
+        description = #{record.description,jdbcType=VARCHAR},
+        project_owner_phone = #{record.projectOwnerPhone,jdbcType=VARCHAR},
+        unit = #{record.unit,jdbcType=VARCHAR},
+        area = #{record.area,jdbcType=VARCHAR},
+        illustration = #{record.illustration,jdbcType=VARCHAR},
+        xj_gs_project_scale = #{record.xjGsProjectScale,jdbcType=DECIMAL},
+        xj_gs_cost = #{record.xjGsCost,jdbcType=DECIMAL},
+        xj_gs_architectural = #{record.xjGsArchitectural,jdbcType=DECIMAL},
+        xj_gs_installation = #{record.xjGsInstallation,jdbcType=DECIMAL},
+        xj_gs_rebar = #{record.xjGsRebar,jdbcType=DECIMAL},
+        xj_gs_concrete = #{record.xjGsConcrete,jdbcType=DECIMAL},
+        xj_gs_template = #{record.xjGsTemplate,jdbcType=DECIMAL},
+        xj_gs_scaffolding = #{record.xjGsScaffolding,jdbcType=DECIMAL},
+        ky_gs_project_scale = #{record.kyGsProjectScale,jdbcType=DECIMAL},
+        ky_gs_cost = #{record.kyGsCost,jdbcType=DECIMAL},
+        ky_gs_architectural = #{record.kyGsArchitectural,jdbcType=DECIMAL},
+        ky_gs_installation = #{record.kyGsInstallation,jdbcType=DECIMAL},
+        ky_gs_rebar = #{record.kyGsRebar,jdbcType=DECIMAL},
+        ky_gs_concrete = #{record.kyGsConcrete,jdbcType=DECIMAL},
+        ky_gs_template = #{record.kyGsTemplate,jdbcType=DECIMAL},
+        ky_gs_scaffolding = #{record.kyGsScaffolding,jdbcType=DECIMAL},
+        gs_project_scale = #{record.gsProjectScale,jdbcType=DECIMAL},
+        gs_cost = #{record.gsCost,jdbcType=DECIMAL},
+        gs_architectural = #{record.gsArchitectural,jdbcType=DECIMAL},
+        gs_installation = #{record.gsInstallation,jdbcType=DECIMAL},
+        gs_rebar = #{record.gsRebar,jdbcType=DECIMAL},
+        gs_concrete = #{record.gsConcrete,jdbcType=DECIMAL},
+        gs_template = #{record.gsTemplate,jdbcType=DECIMAL},
+        gs_scaffolding = #{record.gsScaffolding,jdbcType=DECIMAL},
+        kzj_project_scale = #{record.kzjProjectScale,jdbcType=DECIMAL},
+        kzj_cost = #{record.kzjCost,jdbcType=DECIMAL},
+        kzj_architectural = #{record.kzjArchitectural,jdbcType=DECIMAL},
+        kzj_installation = #{record.kzjInstallation,jdbcType=DECIMAL},
+        kzj_rebar = #{record.kzjRebar,jdbcType=DECIMAL},
+        kzj_concrete = #{record.kzjConcrete,jdbcType=DECIMAL},
+        kzj_template = #{record.kzjTemplate,jdbcType=DECIMAL},
+        kzj_scaffolding = #{record.kzjScaffolding,jdbcType=DECIMAL},
+        htj_project_scale = #{record.htjProjectScale,jdbcType=DECIMAL},
+        kzj_cost = #{record.htjCost,jdbcType=DECIMAL},
+        htj_architectural = #{record.htjArchitectural,jdbcType=DECIMAL},
+        htj_installation = #{record.htjInstallation,jdbcType=DECIMAL},
+        htj_rebar = #{record.htjRebar,jdbcType=DECIMAL},
+        htj_concrete = #{record.htjConcrete,jdbcType=DECIMAL},
+        htj_template = #{record.htjTemplate,jdbcType=DECIMAL},
+        htj_scaffolding = #{record.htjScaffolding,jdbcType=DECIMAL},
+        cost_unit = #{record.costUnit,jdbcType=VARCHAR},
+        architectural_unit = #{record.architecturalUnit,jdbcType=VARCHAR},
+        installation_unit = #{record.installationUnit,jdbcType=VARCHAR},
+        rebar_unit = #{record.rebarUnit,jdbcType=VARCHAR},
+        concrete_unit = #{record.concreteUnit,jdbcType=VARCHAR},
+        template_unit = #{record.templateUnit,jdbcType=VARCHAR},
+        scaffolding_unit = #{record.scaffoldingUnit,jdbcType=VARCHAR},
+        sum_tzbg_je= #{record.sumTzBgJe,jdbcType=DECIMAL},
+        sum_jy_je= #{record.sumJyJe,jdbcType=DECIMAL}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.cost.CostProject">
+        update cost_project
+        <set>
+            <if test="pid != null">
+                pid = #{pid,jdbcType=VARCHAR},
+            </if>
+            <if test="code != null">
+                code = #{code,jdbcType=VARCHAR},
+            </if>
+            <if test="name != null">
+                name = #{name,jdbcType=VARCHAR},
+            </if>
+            <if test="projectOwner != null">
+                project_owner = #{projectOwner,jdbcType=VARCHAR},
+            </if>
+            <if test="personLiableId != null">
+                person_liable_id = #{personLiableId,jdbcType=VARCHAR},
+            </if>
+            <if test="lxpfNumber != null">
+                lxpf_number = #{lxpfNumber,jdbcType=VARCHAR},
+            </if>
+            <if test="projectCategoryId != null">
+                project_category_id = #{projectCategoryId,jdbcType=VARCHAR},
+            </if>
+            <if test="projectClassificationId != null">
+                project_classification_id = #{projectClassificationId,jdbcType=VARCHAR},
+            </if>
+            <if test="projectNode != null">
+                project_node = #{projectNode,jdbcType=VARCHAR},
+            </if>
+            <if test="nodeMemo != null">
+                node_memo = #{nodeMemo,jdbcType=VARCHAR},
+            </if>
+            <if test="nodeTime != null">
+                node_time = #{nodeTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="xjGsJe != null">
+                xj_gs_je = #{xjGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsJe != null">
+                ky_gs_je = #{kyGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="planOverTime != null">
+                plan_over_time = #{planOverTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="projectManagementAgreement != null">
+                project_management_agreement = #{projectManagementAgreement,jdbcType=VARCHAR},
+            </if>
+            <if test="settlementAgreement != null">
+                settlement_agreement = #{settlementAgreement,jdbcType=VARCHAR},
+            </if>
+            <if test="settlementReivewMethod != null">
+                settlement_reivew_method = #{settlementReivewMethod,jdbcType=VARCHAR},
+            </if>
+            <if test="projectLocation != null">
+                project_location = #{projectLocation,jdbcType=VARCHAR},
+            </if>
+            <if test="auditPriceUnit != null">
+                audit_price_unit = #{auditPriceUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="projectIntroduction != null">
+                project_introduction = #{projectIntroduction,jdbcType=VARCHAR},
+            </if>
+            <if test="sumGsJe != null">
+                sum_gs_je = #{sumGsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumYsJe != null">
+                sum_ys_je = #{sumYsJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumKzjJe != null">
+                sum_kzj_je = #{sumKzjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumHtjJe != null">
+                sum_htj_je = #{sumHtjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumBgjJe != null">
+                sum_bgj_je = #{sumBgjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumJsjJe != null">
+                sum_jsj_je = #{sumJsjJe,jdbcType=DECIMAL},
+            </if>
+            <if test="creator != null">
+                creator = #{creator,jdbcType=VARCHAR},
+            </if>
+            <if test="creatorTime != null">
+                creator_time = #{creatorTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="allProcess != null">
+                all_process = #{allProcess,jdbcType=VARCHAR},
+            </if>
+            <if test="xjGsGcf != null">
+                xj_gs_gcf = #{xjGsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsElfy != null">
+                xj_gs_elfy = #{xjGsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsSlfy != null">
+                xj_gs_slfy = #{xjGsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsGcf != null">
+                ky_gs_gcf = #{kyGsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsElfy != null">
+                ky_gs_elfy = #{kyGsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsSlfy != null">
+                ky_gs_slfy = #{kyGsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="gsGcf != null">
+                gs_gcf = #{gsGcf,jdbcType=DECIMAL},
+            </if>
+            <if test="gsElfy != null">
+                gs_elfy = #{gsElfy,jdbcType=DECIMAL},
+            </if>
+            <if test="gsSlfy != null">
+                gs_slfy = #{gsSlfy,jdbcType=DECIMAL},
+            </if>
+            <if test="description != null">
+                description = #{description,jdbcType=VARCHAR},
+            </if>
+            <if test="projectOwnerPhone != null">
+                project_owner_phone = #{projectOwnerPhone,jdbcType=VARCHAR},
+            </if>
+            <if test="unit != null">
+                unit = #{unit,jdbcType=VARCHAR},
+            </if>
+            <if test="area != null">
+                area = #{area,jdbcType=VARCHAR},
+            </if>
+            <if test="illustration != null">
+                illustration = #{illustration,jdbcType=VARCHAR},
+            </if>
+            <if test="xjGsProjectScale != null">
+                xj_gs_project_scale = #{xjGsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsCost != null">
+                xj_gs_cost = #{xjGsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsArchitectural != null">
+                xj_gs_architectural = #{xjGsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsInstallation != null">
+                xj_gs_installation = #{xjGsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsRebar != null">
+                xj_gs_rebar = #{xjGsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsConcrete != null">
+                xj_gs_concrete = #{xjGsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsTemplate != null">
+                xj_gs_template = #{xjGsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="xjGsScaffolding != null">
+                xj_gs_scaffolding = #{xjGsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsProjectScale != null">
+                ky_gs_project_scale = #{kyGsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsCost != null">
+                ky_gs_cost = #{kyGsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsArchitectural != null">
+                ky_gs_architectural = #{kyGsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsInstallation != null">
+                ky_gs_installation = #{kyGsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsRebar != null">
+                ky_gs_rebar = #{kyGsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsConcrete != null">
+                ky_gs_concrete = #{kyGsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsTemplate != null">
+                ky_gs_template = #{kyGsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="kyGsScaffolding != null">
+                ky_gs_scaffolding = #{kyGsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="gsProjectScale != null">
+                gs_project_scale = #{gsProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="gsCost != null">
+                gs_cost = #{gsCost,jdbcType=DECIMAL},
+            </if>
+            <if test="gsArchitectural != null">
+                gs_architectural = #{gsArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="gsInstallation != null">
+                gs_installation = #{gsInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="gsRebar != null">
+                gs_rebar = #{gsRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="gsConcrete != null">
+                gs_concrete = #{gsConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="gsTemplate != null">
+                gs_template = #{gsTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="gsScaffolding != null">
+                gs_scaffolding = #{gsScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjProjectScale != null">
+                kzj_project_scale = #{kzjProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjCost != null">
+                kzj_cost = #{kzjCost,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjArchitectural != null">
+                kzj_architectural = #{kzjArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjInstallation != null">
+                kzj_installation = #{kzjInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjRebar != null">
+                kzj_rebar = #{kzjRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjConcrete != null">
+                kzj_concrete = #{kzjConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjTemplate != null">
+                kzj_template = #{kzjTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="kzjScaffolding != null">
+                kzj_scaffolding = #{kzjScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="htjProjectScale != null">
+                htj_project_scale = #{htjProjectScale,jdbcType=DECIMAL},
+            </if>
+            <if test="htjCost != null">
+                kzj_cost = #{htjCost,jdbcType=DECIMAL},
+            </if>
+            <if test="htjArchitectural != null">
+                htj_architectural = #{htjArchitectural,jdbcType=DECIMAL},
+            </if>
+            <if test="htjInstallation != null">
+                htj_installation = #{htjInstallation,jdbcType=DECIMAL},
+            </if>
+            <if test="htjRebar != null">
+                htj_rebar = #{htjRebar,jdbcType=DECIMAL},
+            </if>
+            <if test="htjConcrete != null">
+                htj_concrete = #{htjConcrete,jdbcType=DECIMAL},
+            </if>
+            <if test="htjTemplate != null">
+                htj_template = #{htjTemplate,jdbcType=DECIMAL},
+            </if>
+            <if test="htjScaffolding != null">
+                htj_scaffolding = #{htjScaffolding,jdbcType=DECIMAL},
+            </if>
+            <if test="costUnit != null">
+                cost_unit = #{costUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="architecturalUnit != null">
+                architectural_unit = #{architecturalUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="installationUnit != null">
+                installation_unit = #{installationUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="rebarUnit != null">
+                rebar_unit = #{rebarUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="concreteUnit != null">
+                concrete_unit = #{concreteUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="templateUnit != null">
+                template_unit = #{templateUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="scaffoldingUnit != null">
+                scaffolding_unit = #{scaffoldingUnit,jdbcType=VARCHAR},
+            </if>
+            <if test="sumTzBgJe != null">
+                sum_tzbg_je= #{sumTzBgJe,jdbcType=DECIMAL},
+            </if>
+            <if test="sumJyJe != null">
+                sum_jy_je= #{sumJyJe,jdbcType=DECIMAL},
+            </if>
+            <if test="showFlag2 != null">
+                show_flag2= #{showFlag2,jdbcType=VARCHAR},
+            </if>
+            <if test="outdoorCost != null">
+                outdoorCost= #{outdoorCost,jdbcType=VARCHAR},
+            </if>
+            <if test="outdoorKyGs != null">
+                outdoorKyGs= #{outdoorKyGs,jdbcType=VARCHAR},
+            </if>
+            <if test="outdoorGsCost != null">
+                outdoorGsCost= #{outdoorGsCost,jdbcType=VARCHAR},
+            </if>
+            <if test="outdoorUnit != null">
+                outdoor_unit= #{outdoorUnit,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.cost.CostProject">
+    update cost_project
+    set pid = #{pid,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      project_owner = #{projectOwner,jdbcType=VARCHAR},
+      person_liable_id = #{personLiableId,jdbcType=VARCHAR},
+      lxpf_number = #{lxpfNumber,jdbcType=VARCHAR},
+      project_category_id = #{projectCategoryId,jdbcType=VARCHAR},
+      project_classification_id = #{projectClassificationId,jdbcType=VARCHAR},
+      project_node = #{projectNode,jdbcType=VARCHAR},
+      node_memo = #{nodeMemo,jdbcType=VARCHAR},
+      node_time = #{nodeTime,jdbcType=TIMESTAMP},
+      xj_gs_je = #{xjGsJe,jdbcType=DECIMAL},
+      ky_gs_je = #{kyGsJe,jdbcType=DECIMAL},
+      plan_over_time = #{planOverTime,jdbcType=TIMESTAMP},
+      project_management_agreement = #{projectManagementAgreement,jdbcType=VARCHAR},
+      settlement_agreement = #{settlementAgreement,jdbcType=VARCHAR},
+      settlement_reivew_method = #{settlementReivewMethod,jdbcType=VARCHAR},
+      project_location = #{projectLocation,jdbcType=VARCHAR},
+      audit_price_unit = #{auditPriceUnit,jdbcType=VARCHAR},
+      project_introduction = #{projectIntroduction,jdbcType=VARCHAR},
+      sum_gs_je = #{sumGsJe,jdbcType=DECIMAL},
+      sum_ys_je = #{sumYsJe,jdbcType=DECIMAL},
+      sum_kzj_je = #{sumKzjJe,jdbcType=DECIMAL},
+      sum_htj_je = #{sumHtjJe,jdbcType=DECIMAL},
+      sum_bgj_je = #{sumBgjJe,jdbcType=DECIMAL},
+      sum_jsj_je = #{sumJsjJe,jdbcType=DECIMAL},
+      creator = #{creator,jdbcType=VARCHAR},
+      creator_time = #{creatorTime,jdbcType=TIMESTAMP},
+      all_process = #{allProcess,jdbcType=VARCHAR},
+      xj_gs_gcf = #{xjGsGcf,jdbcType=DECIMAL},
+      xj_gs_elfy = #{xjGsElfy,jdbcType=DECIMAL},
+      xj_gs_slfy = #{xjGsSlfy,jdbcType=DECIMAL},
+      ky_gs_gcf = #{kyGsGcf,jdbcType=DECIMAL},
+      ky_gs_elfy = #{kyGsElfy,jdbcType=DECIMAL},
+      ky_gs_slfy = #{kyGsSlfy,jdbcType=DECIMAL},
+      gs_gcf = #{gsGcf,jdbcType=DECIMAL},
+      gs_elfy = #{gsElfy,jdbcType=DECIMAL},
+      gs_slfy = #{gsSlfy,jdbcType=DECIMAL},
+      description = #{description,jdbcType=VARCHAR},
+      project_owner_phone = #{projectOwnerPhone,jdbcType=VARCHAR},unit=#{unit,jdbcType=VARCHAR},area=#{area,jdbcType=VARCHAR},illustration=#{illustration,jdbcType=VARCHAR},
+      xj_gs_project_scale=#{xjGsProjectScale,jdbcType=DECIMAL}, xj_gs_cost=#{xjGsCost,jdbcType=DECIMAL}, xj_gs_architectural=#{xjGsArchitectural,jdbcType=DECIMAL},xj_gs_installation= #{xjGsInstallation,jdbcType=DECIMAL},
+      xj_gs_rebar=#{xjGsRebar,jdbcType=DECIMAL}, xj_gs_concrete=#{xjGsConcrete,jdbcType=DECIMAL}, xj_gs_template=#{xjGsTemplate,jdbcType=DECIMAL}, xj_gs_scaffolding=#{xjGsScaffolding,jdbcType=DECIMAL},
+      ky_gs_project_scale=#{kyGsProjectScale,jdbcType=DECIMAL}, ky_gs_cost=#{kyGsCost,jdbcType=DECIMAL}, ky_gs_architectural=#{kyGsArchitectural,jdbcType=DECIMAL}, ky_gs_installation=#{kyGsInstallation,jdbcType=DECIMAL},
+      ky_gs_rebar=#{kyGsRebar,jdbcType=DECIMAL}, ky_gs_concrete=#{kyGsConcrete,jdbcType=DECIMAL}, ky_gs_template=#{kyGsTemplate,jdbcType=DECIMAL},ky_gs_scaffolding= #{kyGsScaffolding,jdbcType=DECIMAL},
+      gs_project_scale=#{gsProjectScale,jdbcType=DECIMAL}, gs_cost=#{gsCost,jdbcType=DECIMAL}, gs_architectural=#{gsArchitectural,jdbcType=DECIMAL}, gs_installation=#{gsInstallation,jdbcType=DECIMAL},
+      gs_rebar=#{gsRebar,jdbcType=DECIMAL}, gs_concrete=#{gsConcrete,jdbcType=DECIMAL}, gs_template=#{gsTemplate,jdbcType=DECIMAL}, gs_scaffolding=#{gsScaffolding,jdbcType=DECIMAL},
+      kzj_project_scale=#{kzjProjectScale,jdbcType=DECIMAL}, kzj_cost=#{kzjCost,jdbcType=DECIMAL}, kzj_architectural=#{kzjArchitectural,jdbcType=DECIMAL}, kzj_installation=#{kzjInstallation,jdbcType=DECIMAL},
+      kzj_rebar= #{kzjRebar,jdbcType=DECIMAL}, kzj_concrete=#{kzjConcrete,jdbcType=DECIMAL},kzj_template= #{kzjTemplate,jdbcType=DECIMAL}, kzj_scaffolding=#{kzjScaffolding,jdbcType=DECIMAL},
+      htj_project_scale =#{htjProjectScale,jdbcType=DECIMAL},htj_cost= #{htjCost,jdbcType=DECIMAL}, htj_architectural=#{htjArchitectural,jdbcType=DECIMAL}, htj_installation=#{htjInstallation,jdbcType=DECIMAL},
+      htj_rebar=#{htjRebar,jdbcType=DECIMAL},htj_concrete= #{htjConcrete,jdbcType=DECIMAL}, htj_template=#{htjTemplate,jdbcType=DECIMAL},htj_scaffolding=#{htjScaffolding,jdbcType=DECIMAL},
+      cost_unit = #{costUnit,jdbcType=VARCHAR},
+      architectural_unit = #{architecturalUnit,jdbcType=VARCHAR},
+      installation_unit = #{installationUnit,jdbcType=VARCHAR},
+      rebar_unit = #{rebarUnit,jdbcType=VARCHAR},
+      concrete_unit = #{concreteUnit,jdbcType=VARCHAR},
+      template_unit = #{templateUnit,jdbcType=VARCHAR},
+      scaffolding_unit = #{scaffoldingUnit,jdbcType=VARCHAR},
+      sum_tzbg_je= #{sumTzBgJe,jdbcType=DECIMAL},
+      sum_jy_je= #{sumJyJe,jdbcType=DECIMAL},
+      show_flag2= #{showFlag2,jdbcType=VARCHAR},
+      outdoorCost= #{outdoorCost,jdbcType=DECIMAL},
+      outdoorKyGs= #{outdoorKyGs,jdbcType=DECIMAL},
+      outdoorGsCost= #{outdoorGsCost,jdbcType=DECIMAL},
+      )
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+    <select id="getAAA" resultType="java.lang.String" parameterType="java.lang.String">
+     
+		SELECT GROUP_CONCAT(n.cCode) FROM(
+		SELECT b.cCode FROM (
+		SELECT a.*,GROUP_CONCAT(a.code) AS 'cCode' FROM (
+		SELECT * FROM (
+		SELECT c.id,c.`code`,c.`name`,c.project_id,c.contract_amount as 'am',SUM(t.give_amount) AS 'g' FROM cost_contract c INNER JOIN cost_task t ON c.id=t.contract_id 
+		 WHERE c.main_flag='主合同' AND t.audit_price_type='结算审核'  GROUP BY c.id
+		)m WHERE m.project_id=#{projectId}
+		HAVING m.g>0
+		)a GROUP BY a.am ,a.g
+		HAVING count(*)>1 
+		)b
+		)n
+    </select>
+    <select id="getBBB" resultType="java.lang.String" parameterType="java.lang.String">
+      SELECT GROUP_CONCAT(a.str) FROM(
+		SELECT m.id,m.str FROM(
+		SELECT c.id,c.`code`,right(c.`code`,3)as 'code3',c.name,GROUP_CONCAT(DISTINCT c.`code`) AS "str" FROM cost_contract c WHERE c.project_id=#{id}
+		GROUP BY code3
+		HAVING count(*)>1 
+		)m
+		)a
+    </select>
+</mapper>

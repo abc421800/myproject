@@ -1,0 +1,21 @@
+package com.cost168.costaudit.mapper.yaohao;
+
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
+
+public interface YaohaoAssessMapper {
+    List<YaohaoAssess> selectListByMap(Map<String, Object> map);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(YaohaoAssess assess);
+
+    YaohaoAssess selectByPrimaryKey(String id);
+
+    int updateByPrimaryKey(YaohaoAssess assess);
+
+    int selectCountByMap(Map<String, Object> map);
+}

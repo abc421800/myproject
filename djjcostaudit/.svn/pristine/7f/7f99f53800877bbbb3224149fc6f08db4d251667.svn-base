@@ -1,0 +1,125 @@
+package com.cost168.costaudit.pojo.yaohao;
+
+import java.util.Date;
+
+public class YaohaoCandidate {
+    private String id;
+
+    private String enterpriseCode;
+
+    private String yearAssess;
+
+    private Integer yearWinNuma;
+
+    private Integer yearWinNumb;
+
+    private String yaohaoYear;
+
+    private String yaohaoGrade;
+
+    private Date createTime;
+
+    private String creater;
+
+    private Integer roundNum;
+
+    private String remark;
+
+    private String bidFlag;
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id == null ? null : id.trim();
+    }
+
+    public String getEnterpriseCode() {
+        return enterpriseCode;
+    }
+
+    public void setEnterpriseCode(String enterpriseCode) {
+        this.enterpriseCode = enterpriseCode == null ? null : enterpriseCode.trim();
+    }
+
+    public String getYearAssess() {
+        return yearAssess;
+    }
+
+    public void setYearAssess(String yearAssess) {
+        this.yearAssess = yearAssess == null ? null : yearAssess.trim();
+    }
+
+    public Integer getYearWinNuma() {
+        return yearWinNuma;
+    }
+
+    public void setYearWinNuma(Integer yearWinNuma) {
+        this.yearWinNuma = yearWinNuma;
+    }
+
+    public Integer getYearWinNumb() {
+        return yearWinNumb;
+    }
+
+    public void setYearWinNumb(Integer yearWinNumb) {
+        this.yearWinNumb = yearWinNumb;
+    }
+
+    public String getYaohaoYear() {
+        return yaohaoYear;
+    }
+
+    public void setYaohaoYear(String yaohaoYear) {
+        this.yaohaoYear = yaohaoYear == null ? null : yaohaoYear.trim();
+    }
+
+    public String getYaohaoGrade() {
+        return yaohaoGrade;
+    }
+
+    public void setYaohaoGrade(String yaohaoGrade) {
+        this.yaohaoGrade = yaohaoGrade == null ? null : yaohaoGrade.trim();
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    public String getCreater() {
+        return creater;
+    }
+
+    public void setCreater(String creater) {
+        this.creater = creater == null ? null : creater.trim();
+    }
+
+    public Integer getRoundNum() {
+        return roundNum;
+    }
+
+    public void setRoundNum(Integer roundNum) {
+        this.roundNum = roundNum;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
+    }
+
+    public String getBidFlag() {
+        return bidFlag;
+    }
+
+    public void setBidFlag(String bidFlag) {
+        this.bidFlag = bidFlag == null ? null : bidFlag.trim();
+    }
+}

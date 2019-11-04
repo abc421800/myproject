@@ -1,0 +1,1267 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.work.WorkRegisterMapper">
+    <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.work.WorkRegister">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="person_id" property="personId" jdbcType="VARCHAR"/>
+        <result column="enterprise_id" property="enterpriseId" jdbcType="VARCHAR"/>
+        <result column="reg_year_month" property="regYearMonth" jdbcType="VARCHAR"/>
+        <result column="reg_year" property="regYear" jdbcType="VARCHAR"/>
+        <result column="reg_month" property="regMonth" jdbcType="VARCHAR"/>
+        <result column="morning" property="morning" jdbcType="VARCHAR"/>
+        <result column="afternoon" property="afternoon" jdbcType="VARCHAR"/>
+        <result column="reg_day" property="regDay" jdbcType="VARCHAR"/>
+        <result column="working_day" property="workingDay" jdbcType="REAL"/>
+        <result column="creater" property="creater" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="remark" property="remark" jdbcType="VARCHAR"/>
+        <result column="register_time" property="registerTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+    <sql id="Base_Column_List">
+    id, person_id, enterprise_id, reg_year_month, reg_year, reg_month, morning, afternoon, 
+    reg_day, working_day, creater, create_time, update_time, remark, register_time
+  </sql>
+    <select id="selectByExample" resultMap="BaseResultMap"
+            parameterType="com.cost168.costaudit.pojo.work.WorkRegisterExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        <include refid="Base_Column_List"/>
+        from work_register
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+    <select id="selectListByMap" resultType="com.cost168.costaudit.pojo.work.vo.WorkRegisterVo" parameterType="map">
+
+        SELECT m.*,m.am_sb+m.pm_sb AS 'sb',m.am_nxj+m.pm_nxj AS 'nxj', m.am_tqj+m.pm_tqj AS 'tqj',
+        m.am_sj+m.pm_sj AS 'sj', m.am_syj+m.pm_syj AS 'syj', m.am_jsj+m.pm_jsj AS 'jsj',
+        m.am_bj+m.pm_bj AS 'bj', m.am_hj+m.pm_hj AS 'hj',m.am_sangj+m.pm_sangj AS 'sangj',
+        m.am_lgxx+m.pm_lgxx AS 'lgxx',m.am_cc+m.pm_cc AS 'cc',m.am_kg+m.pm_kg AS 'kg',
+        m.am_jb+m.pm_jb AS 'jb',m.am_xx+m.pm_xx AS 'xx',m.am_qt+m.pm_qt AS 'qt'
+        FROM(
+        SELECT p.id,p.name,e.name AS "enterpriseName",p.annualLeaveUseup AS 'kxnj',
+        max(CASE WHEN r.`reg_day`='1' THEN r.morning end) AS 'morning_1',
+        max(CASE WHEN r.`reg_day`='1' THEN r.afternoon end) AS 'afternoon_1',
+        max(CASE WHEN r.`reg_day`='2' THEN r.morning end) AS 'morning_2',
+        max(CASE WHEN r.`reg_day`='2' THEN r.afternoon end) AS 'afternoon_2',
+        max(CASE WHEN r.`reg_day`='3' THEN r.morning end) AS 'morning_3',
+        max(CASE WHEN r.`reg_day`='3' THEN r.afternoon end) AS 'afternoon_3',
+        max(CASE WHEN r.`reg_day`='4' THEN r.morning end) AS 'morning_4',
+        max(CASE WHEN r.`reg_day`='4' THEN r.afternoon end) AS 'afternoon_4',
+        max(CASE WHEN r.`reg_day`='5' THEN r.morning end) AS 'morning_5',
+        max(CASE WHEN r.`reg_day`='5' THEN r.afternoon end) AS 'afternoon_5',
+        max(CASE WHEN r.`reg_day`='6' THEN r.morning end) AS 'morning_6',
+        max(CASE WHEN r.`reg_day`='6' THEN r.afternoon end) AS 'afternoon_6',
+        max(CASE WHEN r.`reg_day`='7' THEN r.morning end) AS 'morning_7',
+        max(CASE WHEN r.`reg_day`='7' THEN r.afternoon end) AS 'afternoon_7',
+        max(CASE WHEN r.`reg_day`='8' THEN r.morning end) AS 'morning_8',
+        max(CASE WHEN r.`reg_day`='8' THEN r.afternoon end) AS 'afternoon_8',
+        max(CASE WHEN r.`reg_day`='9' THEN r.morning end) AS 'morning_9',
+        max(CASE WHEN r.`reg_day`='9' THEN r.afternoon end) AS 'afternoon_9',
+        max(CASE WHEN r.`reg_day`='10' THEN r.morning end) AS 'morning_10',
+        max(CASE WHEN r.`reg_day`='10' THEN r.afternoon end) AS 'afternoon_10',
+        max(CASE WHEN r.`reg_day`='11' THEN r.morning end) AS 'morning_11',
+        max(CASE WHEN r.`reg_day`='11' THEN r.afternoon end) AS 'afternoon_11',
+        max(CASE WHEN r.`reg_day`='12' THEN r.morning end) AS 'morning_12',
+        max(CASE WHEN r.`reg_day`='12' THEN r.afternoon end) AS 'afternoon_12',
+        max(CASE WHEN r.`reg_day`='13' THEN r.morning end) AS 'morning_13',
+        max(CASE WHEN r.`reg_day`='13' THEN r.afternoon end) AS 'afternoon_13',
+        max(CASE WHEN r.`reg_day`='14' THEN r.morning end) AS 'morning_14',
+        max(CASE WHEN r.`reg_day`='14' THEN r.afternoon end) AS 'afternoon_14',
+        max(CASE WHEN r.`reg_day`='15' THEN r.morning end) AS 'morning_15',
+        max(CASE WHEN r.`reg_day`='15' THEN r.afternoon end) AS 'afternoon_15',
+        max(CASE WHEN r.`reg_day`='16' THEN r.morning end) AS 'morning_16',
+        max(CASE WHEN r.`reg_day`='16' THEN r.afternoon end) AS 'afternoon_16',
+        max(CASE WHEN r.`reg_day`='17' THEN r.morning end) AS 'morning_17',
+        max(CASE WHEN r.`reg_day`='17' THEN r.afternoon end) AS 'afternoon_17',
+        max(CASE WHEN r.`reg_day`='18' THEN r.morning end) AS 'morning_18',
+        max(CASE WHEN r.`reg_day`='18' THEN r.afternoon end) AS 'afternoon_18',
+        max(CASE WHEN r.`reg_day`='19' THEN r.morning end) AS 'morning_19',
+        max(CASE WHEN r.`reg_day`='19' THEN r.afternoon end) AS 'afternoon_19',
+        max(CASE WHEN r.`reg_day`='20' THEN r.morning end) AS 'morning_20',
+        max(CASE WHEN r.`reg_day`='20' THEN r.afternoon end) AS 'afternoon_20',
+        max(CASE WHEN r.`reg_day`='21' THEN r.morning end) AS 'morning_21',
+        max(CASE WHEN r.`reg_day`='21' THEN r.afternoon end) AS 'afternoon_21',
+        max(CASE WHEN r.`reg_day`='22' THEN r.morning end) AS 'morning_22',
+        max(CASE WHEN r.`reg_day`='22' THEN r.afternoon end) AS 'afternoon_22',
+        max(CASE WHEN r.`reg_day`='23' THEN r.morning end) AS 'morning_23',
+        max(CASE WHEN r.`reg_day`='23' THEN r.afternoon end) AS 'afternoon_23',
+        max(CASE WHEN r.`reg_day`='24' THEN r.morning end) AS 'morning_24',
+        max(CASE WHEN r.`reg_day`='24' THEN r.afternoon end) AS 'afternoon_24',
+        max(CASE WHEN r.`reg_day`='25' THEN r.morning end) AS 'morning_25',
+        max(CASE WHEN r.`reg_day`='25' THEN r.afternoon end) AS 'afternoon_25',
+        max(CASE WHEN r.`reg_day`='26' THEN r.morning end) AS 'morning_26',
+        max(CASE WHEN r.`reg_day`='26' THEN r.afternoon end) AS 'afternoon_26',
+        max(CASE WHEN r.`reg_day`='27' THEN r.morning end) AS 'morning_27',
+        max(CASE WHEN r.`reg_day`='27' THEN r.afternoon end) AS 'afternoon_27',
+        max(CASE WHEN r.`reg_day`='28' THEN r.morning end) AS 'morning_28',
+        max(CASE WHEN r.`reg_day`='28' THEN r.afternoon end) AS 'afternoon_28',
+        max(CASE WHEN r.`reg_day`='29' THEN r.morning end) AS 'morning_29',
+        max(CASE WHEN r.`reg_day`='29' THEN r.afternoon end) AS 'afternoon_29',
+        max(CASE WHEN r.`reg_day`='30' THEN r.morning end) AS 'morning_30',
+        max(CASE WHEN r.`reg_day`='30' THEN r.afternoon end) AS 'afternoon_30',
+        max(CASE WHEN r.`reg_day`='31' THEN r.morning end) AS 'morning_31',
+        max(CASE WHEN r.`reg_day`='31' THEN r.afternoon end) AS 'afternoon_31',
+
+        SUM(CASE WHEN r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb',
+        SUM(CASE WHEN r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb',
+        SUM(CASE WHEN r.morning='年休假' THEN 0.5 ELSE 0 END) AS 'am_nxj',
+        SUM(CASE WHEN r.afternoon='年休假' THEN 0.5 ELSE 0 END) AS 'pm_nxj',
+        SUM(CASE WHEN r.morning='探亲假' THEN 0.5 ELSE 0 END) AS 'am_tqj',
+        SUM(CASE WHEN r.afternoon='探亲假' THEN 0.5 ELSE 0 END) AS 'pm_tqj',
+        SUM(CASE WHEN r.morning='事假' THEN 0.5 ELSE 0 END) AS 'am_sj',
+        SUM(CASE WHEN r.afternoon='事假' THEN 0.5 ELSE 0 END) AS 'pm_sj',
+        SUM(CASE WHEN r.morning='生育假' THEN 0.5 ELSE 0 END) AS 'am_syj',
+        SUM(CASE WHEN r.afternoon='生育假' THEN 0.5 ELSE 0 END) AS 'pm_syj',
+        SUM(CASE WHEN r.morning='计生假' THEN 0.5 ELSE 0 END) AS 'am_jsj',
+        SUM(CASE WHEN r.afternoon='计生假' THEN 0.5 ELSE 0 END) AS 'pm_jsj',
+        SUM(CASE WHEN r.morning='病假' THEN 0.5 ELSE 0 END) AS 'am_bj',
+        SUM(CASE WHEN r.afternoon='病假' THEN 0.5 ELSE 0 END) AS 'pm_bj',
+        SUM(CASE WHEN r.morning='婚假' THEN 0.5 ELSE 0 END) AS 'am_hj',
+        SUM(CASE WHEN r.afternoon='婚假' THEN 0.5 ELSE 0 END) AS 'pm_hj',
+        SUM(CASE WHEN r.morning='丧假' THEN 0.5 ELSE 0 END) AS 'am_sangj',
+        SUM(CASE WHEN r.afternoon='丧假' THEN 0.5 ELSE 0 END) AS 'pm_sangj',
+        SUM(CASE WHEN r.morning='离岗学习' THEN 0.5 ELSE 0 END) AS 'am_lgxx',
+        SUM(CASE WHEN r.afternoon='离岗学习' THEN 0.5 ELSE 0 END) AS 'pm_lgxx',
+        SUM(CASE WHEN r.morning='出差' THEN 0.5 ELSE 0 END) AS 'am_cc',
+        SUM(CASE WHEN r.afternoon='出差' THEN 0.5 ELSE 0 END) AS 'pm_cc',
+        SUM(CASE WHEN r.morning='旷工' THEN 0.5 ELSE 0 END) AS 'am_kg',
+        SUM(CASE WHEN r.afternoon='旷工' THEN 0.5 ELSE 0 END) AS 'pm_kg',
+        SUM(CASE WHEN r.morning='加班' THEN 0.5 ELSE 0 END) AS 'am_jb',
+        SUM(CASE WHEN r.afternoon='加班' THEN 0.5 ELSE 0 END) AS 'pm_jb',
+        SUM(CASE WHEN r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx',
+        SUM(CASE WHEN r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx',
+        SUM(CASE WHEN r.morning='其他' THEN 0.5 ELSE 0 END) AS 'am_qt',
+        SUM(CASE WHEN r.afternoon='其他' THEN 0.5 ELSE 0 END) AS 'pm_qt',
+        GROUP_CONCAT(CASE WHEN r.morning='其他' OR r.afternoon='其他' THEN r.remark END) AS 'reg_remark',
+        GROUP_CONCAT(DISTINCT r.creater) AS 'reg_creater'
+        FROM work_person p LEFT JOIN work_register r ON p.id=r.person_id
+        <if test="regYearMonth !=null and regYearMonth != ''">
+            and r.reg_year_month = #{regYearMonth}
+        </if>
+        LEFT JOIN work_enterprise e ON p.enterprise_id = e.id
+        <where>
+            <if test="name != null and name !=''">
+                and p.name like concat('%',#{name},'%')
+            </if>
+            <if test="enterpriseName != null and enterpriseName !=''">
+                and e.name like concat('%',#{enterpriseName},'%')
+            </if>
+            <if test="morningOrAfternoon != null and morningOrAfternoon !=''">
+                and (r.morning = #{morningOrAfternoon} or r.afternoon= #{morningOrAfternoon})
+            </if>
+        </where>
+
+        GROUP BY p.id order by p.create_time desc )m
+
+
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map">
+        SELECT COUNT(m.id) FROM
+        (
+        SELECT p.id FROM work_person p LEFT JOIN work_register r
+        ON p.id=r.person_id
+        <if test="regYearMonth !=null and regYearMonth != ''">
+            and r.reg_year_month = #{regYearMonth}
+        </if>
+        LEFT JOIN work_enterprise e ON p.enterprise_id = e.id
+        <where>
+            <if test="name != null and name !=''">
+                and p.name like concat('%',#{name},'%')
+            </if>
+            <if test="enterpriseName != null and enterpriseName !=''">
+                and e.name like concat('%',#{enterpriseName},'%')
+            </if>
+            <if test="morningOrAfternoon != null and morningOrAfternoon !=''">
+                and (r.morning = #{morningOrAfternoon} or r.afternoon= #{morningOrAfternoon})
+            </if>
+        </where>
+        GROUP BY p.id)m
+    </select>
+    <select id="selectYearList" resultType="java.lang.String" parameterType="map">
+  	SELECT GROUP_CONCAT(DISTINCT reg_year) FROM work_register
+  </select>
+    <select id="selectMonthList" resultType="java.lang.String" parameterType="map">
+  	SELECT GROUP_CONCAT(DISTINCT reg_month) FROM work_register
+  </select>
+    <select id="selectByDay" resultMap="BaseResultMap" parameterType="map">
+        select
+        <include refid="Base_Column_List"/>
+        from work_register r
+        <where>
+            <if test="personId != null and personId !=''">
+                and r.person_id = #{personId}
+            </if>
+            <if test="regYear != null and regYear !=''">
+                and r.reg_year = #{regYear}
+            </if>
+            <if test="regMonth != null and regMonth !=''">
+                and r.reg_month = #{regMonth}
+            </if>
+            <if test="regDay != null and regDay !=''">
+                and r.reg_day = #{regDay}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from work_register
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+    <!--考勤人员台账-->
+    <select id="selectWorkAttendancePerson" resultType="com.cost168.costaudit.pojo.work.vo.WorkAttendanceParam"
+            parameterType="map">
+        SELECT m.*
+        ,m.am_sb1+m.pm_sb1 AS 'monthOfWorkday1',m.am_xx1+m.pm_xx1 AS 'monthOfRestday1',m.am_qj1+m.pm_qj1 AS
+        'monthOfLeave1'
+        ,m.am_jb1+m.pm_jb1 AS 'monthOfOvertime1'
+
+        ,m.am_sb2+m.pm_sb2 AS 'monthOfWorkday2',m.am_xx2+m.pm_xx2 AS 'monthOfRestday2',m.am_qj2+m.pm_qj2 AS
+        'monthOfLeave2'
+        ,m.am_jb2+m.pm_jb2 AS 'monthOfOvertime2'
+
+        ,m.am_sb3+m.pm_sb3 AS 'monthOfWorkday3',m.am_xx3+m.pm_xx3 AS 'monthOfRestday3',m.am_qj3+m.pm_qj3 AS
+        'monthOfLeave3'
+        ,m.am_jb3+m.pm_jb3 AS 'monthOfOvertime3'
+
+        ,m.am_sb4+m.pm_sb4 AS 'monthOfWorkday4',m.am_xx4+m.pm_xx4 AS 'monthOfRestday4',m.am_qj4+m.pm_qj4 AS
+        'monthOfLeave4'
+        ,m.am_jb4+m.pm_jb4 AS 'monthOfOvertime4'
+
+        ,m.am_sb5+m.pm_sb5 AS 'monthOfWorkday5',m.am_xx5+m.pm_xx5 AS 'monthOfRestday5',m.am_qj5+m.pm_qj5 AS
+        'monthOfLeave5'
+        ,m.am_jb5+m.pm_jb5 AS 'monthOfOvertime5'
+
+        ,m.am_sb6+m.pm_sb6 AS 'monthOfWorkday6',m.am_xx6+m.pm_xx6 AS 'monthOfRestday6',m.am_qj6+m.pm_qj6 AS
+        'monthOfLeave6'
+        ,m.am_jb6+m.pm_jb6 AS 'monthOfOvertime6'
+
+        ,m.am_sb7+m.pm_sb7 AS 'monthOfWorkday7',m.am_xx7+m.pm_xx7 AS 'monthOfRestday7',m.am_qj7+m.pm_qj7 AS
+        'monthOfLeave7'
+        ,m.am_jb7+m.pm_jb7 AS 'monthOfOvertime7'
+
+        ,m.am_sb8+m.pm_sb8 AS 'monthOfWorkday8',m.am_xx8+m.pm_xx8 AS 'monthOfRestday8',m.am_qj8+m.pm_qj8 AS
+        'monthOfLeave8'
+        ,m.am_jb8+m.pm_jb8 AS 'monthOfOvertime8'
+
+        ,m.am_sb9+m.pm_sb9 AS 'monthOfWorkday9',m.am_xx9+m.pm_xx9 AS 'monthOfRestday9',m.am_qj9+m.pm_qj9 AS
+        'monthOfLeave9'
+        ,m.am_jb9+m.pm_jb9 AS 'monthOfOvertime9'
+
+        ,m.am_sb10+m.pm_sb10 AS 'monthOfWorkday10',m.am_xx10+m.pm_xx10 AS 'monthOfRestday10',m.am_qj10+m.pm_qj10 AS
+        'monthOfLeave10'
+        ,m.am_jb10+m.pm_jb10 AS 'monthOfOvertime10'
+
+        ,m.am_sb11+m.pm_sb11 AS 'monthOfWorkday11',m.am_xx11+m.pm_xx11 AS 'monthOfRestday11',m.am_qj11+m.pm_qj11 AS
+        'monthOfLeave11'
+        ,m.am_jb11+m.pm_jb11 AS 'monthOfOvertime11'
+
+        ,m.am_sb12+m.pm_sb12 AS 'monthOfWorkday12',m.am_xx12+m.pm_xx12 AS 'monthOfRestday12',m.am_qj12+m.pm_qj12 AS
+        'monthOfLeave12'
+        ,m.am_jb12+m.pm_jb12 AS 'monthOfOvertime12'
+
+        ,m.am_sb1+m.pm_sb1+m.am_sb2+m.pm_sb2+m.am_sb3+m.pm_sb3+m.am_sb4+m.pm_sb4+m.am_sb5+m.pm_sb5+m.am_sb6+m.pm_sb6+m.am_sb7+m.pm_sb7+m.am_sb8+m.pm_sb8
+        +m.am_sb9+m.pm_sb9+m.am_sb10+m.pm_sb10+m.am_sb11+m.pm_sb11+m.am_sb12+m.pm_sb12 AS 'yearOfWork'
+
+        ,m.am_xx1+m.pm_xx1+m.am_xx2+m.pm_xx2+m.am_xx3+m.pm_xx3+m.am_xx4+m.pm_xx4+m.am_xx5+m.pm_xx5+m.am_xx6+m.pm_xx6+m.am_xx7+m.pm_xx7+m.am_xx8+m.pm_xx8
+        +m.am_xx9+m.pm_xx9+m.am_xx10+m.pm_xx10+m.am_xx11+m.pm_xx11+m.am_xx12+m.pm_xx12 AS 'yearOfRest'
+
+        ,m.am_qj1+m.pm_qj1+m.am_qj2+m.pm_qj2+m.am_qj3+m.pm_qj3+m.am_qj4+m.pm_qj4+m.am_qj5+m.pm_qj5+m.am_qj6+m.pm_qj6+m.am_qj7+m.pm_qj7+m.am_qj8+m.pm_qj8
+        +m.am_qj9+m.pm_qj9+m.am_qj10+m.pm_qj10+m.am_qj11+m.pm_qj11+m.am_qj12+m.pm_qj12 AS 'yearOfLeave'
+
+        ,m.am_jb1+m.pm_jb1+m.am_jb2+m.pm_jb2+m.am_jb3+m.pm_jb3+m.am_jb4+m.pm_jb4+m.am_jb5+m.pm_jb5+m.am_jb6+m.pm_jb6+m.am_jb7+m.pm_jb7+m.am_jb8+m.pm_jb8
+        +m.am_jb9+m.pm_jb9+m.am_jb10+m.pm_jb10+m.am_jb11+m.pm_jb11+m.am_jb12+m.pm_jb12 AS 'yearOvertime'
+
+        FROM
+        (
+        SELECT p.id,p.name,e.name AS "enterpriseName",p.effective_flag AS 'status',(p.annualLeaveTotal-p.annualLeaveUseup)
+        AS 'annual',reg_year AS 'year',('yearOfWork'/365-'yearOfRest') AS attendanceRate,
+
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb1',
+
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb2',
+
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb3',
+
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb4',
+
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb5',
+
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb6',
+
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb7',
+
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb8',
+
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb9',
+
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb10',
+
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb11',
+
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='休息' THEN 0.5 ELSE 0 END) AS 'am_xx12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='休息' THEN 0.5 ELSE 0 END) AS 'pm_xx12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='请假' THEN 0.5 ELSE 0 END) AS 'am_qj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='请假' THEN 0.5 ELSE 0 END) AS 'pm_qj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb12'
+
+        FROM work_person p
+        LEFT JOIN work_register r ON p.id=r.person_id
+        LEFT JOIN work_enterprise e ON p.enterprise_id = e.id
+        <where>
+            <if test="year != null and year !=''">
+                and r.reg_year=#{year}
+            </if>
+            <if test="name != null and name !=''">
+                and p.name like concat('%',#{name},'%')
+            </if>
+            <if test="enterpriseName != null and enterpriseName !=''">
+                and e.name like concat('%',#{enterpriseName},'%')
+            </if>
+            <if test="morningOrAfternoon != null and morningOrAfternoon !=''">
+                and (r.morning = #{morningOrAfternoon} or r.afternoon= #{morningOrAfternoon})
+            </if>
+            <!--<if test="attStarttime != null and attStarttime !=''">
+                and <![CDATA[ p.creator_time>=#{attStarttime} ]]>
+            </if>
+            <if test="attEndtime != null and attEndtime !=''">
+                and <![CDATA[ p.creator_time<=#{attEndtime} ]]>
+            </if>-->
+            <if test="status != null and status !=''">
+                and p.effective_flag = #{status}
+            </if>
+        </where>
+        GROUP BY p.id)m
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <!--查询考勤人员台账所需数据-->
+    <select id="selectDataList" resultType="com.cost168.costaudit.pojo.work.vo.WorkAttendancePersonExportParam" parameterType="map">
+        SELECT m.*
+        ,m.am_sb1+m.pm_sb1 AS 'monthOfWorkday1',m.am_jb1+m.pm_jb1 AS 'monthOfOvertime1',m.am_nxj1+m.pm_nxj1 AS 'monthOfnxj1',m.am_tqj1+m.pm_tqj1 AS 'monthOftqj1'
+        ,m.am_shij1+m.pm_shij1 AS 'monthOfshij1',m.am_syj1+m.pm_syj1 AS 'monthOfsyj1',m.am_js1+m.pm_js1 AS 'monthOfjs1',m.am_bj1+m.pm_bj1 AS 'monthOfbj1'
+        ,m.am_hj1+m.pm_hj1 AS 'monthOfhj1',m.am_sangj1+m.pm_sangj1 AS 'monthOfsangj1',m.am_lgxx1+m.pm_lgxx1 AS 'monthOflgxx1',m.am_cc1+m.pm_cc1 AS 'monthOfcc1'
+        ,m.am_kg1+pm_kg1 AS 'monthOfkg1',m.am_qt1+m.pm_qt1 AS 'monthOfqt1'
+
+        ,m.am_sb2+m.pm_sb2 AS 'monthOfWorkday2',m.am_jb2+m.pm_jb2 AS 'monthOfOvertime2',m.am_nxj2+m.pm_nxj2 AS 'monthOfnxj2',m.am_tqj2+m.pm_tqj2 AS 'monthOftqj2'
+        ,m.am_shij2+m.pm_shij2 AS 'monthOfshij2',m.am_syj2+m.pm_syj2 AS 'monthOfsyj2',m.am_js2+m.pm_js2 AS 'monthOfjs2',m.am_bj2+m.pm_bj2 AS 'monthOfbj2'
+        ,m.am_hj2+m.pm_hj2 AS 'monthOfhj2',m.am_sangj2+m.pm_sangj2 AS 'monthOfsangj2',m.am_lgxx2+m.pm_lgxx2 AS 'monthOflgxx2',m.am_cc2+m.pm_cc2 AS 'monthOfcc2'
+        ,m.am_kg2+pm_kg2 AS 'monthOfkg2',m.am_qt2+m.pm_qt2 AS 'monthOfqt2'
+
+        ,m.am_sb3+m.pm_sb3 AS 'monthOfWorkday3',m.am_jb3+m.pm_jb3 AS 'monthOfOvertime3',m.am_nxj3+m.pm_nxj3 AS 'monthOfnxj3',m.am_tqj3+m.pm_tqj3 AS 'monthOftqj3'
+        ,m.am_shij3+m.pm_shij3 AS 'monthOfshij3',m.am_syj3+m.pm_syj3 AS 'monthOfsyj3',m.am_js3+m.pm_js3 AS 'monthOfjs3',m.am_bj3+m.pm_bj3 AS 'monthOfbj3'
+        ,m.am_hj3+m.pm_hj3 AS 'monthOfhj3',m.am_sangj3+m.pm_sangj3 AS 'monthOfsangj3',m.am_lgxx3+m.pm_lgxx3 AS 'monthOflgxx3',m.am_cc3+m.pm_cc3 AS 'monthOfcc3'
+        ,m.am_kg3+pm_kg3 AS 'monthOfkg3',m.am_qt3+m.pm_qt3 AS 'monthOfqt3'
+
+        ,m.am_sb4+m.pm_sb4 AS 'monthOfWorkday4',m.am_jb4+m.pm_jb4 AS 'monthOfOvertime4',m.am_nxj4+m.pm_nxj4 AS 'monthOfnxj4',m.am_tqj4+m.pm_tqj4 AS 'monthOftqj4'
+        ,m.am_shij4+m.pm_shij4 AS 'monthOfshij4',m.am_syj4+m.pm_syj4 AS 'monthOfsyj4',m.am_js4+m.pm_js4 AS 'monthOfjs4',m.am_bj4+m.pm_bj4 AS 'monthOfbj4'
+        ,m.am_hj4+m.pm_hj4 AS 'monthOfhj4',m.am_sangj4+m.pm_sangj4 AS 'monthOfsangj4',m.am_lgxx4+m.pm_lgxx4 AS 'monthOflgxx4',m.am_cc4+m.pm_cc4 AS 'monthOfcc4'
+        ,m.am_kg4+pm_kg4 AS 'monthOfkg4',m.am_qt4+m.pm_qt4 AS 'monthOfqt4'
+
+        ,m.am_sb5+m.pm_sb5 AS 'monthOfWorkday5',m.am_jb5+m.pm_jb5 AS 'monthOfOvertime5',m.am_nxj5+m.pm_nxj5 AS 'monthOfnxj5',m.am_tqj5+m.pm_tqj5 AS 'monthOftqj5'
+        ,m.am_shij5+m.pm_shij5 AS 'monthOfshij5',m.am_syj5+m.pm_syj5 AS 'monthOfsyj5',m.am_js5+m.pm_js5 AS 'monthOfjs5',m.am_bj5+m.pm_bj5 AS 'monthOfbj5'
+        ,m.am_hj5+m.pm_hj5 AS 'monthOfhj5',m.am_sangj5+m.pm_sangj5 AS 'monthOfsangj5',m.am_lgxx5+m.pm_lgxx5 AS 'monthOflgxx5',m.am_cc5+m.pm_cc5 AS 'monthOfcc5'
+        ,m.am_kg5+pm_kg5 AS 'monthOfkg5',m.am_qt5+m.pm_qt5 AS 'monthOfqt5'
+
+        ,m.am_sb6+m.pm_sb6 AS 'monthOfWorkday6',m.am_jb6+m.pm_jb6 AS 'monthOfOvertime6',m.am_nxj6+m.pm_nxj6 AS 'monthOfnxj6',m.am_tqj6+m.pm_tqj6 AS 'monthOftqj6'
+        ,m.am_shij6+m.pm_shij6 AS 'monthOfshij6',m.am_syj6+m.pm_syj6 AS 'monthOfsyj6',m.am_js6+m.pm_js6 AS 'monthOfjs6',m.am_bj6+m.pm_bj6 AS 'monthOfbj6'
+        ,m.am_hj6+m.pm_hj6 AS 'monthOfhj6',m.am_sangj6+m.pm_sangj6 AS 'monthOfsangj6',m.am_lgxx6+m.pm_lgxx6 AS 'monthOflgxx6',m.am_cc6+m.pm_cc6 AS 'monthOfcc6'
+        ,m.am_kg6+pm_kg6 AS 'monthOfkg6',m.am_qt6+m.pm_qt6 AS 'monthOfqt6'
+
+        ,m.am_sb7+m.pm_sb7 AS 'monthOfWorkday7',m.am_jb7+m.pm_jb7 AS 'monthOfOvertime7',m.am_nxj7+m.pm_nxj7 AS 'monthOfnxj7',m.am_tqj7+m.pm_tqj7 AS 'monthOftqj7'
+        ,m.am_shij7+m.pm_shij7 AS 'monthOfshij7',m.am_syj7+m.pm_syj7 AS 'monthOfsyj7',m.am_js7+m.pm_js7 AS 'monthOfjs7',m.am_bj7+m.pm_bj7 AS 'monthOfbj7'
+        ,m.am_hj7+m.pm_hj7 AS 'monthOfhj7',m.am_sangj7+m.pm_sangj7 AS 'monthOfsangj7',m.am_lgxx7+m.pm_lgxx7 AS 'monthOflgxx7',m.am_cc7+m.pm_cc7 AS 'monthOfcc7'
+        ,m.am_kg7+pm_kg7 AS 'monthOfkg7',m.am_qt7+m.pm_qt7 AS 'monthOfqt7'
+
+        ,m.am_sb8+m.pm_sb8 AS 'monthOfWorkday8',m.am_jb8+m.pm_jb8 AS 'monthOfOvertime8',m.am_nxj8+m.pm_nxj8 AS 'monthOfnxj8',m.am_tqj8+m.pm_tqj8 AS 'monthOftqj8'
+        ,m.am_shij8+m.pm_shij8 AS 'monthOfshij8',m.am_syj8+m.pm_syj8 AS 'monthOfsyj8',m.am_js8+m.pm_js8 AS 'monthOfjs8',m.am_bj8+m.pm_bj8 AS 'monthOfbj8'
+        ,m.am_hj8+m.pm_hj8 AS 'monthOfhj8',m.am_sangj8+m.pm_sangj8 AS 'monthOfsangj8',m.am_lgxx8+m.pm_lgxx8 AS 'monthOflgxx8',m.am_cc8+m.pm_cc8 AS 'monthOfcc8'
+        ,m.am_kg8+pm_kg8 AS 'monthOfkg8',m.am_qt8+m.pm_qt8 AS 'monthOfqt8'
+
+        ,m.am_sb9+m.pm_sb9 AS 'monthOfWorkday9',m.am_jb9+m.pm_jb9 AS 'monthOfOvertime9',m.am_nxj9+m.pm_nxj9 AS 'monthOfnxj9',m.am_tqj9+m.pm_tqj9 AS 'monthOftqj9'
+        ,m.am_shij9+m.pm_shij9 AS 'monthOfshij9',m.am_syj9+m.pm_syj9 AS 'monthOfsyj9',m.am_js9+m.pm_js9 AS 'monthOfjs9',m.am_bj9+m.pm_bj9 AS 'monthOfbj9'
+        ,m.am_hj9+m.pm_hj9 AS 'monthOfhj9',m.am_sangj9+m.pm_sangj9 AS 'monthOfsangj9',m.am_lgxx9+m.pm_lgxx9 AS 'monthOflgxx9',m.am_cc9+m.pm_cc9 AS 'monthOfcc9'
+        ,m.am_kg9+pm_kg9 AS 'monthOfkg9',m.am_qt9+m.pm_qt9 AS 'monthOfqt9'
+
+        ,m.am_sb10+m.pm_sb10 AS 'monthOfWorkday10',m.am_jb10+m.pm_jb10 AS 'monthOfOvertime10',m.am_nxj10+m.pm_nxj10 AS 'monthOfnxj10',m.am_tqj10+m.pm_tqj10 AS 'monthOftqj10'
+        ,m.am_shij10+m.pm_shij10 AS 'monthOfshij10',m.am_syj10+m.pm_syj10 AS 'monthOfsyj10',m.am_js10+m.pm_js10 AS 'monthOfjs10',m.am_bj10+m.pm_bj10 AS 'monthOfbj10'
+        ,m.am_hj10+m.pm_hj10 AS 'monthOfhj10',m.am_sangj10+m.pm_sangj10 AS 'monthOfsangj10',m.am_lgxx10+m.pm_lgxx10 AS 'monthOflgxx10',m.am_cc10+m.pm_cc10 AS 'monthOfcc10'
+        ,m.am_kg10+pm_kg10 AS 'monthOfkg10',m.am_qt10+m.pm_qt10 AS 'monthOfqt10'
+
+        ,m.am_sb11+m.pm_sb11 AS 'monthOfWorkday11',m.am_jb11+m.pm_jb11 AS 'monthOfOvertime11',m.am_nxj11+m.pm_nxj11 AS 'monthOfnxj11',m.am_tqj11+m.pm_tqj11 AS 'monthOftqj11'
+        ,m.am_shij11+m.pm_shij11 AS 'monthOfshij11',m.am_syj11+m.pm_syj11 AS 'monthOfsyj11',m.am_js11+m.pm_js11 AS 'monthOfjs11',m.am_bj11+m.pm_bj11 AS 'monthOfbj11'
+        ,m.am_hj11+m.pm_hj11 AS 'monthOfhj11',m.am_sangj11+m.pm_sangj11 AS 'monthOfsangj11',m.am_lgxx11+m.pm_lgxx11 AS 'monthOflgxx11',m.am_cc11+m.pm_cc11 AS 'monthOfcc11'
+        ,m.am_kg11+pm_kg11 AS 'monthOfkg11',m.am_qt11+m.pm_qt11 AS 'monthOfqt11'
+
+        ,m.am_sb12+m.pm_sb12 AS 'monthOfWorkday12',m.am_jb12+m.pm_jb12 AS 'monthOfOvertime12',m.am_nxj12+m.pm_nxj12 AS 'monthOfnxj12',m.am_tqj12+m.pm_tqj12 AS 'monthOftqj12'
+        ,m.am_shij12+m.pm_shij12 AS 'monthOfshij12',m.am_syj12+m.pm_syj12 AS 'monthOfsyj12',m.am_js12+m.pm_js12 AS 'monthOfjs12',m.am_bj12+m.pm_bj12 AS 'monthOfbj12'
+        ,m.am_hj12+m.pm_hj12 AS 'monthOfhj12',m.am_sangj12+m.pm_sangj12 AS 'monthOfsangj12',m.am_lgxx12+m.pm_lgxx12 AS 'monthOflgxx12',m.am_cc12+m.pm_cc12 AS 'monthOfcc12'
+        ,m.am_kg12+m.pm_kg12 AS 'monthOfkg12',m.am_qt12+m.pm_qt12 AS 'monthOfqt12'
+
+        ,m.am_sb1+m.pm_sb1+m.am_sb2+m.pm_sb2+m.am_sb3+m.pm_sb3+m.am_sb4+m.pm_sb4+m.am_sb5+m.pm_sb5+m.am_sb6+m.pm_sb6+
+        m.am_sb7+m.pm_sb7+m.am_sb8+m.pm_sb8+m.am_sb9+m.pm_sb9+m.am_sb10+m.pm_sb10+m.am_sb11+m.pm_sb11+m.am_sb12+m.pm_sb12
+        AS 'yearOfWork'
+        ,m.am_jb1+m.pm_jb1+m.am_jb2+m.pm_jb2,m.am_jb3+m.pm_jb3+m.am_jb4+m.pm_jb4+m.am_jb5+m.pm_jb5+m.am_jb6+m.pm_jb6+
+        m.am_jb7+m.pm_jb7+m.am_jb8+m.pm_jb8+m.am_jb9+m.pm_jb9+m.am_jb10+m.pm_jb10+m.am_jb11+m.pm_jb11+m.am_jb12+m.pm_jb12
+        AS 'yearOfOvertime'
+        ,m.am_nxj1+m.pm_nxj1+m.am_nxj2+m.pm_nxj2+m.am_nxj3+m.pm_nxj3+m.am_nxj4+m.pm_nxj4+m.am_nxj5+m.pm_nxj5+m.am_nxj6+m.pm_nxj6+m.am_nxj7+m.pm_nxj7+
+        m.am_nxj8+m.pm_nxj8+m.am_nxj9+m.pm_nxj9+m.am_nxj10+m.pm_nxj10+m.am_nxj11+m.pm_nxj11+m.am_nxj12+m.pm_nxj12
+        AS 'yearOfnxj'
+        ,m.am_tqj1+m.pm_tqj1+m.am_tqj2+m.pm_tqj2+m.am_tqj3+m.pm_tqj3+m.am_tqj4+m.pm_tqj4+m.am_tqj5+m.pm_tqj5+m.am_tqj6+m.pm_tqj6+m.am_tqj7+m.pm_tqj7+
+        m.am_tqj8+m.pm_tqj8+m.am_tqj9+m.pm_tqj9+m.am_tqj10+m.pm_tqj10+m.am_tqj11+m.pm_tqj11+m.am_tqj12+m.pm_tqj12
+        AS 'yearOftqj'
+        ,m.am_shij1+m.pm_shij1+m.am_shij2+m.pm_shij2+m.am_shij3+m.pm_shij3+m.am_shij4+m.pm_shij4+m.am_shij5+m.pm_shij5+m.am_shij6+m.pm_shij6+m.am_shij7+m.pm_shij7+m.am_shij8+m.pm_shij8+
+        m.am_shij9+m.pm_shij9+m.am_shij10+m.pm_shij10+m.am_shij11+m.pm_shij11+m.am_shij12+m.pm_shij12
+        AS 'yearOfshij'
+        ,m.am_syj1+m.pm_syj1+m.am_syj2+m.pm_syj2+m.am_syj3+m.pm_syj3+m.am_syj4+m.pm_syj4+m.am_syj5+m.pm_syj5+m.am_syj6+m.pm_syj6+m.am_syj7+m.pm_syj7+
+        m.am_syj8+m.pm_syj8+m.am_syj9+m.pm_syj9+m.am_syj10+m.pm_syj10+m.am_syj11+m.pm_syj11+m.am_syj12+m.pm_syj12
+        AS 'yearOfsyj'
+        ,m.am_js1+m.pm_js1+m.am_js2+m.pm_js2+m.am_js3+m.pm_js3+m.am_js4+m.pm_js4+m.am_js5+m.pm_js5+m.am_js6+m.pm_js6+m.am_js7+m.pm_js7+m.am_js8+m.pm_js8+
+        m.am_js9+m.pm_js9+m.am_js10+m.pm_js10+m.am_js11+m.pm_js11+m.am_js12+m.pm_js12
+        AS 'yearOfjsj'
+        ,m.am_bj1+m.pm_bj1+m.am_bj2+m.pm_bj2+m.am_bj3+m.pm_bj3+m.am_bj4+m.pm_bj4+m.am_bj5+m.pm_bj5+m.am_bj6+m.pm_bj6+m.am_bj7+m.pm_bj7+m.am_bj8+m.pm_bj8+
+        m.am_bj9+m.pm_bj9+m.am_bj10+m.pm_bj10+m.am_bj11+m.pm_bj11+m.am_bj12+m.pm_bj12
+        AS 'yearOfbj'
+        ,m.am_hj1+m.pm_hj1+m.am_hj2+m.pm_hj2+m.am_hj3+m.pm_hj3+m.am_hj4+m.pm_hj4+m.am_hj5+m.pm_hj5+m.am_hj6+m.pm_hj6+m.am_hj7+m.pm_hj7+m.am_hj8+m.pm_hj8+
+        m.am_hj9+m.pm_hj9+m.am_hj10+m.pm_hj10+m.am_hj11+m.pm_hj11+m.am_hj12+m.pm_hj12
+        AS 'yearOfhj'
+        ,m.am_sangj1+m.pm_sangj1+m.am_sangj2+m.pm_sangj2+m.am_sangj3+m.pm_sangj3+m.am_sangj4+m.pm_sangj4+m.am_sangj5+m.pm_sangj5+m.am_sangj6+m.pm_sangj6+m.am_sangj7+m.pm_sangj7+m.am_sangj8+m.pm_sangj8+
+        m.am_sangj9+m.pm_sangj9+m.am_sangj10+m.pm_sangj10+m.am_sangj11+m.pm_sangj11+m.am_sangj12+m.pm_sangj12
+        AS 'yearOfsangj'
+        ,m.am_lgxx1+m.pm_lgxx1+m.am_lgxx2+m.pm_lgxx2+m.am_lgxx3+m.pm_lgxx3+m.am_lgxx4+m.pm_lgxx4+m.am_lgxx5+m.pm_lgxx5+m.am_lgxx6+m.pm_lgxx6+m.am_lgxx7+m.pm_lgxx7+
+        m.am_lgxx8+m.pm_lgxx8+m.am_lgxx9+m.pm_lgxx9+m.am_lgxx10+m.pm_lgxx10+m.am_lgxx11+m.pm_lgxx11+m.am_lgxx12+m.pm_lgxx12
+        AS 'yearOflgxx'
+        ,m.am_cc1+m.pm_cc1+m.am_cc2+m.pm_cc2+m.am_cc3+m.pm_cc3+m.am_cc4+m.pm_cc4+m.am_cc5+m.pm_cc5+m.am_cc6+m.pm_cc6+m.am_cc7+m.pm_cc7+m.am_cc8+m.pm_cc8+
+        m.am_cc9+m.pm_cc9+m.am_cc10+m.pm_cc10+m.am_cc11+m.pm_cc11+m.am_cc12+m.pm_cc12
+        AS 'yearOfcc'
+        ,m.am_kg1+pm_kg1+m.am_kg2+pm_kg2+m.am_kg3+pm_kg3+m.am_kg4+pm_kg4+m.am_kg5+pm_kg5+m.am_kg6+pm_kg6+m.am_kg7+pm_kg7+m.am_kg8+pm_kg8+m.am_kg9+pm_kg9+
+        m.am_kg10+pm_kg10+m.am_kg11+m.pm_kg11+m.am_kg12+m.pm_kg12
+        AS 'yearOfkg'
+        ,m.am_qt1+m.pm_qt1+m.am_qt2+m.pm_qt2+m.am_qt3+m.pm_qt3+m.am_qt4+m.pm_qt4+m.am_qt5+m.pm_qt5+m.am_qt6+m.pm_qt6+m.am_qt7+m.pm_qt7+m.am_qt8+m.pm_qt8+
+        m.am_qt9+m.pm_qt9+m.am_qt10+m.pm_qt10+m.am_qt11+m.pm_qt11+m.am_qt12+m.pm_qt12
+        AS 'yearOfqt'
+
+        FROM
+        (
+        SELECT p.id,p.name,e.name AS 'enterpriseName',r.reg_year AS 'year',p.annualLeaveTotal AS 'annualTotal',
+        p.annualLeaveUseup AS 'annualLeaveUse',('yearOfWork'/365-'yearOfRest') AS 'attendanceRate',
+
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg1',
+        SUM(CASE WHEN r.reg_month='1' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt1',
+        SUM(CASE WHEN r.reg_month='1' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt1',
+
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg2',
+        SUM(CASE WHEN r.reg_month='2' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt2',
+        SUM(CASE WHEN r.reg_month='2' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt2',
+
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg3',
+        SUM(CASE WHEN r.reg_month='3' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt3',
+        SUM(CASE WHEN r.reg_month='3' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt3',
+
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg4',
+        SUM(CASE WHEN r.reg_month='4' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt4',
+        SUM(CASE WHEN r.reg_month='4' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt4',
+
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg5',
+        SUM(CASE WHEN r.reg_month='5' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt5',
+        SUM(CASE WHEN r.reg_month='5' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt5',
+
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg6',
+        SUM(CASE WHEN r.reg_month='6' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt6',
+        SUM(CASE WHEN r.reg_month='6' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt6',
+
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg7',
+        SUM(CASE WHEN r.reg_month='7' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt7',
+        SUM(CASE WHEN r.reg_month='7' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt7',
+
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg8',
+        SUM(CASE WHEN r.reg_month='8' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt8',
+        SUM(CASE WHEN r.reg_month='8' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt8',
+
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg9',
+        SUM(CASE WHEN r.reg_month='9' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt9',
+        SUM(CASE WHEN r.reg_month='9' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt9',
+
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg10',
+        SUM(CASE WHEN r.reg_month='10' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt10',
+        SUM(CASE WHEN r.reg_month='10' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt10',
+
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg11',
+        SUM(CASE WHEN r.reg_month='11' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt11',
+        SUM(CASE WHEN r.reg_month='11' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt11',
+
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='上班' THEN 0.5 ELSE 0 END) AS 'am_sb12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='上班' THEN 0.5 ELSE 0 END) AS 'pm_sb12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='加班' THEN 0.5 else 0 end) AS 'am_jb12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='加班' THEN 0.5 else 0 end) AS 'pm_jb12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='年休假' THEN 0.5 else 0 end) AS 'am_nxj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='年休假' THEN 0.5 else 0 end) AS 'pm_nxj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='探亲假' THEN 0.5 else 0 end) AS 'am_tqj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='探亲假' THEN 0.5 else 0 end) AS 'pm_tqj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='事假' THEN 0.5 else 0 end) AS 'am_shij12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='事假' THEN 0.5 else 0 end) AS 'pm_shij12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='生育假' THEN 0.5 else 0 end) AS 'am_syj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='生育假' THEN 0.5 else 0 end) AS 'pm_syj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='计生假' THEN 0.5 else 0 end) AS 'am_js12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='计生假' THEN 0.5 else 0 end) AS 'pm_js12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='病假' THEN 0.5 else 0 end) AS 'am_bj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='病假' THEN 0.5 else 0 end) AS 'pm_bj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='婚假' THEN 0.5 else 0 end) AS 'am_hj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='婚假' THEN 0.5 else 0 end) AS 'pm_hj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='丧假' THEN 0.5 else 0 end) AS 'am_sangj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='丧假' THEN 0.5 else 0 end) AS 'pm_sangj12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='离岗学习' THEN 0.5 else 0 end) AS 'am_lgxx12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='离岗学习' THEN 0.5 else 0 end) AS 'pm_lgxx12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='出差' THEN 0.5 else 0 end) AS 'am_cc12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='出差' THEN 0.5 else 0 end) AS 'pm_cc12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='旷工' THEN 0.5 else 0 end) AS 'am_kg12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='旷工' THEN 0.5 else 0 end) AS 'pm_kg12',
+        SUM(CASE WHEN r.reg_month='12' AND r.morning='其他' THEN 0.5 else 0 end) AS 'am_qt12',
+        SUM(CASE WHEN r.reg_month='12' AND r.afternoon='其他' THEN 0.5 else 0 end) AS 'pm_qt12'
+
+        FROM work_person p
+        LEFT JOIN work_register r ON p.id=r.person_id
+        LEFT JOIN work_enterprise e ON p.enterprise_id = e.id
+        <where>
+            <if test="year != null and year !=''">
+                and r.reg_year=#{year}
+            </if>
+            <if test="name != null and name !=''">
+                and p.name like concat('%',#{name},'%')
+            </if>
+            <if test="enterpriseName != null and enterpriseName !=''">
+                and e.name like concat('%',#{enterpriseName},'%')
+            </if>
+            <if test="morningOrAfternoon != null and morningOrAfternoon !=''">
+                and (r.morning = #{morningOrAfternoon} or r.afternoon= #{morningOrAfternoon})
+            </if>
+            <!--<if test="attStarttime != null and attStarttime !=''">
+                and <![CDATA[ p.creator_time>=#{attStarttime} ]]>
+            </if>
+            <if test="attEndtime != null and attEndtime !=''">
+                and <![CDATA[ p.creator_time<=#{attEndtime} ]]>
+            </if>-->
+            <if test="status != null and status !=''">
+                and p.effective_flag = #{status}
+            </if>
+        </where>
+        GROUP BY p.id)m
+        <if test="isPage==true">
+            limit #{curPage},#{pageSize}
+        </if>
+    </select>
+    <select id="selectCountAttendancePersonByMap" resultType="java.lang.Integer" parameterType="map">
+        SELECT COUNT(m.id) FROM
+        (
+        SELECT p.id FROM work_person p
+        LEFT JOIN work_register r ON p.id=r.person_id AND r.reg_year=#{regYear,jdbcType=VARCHAR}
+        LEFT JOIN work_enterprise e ON p.enterprise_id = e.id
+        <if test="regYearMonth !=null and regYearMonth != ''">
+            and r.reg_year_month = #{regYearMonth}
+        </if>
+        <where>
+            <if test="name != null and name !=''">
+                and p.name like concat('%',#{name},'%')
+            </if>
+            <if test="enterpriseName != null and enterpriseName !=''">
+                and e.name like concat('%',#{enterpriseName},'%')
+            </if>
+            <if test="status != null and status !=''">
+                and p.effective_flag = #{status}
+            </if>
+        </where>
+        GROUP BY p.id)m
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from work_register
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+    <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.work.WorkRegisterExample">
+        delete from work_register
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+    <insert id="insert" parameterType="com.cost168.costaudit.pojo.work.WorkRegister">
+    insert into work_register (id, person_id, enterprise_id, 
+      reg_year_month, reg_year, reg_month, 
+      morning, afternoon, reg_day, 
+      working_day,creater, create_time, update_time, 
+      remark, register_time)
+    values (#{id,jdbcType=VARCHAR}, #{personId,jdbcType=VARCHAR}, #{enterpriseId,jdbcType=VARCHAR}, 
+      #{regYearMonth,jdbcType=VARCHAR}, #{regYear,jdbcType=VARCHAR}, #{regMonth,jdbcType=VARCHAR}, 
+      #{morning,jdbcType=VARCHAR}, #{afternoon,jdbcType=VARCHAR}, #{regDay,jdbcType=VARCHAR}, 
+      #{workingDay,jdbcType=REAL},#{creater,jdbcType=VARCHAR} #{createTime,jdbcType=TIMESTAMP},
+      #{updateTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{registerTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.work.WorkRegister">
+        insert into work_register
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="personId != null">
+                person_id,
+            </if>
+            <if test="enterpriseId != null">
+                enterprise_id,
+            </if>
+            <if test="regYearMonth != null">
+                reg_year_month,
+            </if>
+            <if test="regYear != null">
+                reg_year,
+            </if>
+            <if test="regMonth != null">
+                reg_month,
+            </if>
+            <if test="morning != null">
+                morning,
+            </if>
+            <if test="afternoon != null">
+                afternoon,
+            </if>
+            <if test="regDay != null">
+                reg_day,
+            </if>
+            <if test="workingDay != null">
+                working_day,
+            </if>
+            <if test="creater != null">
+                creater,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="remark != null">
+                remark,
+            </if>
+            <if test="registerTime != null">
+                register_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="personId != null">
+                #{personId,jdbcType=VARCHAR},
+            </if>
+            <if test="enterpriseId != null">
+                #{enterpriseId,jdbcType=VARCHAR},
+            </if>
+            <if test="regYearMonth != null">
+                #{regYearMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="regYear != null">
+                #{regYear,jdbcType=VARCHAR},
+            </if>
+            <if test="regMonth != null">
+                #{regMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="morning != null">
+                #{morning,jdbcType=VARCHAR},
+            </if>
+            <if test="afternoon != null">
+                #{afternoon,jdbcType=VARCHAR},
+            </if>
+            <if test="regDay != null">
+                #{regDay,jdbcType=VARCHAR},
+            </if>
+            <if test="workingDay != null">
+                #{workingDay,jdbcType=REAL},
+            </if>
+            <if test="creater != null">
+                #{creater,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="registerTime != null">
+                #{registerTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <select id="countByExample" parameterType="com.cost168.costaudit.pojo.work.WorkRegisterExample"
+            resultType="java.lang.Integer">
+        select count(*) from work_register
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+    <update id="updateByExampleSelective" parameterType="map">
+        update work_register
+        <set>
+            <if test="record.id != null">
+                id = #{record.id,jdbcType=VARCHAR},
+            </if>
+            <if test="record.personId != null">
+                person_id = #{record.personId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.enterpriseId != null">
+                enterprise_id = #{record.enterpriseId,jdbcType=VARCHAR},
+            </if>
+            <if test="record.regYearMonth != null">
+                reg_year_month = #{record.regYearMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="record.regYear != null">
+                reg_year = #{record.regYear,jdbcType=VARCHAR},
+            </if>
+            <if test="record.regMonth != null">
+                reg_month = #{record.regMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="record.morning != null">
+                morning = #{record.morning,jdbcType=VARCHAR},
+            </if>
+            <if test="record.afternoon != null">
+                afternoon = #{record.afternoon,jdbcType=VARCHAR},
+            </if>
+            <if test="record.regDay != null">
+                reg_day = #{record.regDay,jdbcType=VARCHAR},
+            </if>
+            <if test="record.workingDay != null">
+                working_day = #{record.workingDay,jdbcType=REAL},
+            </if>
+            <if test="record.creater != null">
+                creater = #{record.creater,jdbcType=VARCHAR},
+            </if>
+            <if test="record.createTime != null">
+                create_time = #{record.createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.updateTime != null">
+                update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="record.remark != null">
+                remark = #{record.remark,jdbcType=VARCHAR},
+            </if>
+            <if test="record.registerTime != null">
+                register_time = #{record.registerTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByExample" parameterType="map">
+        update work_register
+        set id = #{record.id,jdbcType=VARCHAR},
+        person_id = #{record.personId,jdbcType=VARCHAR},
+        enterprise_id = #{record.enterpriseId,jdbcType=VARCHAR},
+        reg_year_month = #{record.regYearMonth,jdbcType=VARCHAR},
+        reg_year = #{record.regYear,jdbcType=VARCHAR},
+        reg_month = #{record.regMonth,jdbcType=VARCHAR},
+        morning = #{record.morning,jdbcType=VARCHAR},
+        afternoon = #{record.afternoon,jdbcType=VARCHAR},
+        reg_day = #{record.regDay,jdbcType=VARCHAR},
+        working_day = #{record.workingDay,jdbcType=REAL},
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+        remark = #{record.remark,jdbcType=VARCHAR},
+        register_time = #{record.registerTime,jdbcType=TIMESTAMP}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+    <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.work.WorkRegister">
+        update work_register
+        <set>
+            <if test="personId != null">
+                person_id = #{personId,jdbcType=VARCHAR},
+            </if>
+            <if test="enterpriseId != null">
+                enterprise_id = #{enterpriseId,jdbcType=VARCHAR},
+            </if>
+            <if test="regYearMonth != null">
+                reg_year_month = #{regYearMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="regYear != null">
+                reg_year = #{regYear,jdbcType=VARCHAR},
+            </if>
+            <if test="regMonth != null">
+                reg_month = #{regMonth,jdbcType=VARCHAR},
+            </if>
+            <if test="morning != null">
+                morning = #{morning,jdbcType=VARCHAR},
+            </if>
+            <if test="afternoon != null">
+                afternoon = #{afternoon,jdbcType=VARCHAR},
+            </if>
+            <if test="regDay != null">
+                reg_day = #{regDay,jdbcType=VARCHAR},
+            </if>
+            <if test="workingDay != null">
+                working_day = #{workingDay,jdbcType=REAL},
+            </if>
+            <if test="creater != null">
+                creater = #{creater,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="remark != null">
+                remark = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="registerTime != null">
+                register_time = #{registerTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.work.WorkRegister">
+    update work_register
+    set person_id = #{personId,jdbcType=VARCHAR},
+      enterprise_id = #{enterpriseId,jdbcType=VARCHAR},
+      reg_year_month = #{regYearMonth,jdbcType=VARCHAR},
+      reg_year = #{regYear,jdbcType=VARCHAR},
+      reg_month = #{regMonth,jdbcType=VARCHAR},
+      morning = #{morning,jdbcType=VARCHAR},
+      afternoon = #{afternoon,jdbcType=VARCHAR},
+      reg_day = #{regDay,jdbcType=VARCHAR},
+      working_day = #{workingDay,jdbcType=REAL},
+      creater = #{creater,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR},
+      register_time = #{registerTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

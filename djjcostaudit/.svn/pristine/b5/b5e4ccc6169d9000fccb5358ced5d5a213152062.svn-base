@@ -1,0 +1,71 @@
+package com.cost168.costaudit.service.work.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.work.WorkRegisterMapper;
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.pojo.work.WorkRegisterExample;
+import com.cost168.costaudit.pojo.work.vo.WorkRegisterVo;
+import com.cost168.costaudit.service.work.WorkRegisterService;
+
+@Service
+public class WorkRegisterServiceImpl implements WorkRegisterService {
+	
+	@Autowired
+	private WorkRegisterMapper workRegisterMapper;
+
+	@Override
+	public List<WorkRegister> selectByExample(WorkRegisterExample example) {
+		return workRegisterMapper.selectByExample(example);
+	}
+
+	@Override
+	public WorkRegister selectByPrimaryKey(String id) {
+		return workRegisterMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(WorkRegister record) {
+		return workRegisterMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(WorkRegister record) {
+		return workRegisterMapper.updateByPrimaryKeySelective(record);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return workRegisterMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<WorkRegisterVo> selectListByMap(Map<String, Object> map) {
+		return workRegisterMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return workRegisterMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public List<WorkRegister> selectByDay(Map<String, Object> map) {
+		return workRegisterMapper.selectByDay(map);
+	}
+
+	@Override
+	public String selectYearList() {
+		return workRegisterMapper.selectYearList();
+	}
+
+	@Override
+	public String selectMonthList() {
+		return workRegisterMapper.selectMonthList();
+	}
+
+}

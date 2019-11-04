@@ -1,0 +1,219 @@
+package com.cost168.costaudit.controller;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.UsernamePasswordToken;
+import org.apache.shiro.subject.Subject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.cost168.costaudit.pojo.sys.SysOrg;
+import com.cost168.costaudit.pojo.sys.SysRole;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.service.sys.SysOrgService;
+import com.cost168.costaudit.service.sys.SysRoleService;
+import com.cost168.costaudit.service.sys.SysUserOrgService;
+import com.cost168.costaudit.service.sys.SysUserRoleService;
+import com.cost168.costaudit.service.sys.SysUserService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.Global;
+
+/**
+ * 
+ * ClassName: LoginController 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-1-4上午9:20:11
+ * @Company  广东华联软件科技有限公司
+ */
+@Controller
+public class LoginController {
+	
+	
+	@Autowired
+	private SysUserService sysUserService;
+	@Autowired
+	private SysRoleService sysRoleService;
+	@Autowired
+	private SysOrgService sysOrgService;
+	@Autowired
+	private SysUserRoleService sysUserRoleService;
+	@Autowired
+	private SysUserOrgService sysUserOrgService;
+	
+	
+	@RequestMapping("/login")
+	public String toLogin() {
+		return "login";
+	}
+	
+	@RequestMapping("/home")
+	public String index(HttpServletRequest request,HttpSession session) {
+		try {
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			setUserSession(session, currentUser);
+			//设置全局路径
+			Properties props = new Properties();
+			props.load(this.getClass().getResourceAsStream("/resource/resource.properties"));
+			String sitePath=(String) props.get("sitePath");
+			request.getSession().getServletContext().setAttribute("sitePath", sitePath);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "index";
+	}
+
+	private void setUserSession(HttpSession session, SysUser currentUser) {
+		String roleId=sysUserRoleService.selectRoleByUserId(currentUser.getId());
+		String orgId=sysUserOrgService.selectOrgByUserId(currentUser.getId());
+		List<String> roleList=new ArrayList<String>();
+		List<String> orgList=new ArrayList<String>();
+		if(null!=roleId && !"".equals(roleId)){
+			String roleArr[]=roleId.split(",");
+			for(String r:roleArr){
+				SysRole role=  sysRoleService.selectByPrimaryKey(r);
+				roleList.add(role.getName());
+			}
+		}
+		if(null!=orgId && !"".equals(orgId)){
+			String orgArr[]=orgId.split(",");
+			for(String r:orgArr){
+				SysOrg org=  sysOrgService.selectByPrimaryKey(r);
+				orgList.add(org.getName());
+			}
+		}
+		if(CollectionUtils.isNotEmpty(roleList) && roleList.size()>0){
+			session.setAttribute("roleName", roleList.get(0).toString());
+		}else{
+			session.setAttribute("roleName", "未分配角色");
+		}
+		if(CollectionUtils.isNotEmpty(orgList) && orgList.size()>0){
+			session.setAttribute("orgName", orgList.get(0).toString());
+		}else{
+			session.setAttribute("orgName", "未分配部门");
+		}
+		SimpleDateFormat s = new SimpleDateFormat("今天yyyy年MM月dd日");
+		Date date = new Date();
+		session.setAttribute("currentDate", s.format(date));
+		session.setAttribute("user", currentUser);
+		//获取维护数据角色的权限
+		Boolean dataUpdate=false;
+		//String permissionStr= sysUserService.allPermByUserId(currentUser.getAccount());
+		String permissionStr="";
+		if(null==Global.PERMISSIONSTR || "".equals(Global.PERMISSIONSTR)){
+			//获取权限信息
+		    permissionStr= sysUserService.allPermByUserId(currentUser.getAccount());
+			Global.PERMISSIONSTR=permissionStr;
+		}else{
+			permissionStr=Global.PERMISSIONSTR;
+		}
+		System.out.println("【"+permissionStr+"】");
+		String arr[]=permissionStr.split(",");
+		if(null!=arr){
+			for(String str:arr){
+				if("dataUpdate".equals(str)){
+					dataUpdate=true;
+					break;
+				}
+			}
+		}
+		session.setAttribute("dataUpdate", dataUpdate);
+	}
+	
+	@RequestMapping("/overTime")
+	public String overTime(HttpServletRequest request){
+		return "shiro/overtimelogin";
+	}
+	
+	@RequestMapping("/loginHome")
+    public ModelAndView Login(@RequestParam (defaultValue="0")String username, @RequestParam (defaultValue="0")String password) {
+         ModelAndView mav = new ModelAndView();
+         SysUser user = sysUserService.getUserByAccount(username);
+         if (user == null) {
+             mav.setViewName("/login");
+             mav.addObject("msg", "用户不存在，请与系统管理员联系 !");
+             return mav;
+         }
+         if (null!=user.getPassword() && !user.getPassword().equals(DigestUtils.md5Hex(password))) {
+             mav.setViewName("/login");
+             mav.addObject("msg", "帐号密码错误 !");
+             return mav;
+         }
+         if (null!=user && "禁用".equals(user.getStatus())) {
+             mav.setViewName("/login");
+             mav.addObject("msg", "该帐号已被禁用 !");
+             return mav;
+         }
+         SecurityUtils.getSecurityManager().logout(SecurityUtils.getSubject());
+         // 登录后存放进shiro token
+         UsernamePasswordToken token = new UsernamePasswordToken(user.getAccount(), user.getPassword());
+         Subject subject = SecurityUtils.getSubject();
+         subject.login(token);
+         // 登录成功后会跳转到successUrl配置的链接，不用管下面返回的链接。  
+         mav.setViewName("redirect:/home");
+         return mav;
+    }
+	
+	@RequestMapping(value="/404")
+    public String notFound(){
+        return "/shiro/404";
+    }
+	
+	@ResponseBody
+	@RequestMapping("changePwd")
+	public Map<String,Object> updatePwd(HttpServletRequest request) {
+		Map<String,Object> map=new HashMap<String, Object>();
+		String oldPwd = request.getParameter("oldPwd");
+		String newPwd1 = request.getParameter("newPwd1");
+		String newPwd2 = request.getParameter("newPwd2");
+		if (oldPwd == null || oldPwd.length() == 0 || newPwd1 == null
+				|| newPwd1.length() == 0 || newPwd2 == null
+				|| newPwd2.length() == 0) {
+			map.put("flag", false);
+			map.put("msg", "表单信息未齐全,请补全后提交!");
+			return map;
+		}
+		try {
+			SysUser user=shiroUtil.getInstance().currentUser();
+			if (!user.getPassword().equals(DigestUtils.md5Hex(oldPwd))) {
+				map.put("flag", false);
+				map.put("msg", "旧密码不正确,请重新输入!");
+				return map;
+			}
+			if (!newPwd1.equals(newPwd2)) {
+				map.put("flag", false);
+				map.put("msg", "新密码两次输入不一致,请核对后再输入!");
+				return map;
+			}
+			if (user.getPassword().equals(DigestUtils.md5Hex(newPwd1))) {
+				map.put("flag", false);
+				map.put("msg", "新密码与旧密码一致,请核对后再输入!");
+				return map;
+			}
+			user.setPassword(DigestUtils.md5Hex(newPwd1));
+			sysUserService.updateByPrimaryKeySelective(user, null);
+			map.put("flag", true);
+		} catch (Exception e) {
+			e.printStackTrace();
+			map.put("flag", false);
+			map.put("msg", "异常,请核对信息或联系管理员!");
+		}
+		return map;
+	}
+
+}

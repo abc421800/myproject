@@ -1,0 +1,787 @@
+//定义数据表
+$(function () {
+    var bool = false;
+    $(".switchBtn").on('click', function () {
+        $(".filter").toggle();
+        if (!bool) {
+            $(this).addClass("active");
+            $('#projectStatistics').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+            bool = true;
+        } else {
+            $(this).removeClass("active");
+            bool = false;
+            $('#projectStatistics').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+    $('#projectStatistics').datagrid({
+        view: detailview,//注意1
+        fitColumns: false,
+        singleSelect: true,
+        nowrap: false,
+        striped: false,
+        collapsilble: true,
+        dataType: 'json',
+        method: 'post',
+        scrollbarSize:0,
+        pagination: true,
+        height: tableHeight(),
+        pageSize: 200,
+        pageList:[10,100,200,500],
+        showFooter:true,
+        loadMsg: '数据加载中,请稍候...',
+        url: '/costProject/getProjectJsList.do',
+        toolbar:'#tit1',
+        columns: [
+            [
+                {
+                    field: 'priority',
+                    title: '序号',
+                    width: 50,
+                    align:'center',
+                    sortable: false
+                },
+                /*{
+                    field: 'projectName',
+                    title: '项目名称',
+                    width: 200,
+                    align: 'left',
+                    sortable: false ,
+                    formatter: function (value, rowData, index) {
+                    	if(value!=null){
+                    	return "<a href=\"javascript:void(0)\" style=\"color:#549de3;padding-left:2px;" +
+                 		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+                 		"max-width: 100%;vertical-align: middle;\"  title=\""+value+"\" onclick=\"showInfo('"+rowData.projectId+"')\">"+value+"</a>";
+                    	}else{
+                    		return "";
+                    	}
+                    }
+                },*/ {
+                field: 'projectCode',
+                title: '合同编号',
+                width: 150,
+                align: 'left',
+                sortable: false,
+                
+            }, {
+                field: 'projectName',
+                title: '合同名称',
+                width: 280,
+                align: 'left',
+                sortable: false,
+                formatter: function (value, rowData, index) {
+                	if(value!=null){
+                	return "<a href=\"javascript:void(0)\" style=\"color:#549de3;padding-left:2px;" +
+             		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+             		"max-width: 100%;vertical-align: middle;\"  title=\""+value+"\" onclick=\"showInfo('"+rowData.projectId+"')\">"+value+"</a>";
+                	}else{
+                		return "";
+                	}
+                }
+            },
+                {
+                    field: 'partyB',
+                    title: '合同乙方',
+                    width: 180,
+                    align: 'left',
+                    sortable: false
+                }, {
+                field: 'contractAmount',
+                title: '合同金额（元）',
+                width: 140,
+                halign:'center',
+                align: 'right',
+                sortable: false,
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return '<span style="font-weight:bold;color:#dd4d57;">' + addQianFenFu(String(value)) + '</span>';
+                	}else{
+                		return ""
+                	}
+                }
+            }, {
+                field: 'giveAmount',
+                title: '乙方申报结算金额（元）',
+                width: 140,
+                halign:'center',
+                align: 'right',
+                sortable: false,
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return '<span style="font-weight:bold;color:#dd4d57;">' + addQianFenFu(String(value)) + '</span>';
+                	}else{
+                		return ""
+                	}
+                }
+
+            }, {
+                field: 'myAuditAmount',
+                title: '我办审核金额(元)',
+                halign:'center',
+                align: 'right',
+                width: 140,
+                sortable: false,
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return '<span style="font-weight:bold;color:#dd4d57;">' + addQianFenFu(String(value)) + '</span>';
+                	}else{
+                		return ""
+                	}
+                }
+
+            }, {
+                field: 'agencyAuditAmount',
+                title: '评审机构初审金额(元)',
+                halign:'center',
+                align: 'right',
+                width: 140,
+                sortable: false,
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return '<span style="font-weight:bold;color:#dd4d57;">' + addQianFenFu(String(value)) + '</span>';
+                	}else{
+                		return ""
+                	}
+                }
+
+            }, {
+                field: 'decideAmount',
+                title: '重点办/业主/财局<br>定审金额（元）',
+                width: 140,
+                halign:'center',
+                align: 'right',
+                sortable: false,
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return '<span style="font-weight:bold;color:#dd4d57;">' + addQianFenFu(String(value)) + '</span>';
+                	}else{
+                		return ""
+                	}
+                }
+            }, {
+                field: 'ownerApproval',
+                title: '财局/业主批文',
+                width: 120,
+                align: 'center',
+                sortable: false,
+
+            }, {
+                field: 'decideTime',
+                title: '定审日期/财局<br>发文日期',
+                width: 100,
+                align: 'center',
+                sortable: false,
+                formatter: formatterdate,
+            }, {
+                field: 'reviewReport',
+                title: '评审报告书',
+                width: 160,
+                align: 'center',
+                sortable: false,
+            }/*, {
+                field: 'jsCountPercent',
+                title: '合同结算完成率',
+                width: 100,
+                align: 'center',
+                sortable: false,
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return '<span style="font-weight:bold;color:#dd4d57;">' + addQianFenFu(String(value))+"%" + '</span>';
+                	}else{
+                		return "";
+                	}
+                }
+            }*/, {
+                field: 'decideAmountPercent',
+                title: '定审金额占<br>合同金额百分比',
+                width: 100,
+                align: 'center',
+                sortable: false,
+                formatter:function(value,rowData,index){
+                	if(value!=null){
+                		return '<span style="font-weight:bold;color:#dd4d57;">' + addQianFenFu(String(value))+"%"+ '</span>';
+                	}else{
+                		return "";
+                	}
+                }
+            }, {
+                field: 'partyBContacts',
+                title: '乙方联系人/电话',
+                width: 250,
+                align: 'left',
+                sortable: false
+            }, {
+                field: 'executiveDepartment',
+                title: '合同执行部门',
+                width: 120,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'executiveDepartmentContacts',
+                title: '合同执行部门经办人/电话',
+                width: 150,
+                align: 'left',
+                sortable: false
+            }, {
+                field: 'acceptanceTime',
+                title: '预受理日期',
+                width: 150,
+                align: 'left',
+                sortable: false,
+                formatter: formatterdate
+            }, {
+                field: 'financial',
+                title: '财局备案',
+                width: 150,
+                align: 'left',
+                sortable: false
+            }, {
+                field: 'deliveryFlag',
+                title: '是否外送',
+                width: 80,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'decideFlag',
+                title: '是否已经定审',
+                width: 80,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'recordNumber',
+                title: '已定审且不属于财政评审的结算<br>发函财局备案文号',
+                width: 180,
+                align: 'left',
+                sortable: false
+            }, {
+                field: 'contractType',
+                title: '合同类型',
+                width: 100,
+                align: 'center',
+                sortable: false
+            }, {
+                field: 'entrustNumber',
+                title: '委托号',
+                width: 120,
+                align: 'center',
+                sortable: false
+            },{
+                field: 'auditPriceUnit',
+                title: '评审单位',
+                width: 120,
+                align: 'center',
+                sortable: false
+            },{
+                field: 'auditPriceUnitContacts',
+                title: '评审单位联系人/电话',
+                width: 120,
+                align: 'left',
+                sortable: false
+            },{
+                field: 'sendTime',
+                title: '资料送审日期',
+                width: 100,
+                align: 'center',
+                sortable: false,
+                formatter: formatterdate,
+            },{
+                field: 'acceptTime',
+                title: '接收日期',
+                width: 100,
+                align: 'center',
+                sortable: false,
+                formatter: formatterdate,
+            },{
+                field: 'personLiable',
+                title: '经办人',
+                width: 120,
+                align: 'center',
+                sortable: false
+            },{
+                field: 'number',
+                title: '份数',
+                width: 120,
+                align: 'center',
+                sortable: false
+            },{
+                field: 'returnReason',
+                title: '退审原因',
+                width: 200,
+                align: 'left',
+                sortable: false
+            },{
+                field: 'jsProgress',
+                title: '结算进展',
+                width: 220,
+                align: 'left',
+                sortable: false,
+                formatter:function(value,rowData,index){
+                    if(value!=null){
+                		return "<span title="+value+" style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:100%;vertical-align: middle;\">"+value+"</span>";
+                	}else{
+                		return ""
+                	}
+                }
+        }]
+        ],
+        detailFormatter: function (index, row) {//注意2
+            return '<div style="padding:2px 0"><table id="ddv-' + index + '"></table></div>';
+        },
+        onLoadSuccess: function (data) {
+        	console.log("111"+data.total);
+         	 if (data.total == 0) {
+                  $('#projectStatistics').datagrid('loadData', {total: 1, rows: [{contractCode: "未找到相关信息！"}]});
+             }
+          },
+        onExpandRow: function (index, row) {//注意3
+        	
+          	var contractCode=$("#contractCode").val();
+          	var contractName=$("#contractName").val();
+          	var partyB=$("#partyB").val();
+          	var startTime =$("#startTime").val();
+          	var endTime = $("#endTime").val();
+        	var contractType=$("#contractType option:selected").val();
+        	var deliveryFlag=$("#deliveryFlag option:selected").val();
+        	var decideFlag=$("#decideFlag option:selected").val();
+        	var recordNumber=$("#recordNumber").val();
+        	var orgId=$("#orgCombotreeSelect").combotree("getValues");
+        	var dep=orgId.join(",");
+        	if(dep==-1){
+        		dep="";
+        	}
+        	var ownerApproval=$("#ownerApproval").val();
+        	var receiveTimeStart =$("#receiveTimeStart").val();
+          	var receiveTimeEnd = $("#receiveTimeEnd").val();
+          	var decideAmountPercentFlag=$("#decideAmountPercentFlag option:selected").val();
+            var giveFlag = $("#giveFlag").val();
+            $('#ddv-' + index).datagrid({
+                url: '/costProject/getProjectJsContractList.do?projectId='+row.projectId+'&index='+row.priority,
+                fitColumns: true,
+                singleSelect: true,
+                nowrap: false,
+                striped: false,
+                collapsilble: true,
+                loadMsg: '数据加载中,请稍候...',
+                height: 'auto',
+				showHeader:false,
+                scrollbarSize:0,
+                queryParams:{
+                        'contractCode': contractCode,  
+                        'contractName':contractName,
+                        'partyB':partyB,
+                        'startTime':startTime,
+                        'endTime':endTime,
+                        'contractType':contractType,
+                        'deliveryFlag':deliveryFlag,
+                        'decideFlag':decideFlag,
+                        'recordNumber':recordNumber,
+                        'orgId':dep,
+                        'ownerApproval':ownerApproval,
+                        'receiveTimeStart':receiveTimeStart,
+                        'receiveTimeEnd':receiveTimeEnd,
+                    'decideAmountPercentFlag': decideAmountPercentFlag,
+                    'giveFlag': giveFlag
+                    },
+                columns: [
+                    [
+                        {
+                            field: 'priority',
+                            title: '序号',
+                            width: 50,
+                            align:'center',
+                            sortable: false
+                        },
+                       /* {
+                            field: 'projectName',
+                            title: '项目名称',
+                            width: 200,
+                            align: 'center',
+                            sortable: false ,
+                            formatter: function (value, rowData, index) {
+                                return "";
+                            }
+                        },*/ {
+                        field: 'contractCode',
+                        title: '合同编号',
+                        width: 150,
+                        align: 'left',
+                        sortable: false,
+                        formatter: function (value, rowData, index) {
+                        	if(value!=null){
+                        		if(rowData.mainFlag =='主合同'){
+		                        	return "<a href=\"javascript:void(0)\" style=\"color:#549de3;padding-left:2px;" +
+		                     		"overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: inline-block;" +
+		                     		"max-width: 100%;vertical-align: middle;\"  title=\""+value+"\" onclick=\"showContractInfo('"+rowData.contractId+"')\">"+value+"</a>";
+                        		}else{
+                        			return value;
+                        		}
+                        	}else{
+                        		return "";
+                        	}
+                        }
+                    }, {
+                        field: 'contractName',
+                        title: '合同名称',
+                        width: 280,
+                        align: 'left',
+                        sortable: false,
+                    },
+                        {
+                            field: 'partyB',
+                            title: '合同乙方',
+                            width: 180,
+                            align: 'left',
+                            sortable: false
+                     },
+                     {
+                        field: 'contractAmount',
+                        title: '合同金额（元）',
+                        width: 140,
+                        halign:'center',
+                        align: 'right',
+                        sortable: false,
+                        formatter:function(value,rowData,index){
+                        	if(value!=null){
+                                return addQianFenFu(String(value));
+                        	}else{
+                        		return "";
+                        	}
+                        }
+                    }, {
+                        field: 'giveAmount',
+                        title: '乙方申报结算金额（元）',
+                        width: 140,
+                        halign:'center',
+                        align: 'right',
+                        sortable: false,
+                        formatter:function(value,rowData,index){
+                        	if(value!=null){
+                                var temp=addQianFenFu(String(value));
+                                return "<a href=\"javascript:void(0)\" title=" + temp + " style=\"color:#549de3;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: block;\" onclick=\"editInfo('" + rowData.taskId + "')\">" + temp + "</a>";
+                        	}else{
+                        		return "";
+                        	}
+                        }
+
+                    }, {
+                        field: 'myAuditAmount',
+                        title: '我办审核金额(元)',
+                        halign:'center',
+                        align: 'right',
+                        width: 140,
+                        sortable: false,
+                        formatter:function(value,rowData,index){
+                        	if(value!=null){
+                                var temp=addQianFenFu(String(value));
+                                return "<a href=\"javascript:void(0)\" title=" + temp + " style=\"color:#549de3;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: block;\" onclick=\"editInfo('" + rowData.taskId + "')\">" + temp + "</a>";
+                        	}else{
+                        		return "";
+                        	}
+                        }
+
+                    }, {
+                        field: 'agencyAuditAmount',
+                        title: '评审机构初审金额(元)',
+                        halign:'center',
+                        align: 'right',
+                        width: 140,
+                        sortable: false,
+                        formatter:function(value,rowData,index){
+                        	if(value!=null){
+                                var temp=addQianFenFu(String(value));
+                                return "<a href=\"javascript:void(0)\" title=" + temp + " style=\"color:#549de3;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: block;\" onclick=\"editInfo('" + rowData.taskId + "')\">" + temp + "</a>";
+                        	}else{
+                        		return "";
+                        	}
+                        }
+
+                    }, {
+                        field: 'decideAmount',
+                        title: '重点办/业主/财局<br>定审金额（元）',
+                        width: 140,
+                        halign:'center',
+                        align: 'right',
+                        sortable: false,
+                        formatter:function(value,rowData,index){
+                        	if(value!=null){
+                                var temp=addQianFenFu(String(value));
+                                return "<a href=\"javascript:void(0)\" title=" + temp + " style=\"color:#549de3;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display: block;\" onclick=\"editInfo('" + rowData.taskId + "')\">" + temp + "</a>";
+                        	}else{
+                        		return ""
+                        	}
+                        }
+
+                    }, {
+                        field: 'ownerApproval',
+                        title: '财局/业主批文',
+                        width: 120,
+                        align: 'center',
+                        sortable: false,
+                        formatter: function (value, rowData, index) {
+                        	if(value!=null){
+                                return "<span title="+value+" style=\"padding-left:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:block;\">"+value+"</span>";
+                        	}else{
+                        		return ""
+                        	}
+                        }
+                    }, {
+                        field: 'decideTime',
+                        title: '定审日期/财局<br>发文日期',
+                        width: 100,
+                        align: 'center',
+                        sortable: false,
+                        formatter: formatterdate,
+                    }, {
+                        field: 'reviewReport',
+                        title: '评审报告书',
+                        width: 160,
+                        align: 'center',
+                        sortable: false,
+                    }/*, {
+                        field: 'jsCountPercent',
+                        title: '合同结算完成率',
+                        width: 100,
+                        align: 'center',
+                        sortable: false,
+                        formatter:function(value,rowData,index){
+                        	if(value!=null){
+                        		return addQianFenFu(String(value))+"%";
+                        	}else{
+                        		return "";
+                        	}
+                        }
+                    }*/, {
+                        field: 'decideAmountPercent',
+                        title: '定审金额占<br>合同金额百分比',
+                        width: 100,
+                        align: 'center',
+                        sortable: false,
+                        formatter:function(value,rowData,index){
+                        	if(value!=null){
+                        		return addQianFenFu(String(value))+"%";
+                        	}else{
+                        		return "";
+                        	}
+                        }
+                    }, {
+                        field: 'partyBContacts',
+                        title: '乙方联系人/电话',
+                        width: 250,
+                        align: 'left',
+                        sortable: false
+                    }, {
+                        field: 'executiveDepartment',
+                        title: '合同执行部门',
+                        width: 120,
+                        align: 'center',
+                        sortable: false
+                    }, {
+                        field: 'executiveDepartmentContacts',
+                        title: '合同执行部门经办人/电话',
+                        width: 150,
+                        align: 'left',
+                        sortable: false
+                    }, {
+                        field: 'acceptanceTime',
+                        title: '预受理日期',
+                        width: 150,
+                        align: 'left',
+                        sortable: false,
+                        formatter: formatterdate
+                    }, {
+                        field: 'financial',
+                        title: '财局备案',
+                        width: 150,
+                        align: 'left',
+                        sortable: false
+                    }, {
+                        field: 'deliveryFlag',
+                        title: '是否外送',
+                        width: 80,
+                        align: 'center',
+                        sortable: false
+                    }, {
+                        field: 'decideFlag',
+                        title: '是否已经定审',
+                        width: 80,
+                        align: 'center',
+                        sortable: false
+                    }, {
+                        field: 'recordNumber',
+                        title: '已定审且不属于财政评审的结算<br>发函财局备案文号',
+                        width: 180,
+                        align: 'left',
+                        sortable: false
+                    }, {
+                        field: 'contractType',
+                        title: '合同类型',
+                        width: 100,
+                        align: 'center',
+                        sortable: false
+                    }, {
+                        field: 'entrustNumber',
+                        title: '委托号',
+                        width: 120,
+                        align: 'center',
+                        sortable: false
+                    },{
+                        field: 'auditPriceUnit',
+                        title: '评审单位',
+                        width: 120,
+                        align: 'center',
+                        sortable: false
+                    },{
+                        field: 'auditPriceUnitContacts',
+                        title: '评审单位联系人/电话',
+                        width: 120,
+                        align: 'left',
+                        sortable: false
+                    },{
+                        field: 'sendTime',
+                        title: '资料送审日期',
+                        width: 100,
+                        align: 'center',
+                        sortable: false,
+                        formatter: formatterdate,
+                    },{
+                        field: 'acceptTime',
+                        title: '接收日期',
+                        width: 100,
+                        align: 'center',
+                        sortable: false,
+                        formatter: formatterdate,
+                    },{
+                        field: 'personLiable',
+                        title: '经办人',
+                        width: 120,
+                        align: 'center',
+                        sortable: false
+                    },{
+                        field: 'number',
+                        title: '份数',
+                        width: 120,
+                        align: 'center',
+                        sortable: false
+                    },{
+                        field: 'returnReason',
+                        title: '退审原因',
+                        width: 200,
+                        align: 'left',
+                        sortable: false
+                    },{
+                            field: 'jsProgress',
+                            title: '结算进展',
+                            width: 220,
+                            align: 'left',
+                            sortable: false,
+                            formatter:function(value,rowData,index){
+                                if(value!=null){
+                            		return "<span title="+value+" style=\"overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:100%;vertical-align: middle;\">"+value+"</span>";
+                            	}else{
+                            		return ""
+                            	}
+                            }
+                    }]
+                ],
+                onResize: function () {
+                    $('#projectStatistics').datagrid('fixDetailRowHeight', index);
+                },
+                onLoadSuccess: function (data) {
+                    setTimeout(function () {
+                        $('#projectStatistics').datagrid('fixDetailRowHeight', index);
+                    }, 0);
+                }
+            });
+            $('#projectStatistics').datagrid('fixDetailRowHeight', index);
+        }
+
+    });
+    //new End
+    $(window).resize(function () {
+    	if(bool){
+    	            $('#projectStatistics').datagrid('resize', {
+    	                height: $(window).height() - 40
+    	            });
+    	        }else{
+    	            $('#projectStatistics').datagrid('resize', {
+    	                height: tableHeight()
+    	            });
+    	        }
+
+    });
+
+})
+function showInfo(id) {
+    window.parent.addTabGrid('项目详情', "/costProject/editProject?editFlag=n&projId="+id);
+}
+//合同详情
+function showContractInfo(zjkClId) {
+    var href = "/costContract/toEdit?editFlag=n&id="+zjkClId;
+    var title = "合同修改";
+    top.addTabGrid(title, href);
+}
+
+//子合同跳转至审价任务详情
+function editInfo(taskId) {
+    var href = "/costTask/toEdit?editFlag=y&id=" + taskId;
+    var title = "审价任务修改";
+    top.addTabGrid(title, href);
+}
+
+
+//提交查询条件
+function selectSubmit(){
+  	var tableId='projectStatistics';
+  	var contractCode=$("#contractCode").val();
+  	var contractName=$("#contractName").val();
+  	var projectName=$("#projectName").val();
+  	var partyB=$("#partyB").val();
+  	var startTime =$("#startTime").val();
+  	var endTime = $("#endTime").val();
+	var contractType=$("#contractType option:selected").val();
+	var deliveryFlag=$("#deliveryFlag option:selected").val();
+	var decideFlag=$("#decideFlag option:selected").val();
+    var giveFlag = $("#giveFlag").val();
+    var recordNumber = $("#recordNumber").val();
+    var orgId = $("#orgCombotreeSelect").combotree("getValues");
+	var dep=orgId.join(",");
+	if(dep==-1){
+		dep="";
+	}
+	var ownerApproval=$("#ownerApproval").val();
+	var receiveTimeStart =$("#receiveTimeStart").val();
+  	var receiveTimeEnd = $("#receiveTimeEnd").val();
+  	var decideAmountPercentFlag=$("#decideAmountPercentFlag option:selected").val();
+  	var auditPriceType=$("#auditPriceType").val();
+ 	$('#'+tableId).datagrid('options').queryParams = {
+           'contractCode': contractCode,  
+           'contractName':contractName,
+           'projectName':projectName,
+           'partyB':partyB,
+           'startTime':startTime,
+           'endTime':endTime,
+           'contractType':contractType,
+           'deliveryFlag':deliveryFlag,
+           'decideFlag':decideFlag,
+           'recordNumber':recordNumber,
+           'orgId':dep,
+           'ownerApproval':ownerApproval,
+           'receiveTimeStart':receiveTimeStart,
+           'receiveTimeEnd':receiveTimeEnd,
+        'decideAmountPercentFlag': decideAmountPercentFlag,
+        'giveFlag': giveFlag,
+        'auditPriceType':auditPriceType
+       };
+   $('#' + tableId).datagrid("reload");
+}
+//自动刷新
+function Refresh() {
+	var json1={tabTitle:'结算台账',url:'/forward_project_projectJsCount'};
+	window.parent.refreshTab(json1); 
+}
+
+
+

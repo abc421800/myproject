@@ -1,0 +1,65 @@
+package com.cost168.costaudit.utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.cost168.costaudit.pojo.cost.CostContract;
+import com.cost168.costaudit.pojo.cost.CostDocument;
+import com.cost168.costaudit.pojo.cost.CostEnterprise;
+import com.cost168.costaudit.pojo.cost.CostPriceLibrary;
+import com.cost168.costaudit.pojo.cost.CostProject;
+import com.cost168.costaudit.pojo.cost.CostTask;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.vo.cost.ContractJsCountVo;
+import com.cost168.costaudit.vo.cost.ProjectJsCountVo;
+
+
+
+/**
+ * 
+ * ClassName: Global 
+ * @Description: 鍏ㄥ眬鐨勫彉閲忕鐞嗙被
+ * @author lixiang
+ * @date 2018-12-10涓婂崍10:50:25
+ * @Company  骞夸笢鍗庤仈杞欢绉戞妧鏈夐檺鍏徃
+ */
+public class Global {
+	
+	
+	@SuppressWarnings("serial")
+	public static List<String> PREVIEW_JPG_1 = new ArrayList<String>(){{add("jpg");add("png");add("txt");add("pdf");add("xml");}};
+	@SuppressWarnings("serial")
+	public static List<String> PREVIEW_DOC_2 = new ArrayList<String>(){{add("doc");add("docx");}};
+	@SuppressWarnings("serial")
+	public static List<String> PREVIEW_XLS_3 = new ArrayList<String>(){{add("xls");add("xlsx");}};
+	
+	//鎴戠殑鍙拌处
+	public static List<CostProject> PRO_EXPORT_LIST =null;
+	public static String PRO_START_TIME =null;
+	public static String PRO_END_TIME =null;
+	//鍚堝悓鍙拌处
+	public static List<CostContract> CON_EXPORT_LIST =null;
+	public static String CON_START_TIME =null;
+	public static String CON_END_TIME =null;
+	//寰�潵鏂囦欢
+	public static List<CostDocument> DOC_EXPORT_LIST =null;
+	public static String DOC_START_TIME =null;
+	public static String DOC_END_TIME =null;
+	//瀹′环浠诲姟
+	public static List<CostTask> TAS_EXPORT_LIST =null;
+	public static String TAS_START_TIME =null;
+	public static String TAS_END_TIME =null;
+	//鍏ュ簱浼佷笟
+	public static List<CostEnterprise> ENT_EXPORT_LIST =null;
+	//鐢ㄦ埛鍒楄〃
+	public static List<SysUser> USE_EXPORT_LIST =null;
+	//鍗曚环搴�
+	public static List<CostPriceLibrary> PRI_EXPORT_LIST =null;
+	public static String PRI_START_TIME =null;
+	public static String PRI_END_TIME =null;
+	//统计查询：项目结算台账
+	public static List<ProjectJsCountVo> PROJECT_JSCOUNT_EXPORT_LIST =null;
+	public static List<ContractJsCountVo> CONTRACT_JSCOUNT_EXPORT_LIST =null;
+	public static List<ContractJsCountVo> CONTRACT_JSCOUNT_EXPORT_LIST2 =null;
+
+}

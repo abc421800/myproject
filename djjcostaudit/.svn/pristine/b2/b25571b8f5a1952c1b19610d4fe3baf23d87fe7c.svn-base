@@ -1,0 +1,163 @@
+package com.cost168.costaudit.controller.yaohao;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.yaohao.YaohaoOrder;
+import com.cost168.costaudit.pojo.yaohao.YaohaoWinbid;
+import com.cost168.costaudit.service.yaohao.YaohaoAutocodeService;
+import com.cost168.costaudit.service.yaohao.YaohaoCandidateService;
+import com.cost168.costaudit.service.yaohao.YaohaoOrderService;
+import com.cost168.costaudit.service.yaohao.YaohaoWinbidService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.JsonUtils;
+import com.cost168.costaudit.utils.OrderUtil;
+
+/**
+ * 
+ * ClassName: YaohaoOrderController 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-7-8下午4:20:02
+ * @Company 广东华联软件科技有限公司
+ */
+@Controller
+@RequestMapping("/yaohaoOrder")
+public class YaohaoOrderController {
+	
+	@Autowired
+	private YaohaoOrderService yaohaoOrderService;
+	@Autowired
+	private YaohaoAutocodeService yaohaoAutocodeService;
+	@Autowired
+	private YaohaoWinbidService yaohaoWinbidService;
+	@Autowired
+	private YaohaoCandidateService yaohaoCandidateService;
+	
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,YaohaoOrder yaohaoOrder, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			Map<String,Object> selectMap=JsonUtils.object2Map(yaohaoOrder);
+			String startTime =request.getParameter("startTime");
+			String endTime =request.getParameter("endTime");
+			if(null!=startTime && !"".equals(startTime)){
+				map.put("startTime", startTime+" 00:00:00");
+			}
+			if(null!=endTime && !"".equals(endTime)){
+				map.put("endTime", endTime+" 24:00:00");
+			}
+			map.putAll(selectMap);
+		    List<YaohaoOrder> list= yaohaoOrderService.selectListByMap(map);
+		    int total= yaohaoOrderService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toEdit")
+	public String toEdit(HttpServletRequest request){
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		String url="";
+		String id=request.getParameter("id");
+		if(null!=id && !"".equals(id)) {
+			url="/yaohaoOrder/upd";
+			YaohaoOrder yaohaoOrder = yaohaoOrderService.selectByPrimaryKey(id);
+			List<YaohaoWinbid> winbidList= yaohaoWinbidService.selectListByOrderCode(yaohaoOrder.getCode());
+			request.setAttribute("winbidList", winbidList);
+			request.setAttribute("add_edit", "edit");
+			request.setAttribute("obj", yaohaoOrder);
+		}else{
+			//获取摇号单编号
+			String codeA=yaohaoAutocodeService.getCodeAorB("A");
+			String codeB=yaohaoAutocodeService.getCodeAorB("B");
+			request.setAttribute("codeA", codeA.substring(1,codeA.length()));
+			request.setAttribute("codeB", codeB.substring(1,codeB.length()));
+			url="/yaohaoOrder/save";
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String currentDate = sdf.format(new Date());
+            String yaohaoYear = currentDate.substring(0, 4);
+			//第一档候选人数
+			Map<String,Object> map=new HashMap<String, Object>();
+			map.put("yaohaoGrade", "第一档");
+			map.put("yaohaoYear", yaohaoYear);
+			int yaohaoGradeA= yaohaoCandidateService.selectCountByMap(map);
+			map.clear();
+			map.put("yaohaoGrade", "第二档");
+			map.put("yaohaoYear", yaohaoYear);
+			int yaohaoGradeB= yaohaoCandidateService.selectCountByMap(map);
+			YaohaoOrder order=new YaohaoOrder();
+			String orderId=OrderUtil.buildOrderId("");
+			order.setId(orderId);
+			order.setCode(yaohaoAutocodeService.getCodeAorB("B"));
+			order.setCreater(currentUser.getName());
+            order.setYaohaoYear(yaohaoYear);
+            order.setYaohaoTime(new Date());
+            order.setEnterpriseNum(yaohaoGradeB);
+            request.setAttribute("yaohaoGradeA", yaohaoGradeA);
+            request.setAttribute("yaohaoGradeB", yaohaoGradeB);
+			request.setAttribute("obj", order);
+			request.setAttribute("add_edit", "add");
+		}
+		request.setAttribute("url", url);
+		return "yaohao/yaohaoMng/yaohaoDetails";
+	}
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,YaohaoOrder yaohaoOrder){
+		GlobalResult result=new GlobalResult();
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String winbid=request.getParameter("winbid");
+			yaohaoOrder.setCreateTime(new Date());
+			String yaohaoTimeStr=request.getParameter("yaohaoTimeStr");
+			if(null!=yaohaoTimeStr && !"".equals(yaohaoTimeStr)){
+				yaohaoOrder.setYaohaoTime(sdf.parse(yaohaoTimeStr));
+			}
+			yaohaoOrderService.registerOrder(winbid, yaohaoOrder);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+
+	
+	@ResponseBody
+	@RequestMapping("/upd")
+	public GlobalResult upd(HttpServletRequest request,YaohaoOrder yaohaoOrder){
+		GlobalResult result=new GlobalResult();
+		try {
+			String winbid=request.getParameter("winbid");
+			yaohaoOrderService.updRegisterOrder(winbid, yaohaoOrder);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+
+}

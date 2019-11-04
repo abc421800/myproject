@@ -1,0 +1,174 @@
+var scrollHeight=0;
+var str='';
+$(function () {
+    $(window).resize(function () {
+        $("#tt").tabs({
+            tabHeight: 32,
+            plain: true,
+            height:'auto',
+            onSelect:function (title) {
+                if(title!=str){
+                    $('.wrap_center').scrollTop(scrollHeight);
+                    str=title;
+                }
+            }
+        });
+    }).resize();
+    $(".tabs").on("click","li",function(){
+        scrollHeight=$('.wrap_center').scrollTop();
+    });
+    fujian();
+
+
+
+});
+
+function fujian() {
+    $("#fujian").treegrid({
+        url: "fujian.json",
+        // height: $(window).height() - $('#table_edit').height() - 40 - 55,
+        height: 500,
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        fitColumns: true,
+        striped: true,
+        collapsilble: true,
+        lines: true,//下面三个是树属性
+        animate: true,
+        rownumbers: true,// 行号
+        idField: 'id',
+        parentField: "_parentId",
+        treeField: 'docTitle',
+        toolbar: '#tit1',
+        columns: [[
+            {field: 'ck',   title : '单选框', checkbox: true},
+            {
+                field: 'docTitle',
+                title: '文档标题',
+                width: 290,
+                halign: 'center'
+            }, {
+                field: 'docType',
+                title: '类型',
+                halign: 'center',
+                align: 'center',
+                width: 100
+            }, {
+                field: 'size',
+                title: '大小',
+                halign: 'center',
+                align: 'center',
+                width: 100,
+            },{
+                field: 'publisher',
+                title: '发布人',
+                halign: 'center',
+                align: 'center',
+                width: 100,
+            },{
+                field: 'publishTime',
+                title: '发布时间',
+                halign: 'center',
+                align: 'center',
+                width: 100,
+            }, {
+                field: 'opt',
+                title: '操作',
+                halign: 'center',
+                align: 'center',
+                width: 120,
+                formatter: function (value, rowData, rowIndex) {
+                    if (String(rowData.docTitle) == '前期准备') {
+                        return ""
+                    } else if (String(rowData.docTitle) == '材料选型') {
+                        return ""
+                    } else {
+                        return "<a href='javascript:void(0)' class='btn btn-outline-primary' onclick=''>预览</a>&nbsp;&nbsp;" +
+                            "<a href='javascript:void(0)' class='btn btn-outline-success' onclick=''>下载</a>&nbsp;&nbsp;" +
+                            "<a href='javascript:void(0)' class='btn btn-outline-danger' onclick=''>删除</a>";
+                    }
+
+                }
+            }]],
+        onBeforeCheck: function (rows, data) {
+            if (rows == null) {
+                return true;
+            }
+            if (rows.isLink == "false") {
+                return false;
+            }
+        },
+        onLoadSuccess: function(row){
+            $('#fujian').treegrid('enableDnd', row?row.id:null);
+        }
+    });
+    $(window).resize(function () {
+        $('#fujian').treegrid('resize', {
+            // height: $(window).height() - $('#table_edit').height() - 40 - 55
+            height:500
+        });
+    });
+}
+function getDialog() {
+    $('#dlg').dialog({
+        title: '创建文件夹',
+        width: 600,
+        height: "auto",
+        closed: false,
+        cache: false,
+        top:100,
+        href: 'dialog.html',
+        modal: true
+    });
+}
+function saveFileName(){
+    //更新treegrid数据
+    $('#dlg').dialog('close');
+    $("#fujian").treegrid('reload');
+}
+function addPerson() {
+    $('#addPerson').dialog({
+        title: '系统用户',
+        width: 820,
+        height: 510,
+        closed: false,
+        cache: false,
+        top:100,
+        content:"<iframe name=\"fileFrame\" frameborder=\"0\" src="+'addPerson.html'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+        modal: true
+    });
+}
+
+function dr(){
+    var url = "fileinput.html";
+    $("#dialog").dialog({
+        title: "选择文件",
+        minimizable:false,
+        content:"<iframe name=\"fileFrame\" frameborder=\"0\" src="+'fileinput.html'+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+        width:820,
+        height:530,
+        iconCls: 'icon-info',
+        modal: true,
+        buttons:[{
+            text:'关闭',
+            iconCls:'icon-close',
+            handler:function(data){
+                // $("#zjzx").datagrid('reload');
+                $("#dialog").dialog("close");
+                // console.log("1r"+returnJson);
+                // if(typeof(returnJson)!='undefined'  ){
+                //     console.log(JSON.stringify(returnJson));
+                //     $("#notImportList").dialog({
+                //         title: '未导入附件清单',
+                //         width:900,
+                //         height: 600,
+                //         align: 'center',
+                //         top: 100
+                //
+                //     });
+                //     returnList();
+                // }
+            }
+        }]
+    });
+}

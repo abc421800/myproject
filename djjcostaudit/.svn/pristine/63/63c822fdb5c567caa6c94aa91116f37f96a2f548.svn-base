@@ -1,0 +1,368 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="shiro" uri="http://shiro.apache.org/tags" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>用户列表</title>
+    <jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+</head>
+<body>
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+<div class="row">
+<form action="">
+    <div class="filter">
+        <div class="form-inline">
+            <div class="form-group">
+                <label for="">账号：</label>
+                <input type="text" id="account" value="" placeholder="请输入关键字" class="form-control input-sm">
+            </div>
+            <div class="form-group">
+                <label for="">姓名：</label>
+                <input type="text" id="name" value="" placeholder="请输入关键字" class="form-control input-sm">
+            </div>
+			<div class="form-group">
+                <label for="">性别：</label>
+                <select class="form-control input-sm" onchange="searchUser()" id="sex" style="width: 100px">
+                    <option value="">请选择</option>
+                    <option value="男" >男</option>
+                    <option value="女" >女</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="">所属部门：</label>
+                <select  class="form-control input-sm" onchange="searchUser()" id="department">
+					<option value="">所有部门</option>
+                </select>
+            </div>
+           
+            <div class="form-group">
+                <input type="button"  value="查询" class="btn btn-primary" onclick="searchUser()">&nbsp;
+                <input type="button"  value="重置" onclick="resetUser()" class="btn btn btn-success">&nbsp;
+                <input type="button" name="reset" value="导出" class="btn btn-danger" onclick="exportDate();">&nbsp;
+                <input type="button" name="reset" value="下载导入模版" class="btn btn-info" onclick="importTemplate();">&nbsp;
+                <input type="button" value="导入" class="btn btn-warning" onclick="importUser()">&nbsp;
+            </div>
+        </div>
+    </div>
+    <a href="javascript:void(0);" class="switchBtn"></a>
+    </form>
+</div>
+<div class="row">
+    <table id="user" style="width: 100%;"></table>
+    <div id="tit1">
+    	<shiro:hasPermission name="user:add">
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-add" plain="false" onclick="add()">添加</a>
+        </shiro:hasPermission>
+        <shiro:hasPermission name="user:delete">
+        <a href="javascript:void(0);" class="easyui-linkbutton" iconCls="icon-remove" plain="false" onclick="deleteHandler()">删除</a>
+    	</shiro:hasPermission>
+    	<span style="color:#969696;font-size: 14px">（右键表格表头设置显示隐藏列）</span>
+    	
+    </div>
+</div>
+<div id="importUser"></div>
+<%--<script src="${pageContext.request.contextPath}/res/js/sys/user/userList.js"></script>
+--%><script type="text/javascript">
+function importUser(){
+	var url = "/forward_sys_importUser";
+	$("#importUser").dialog({
+	title: "选择文件",
+	iconCls:'icon-info',
+    minimizable:false,
+    content:"<iframe name=\"fileFrame\" frameborder=\"0\" src="+url+" scrolling=\"yes\" style=\"width:100%;height:100%;\"></iframe>",
+    //content:"<iframe id=\"editFrame\" name=\"editFrame\" frameborder=\"0\" src=\"${dataInit['sitePath']}commonUploadPage.action?fileType=1&type=xls\" scrolling=\"auto\" style=\"width:100%;height:100%;\"></iframe>",
+    width:600,
+    height:500,
+    iconCls: 'icon-edit-lx',
+    modal: true,
+    buttons:[{
+		text:'关闭',
+		iconCls:'icon-info',
+		handler:function(data){
+			$("#user").datagrid('reload');
+			$("#importUser").dialog("close");
+		}
+	}]
+	});
+}
+//获取部门
+$(function(){
+	$.post("/sysOrg/sysOrgList",function(result){
+		for(var i in result){
+		var v=result[i].name;
+		var i=result[i].id;
+			if('造价审核部'==v){
+				var div="<option selected='selected' value="+i+">"+v+"</option>";
+			}else{
+				var div="<option  value="+i+">"+v+"</option>";
+			}
+			$("#department").append(div);
+		}
+		searchUser();
+   	}, "json");
+});
+//导出
+function exportDate(){
+	var selections = $('#user').datagrid('getSelections');
+		var ids = "";
+		if (selections.length != 0) {
+			for(var i = 0;i<selections.length;i++){
+	    		ids+=selections[i].id+",";
+	    	}
+	    	ids = ids.substring(0,ids.length-1);
+	    }
+   	window.location.href = "${path}/sysUser/exportUser?ids="+ids;
+   	
+  	//window.location.href = "/sysUser/exportUser";
+}
+//下载导入模板
+function importTemplate(){
+  	window.location.href = "/sysUser/importTemplate";
+}
+</script>
+<script type="text/javascript">
+$(function() {
+    var bool=false;
+    $(".switchBtn").on('click',function () {
+        $(".filter").toggle();
+        if(!bool){
+            $(this).addClass("active");
+            $('#user').datagrid('resize', {
+                height: $(window).height()  -40
+            });
+            bool=true;
+        }else{
+            $(this).removeClass("active");
+            bool=false;
+            $('#user').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+    $('#user').datagrid({
+        url: '/sysUser/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        rownumbers: true,
+        height: tableHeight(),
+        fitColumns: true,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 10,
+        singleSelect: false,
+        columns: [
+            [{field: 'id',title : '单选框',checkbox: true},
+             {field:'account', title:'账号',width:100,align:'left',sortable:false},
+             {field:'name',title:'姓名',width:70,align:'left',sortable:false},
+             {field:'orgId',title:'部门',width:100,align:'left',sortable:false}, 
+             {field:'roleId',title:'角色',width:100,align:'center',sortable:false},
+             {field: 'sex',title: '性别',width: 50,align: 'center',sortable: false},  
+             {field: 'status',title: '是否可用',width: 60,align: 'center',sortable: false,
+            	 formatter:function(value,row,index){  
+	        		 if(row.id){
+	        			 if("可用"==value){
+	        				 return '<span style="color:green">可用</span>';
+	        			 }else if("禁用" ==value){
+	        				 return '<span style="color:red">禁用</span>';
+	        			 }else{
+	        				 return '<span style="color:green">可用</span>';
+	        			 }
+	        		 }else{
+	        			 return " ";
+	        		 }
+                }  		 
+             },  
+             {field: 'phone',title: '电话',width: 100,align: 'left',sortable: false},
+             /* {field: 'wechat',title: '微信号',width: 100,align: 'left',sortable: false},  */
+             {field: 'manager',title: '管理',align: 'center',halign: 'center',width:190,  
+            	formatter: function(value, row, index) {
+            		if(row.id){
+	                    var a="";
+	                    var b="";
+	                    var c="";
+	                    var d="";
+	                    <shiro:hasPermission name="user:update">
+	                      a= "<a href='javascript:void(0)' class='btn btn-outline-primary' onclick='editInfo(\"" + row.id + "\");'>编辑</a>&nbsp;&nbsp;"; 
+	                    </shiro:hasPermission>
+	                    <shiro:hasPermission name="user:resetPwd">
+	                      b= "<a href='javascript:void(0)' class='btn btn-outline-success' onclick='resetPwd(\"" + row.id + "\");'>重置密码</a>&nbsp;&nbsp;"; 
+	                    </shiro:hasPermission>
+	                    <shiro:hasPermission name="user:jy">
+	                      if(row.status=="可用"){
+		                      c= "<a href='javascript:void(0)' class='btn btn-outline-danger' onclick='prohibitUser(\"" + row.id + "\",\"禁用\");'>禁用</a>&nbsp;&nbsp;"; 
+	                      }else{
+		                      d= "<a href='javascript:void(0)' class='btn btn-outline-info' onclick='prohibitUser(\"" + row.id + "\",\"启用\");'>启用</a>&nbsp;&nbsp;"; 
+	                      }
+	                     </shiro:hasPermission>
+	                    return a+b+c+d;
+            		}
+                }   
+                
+            }
+            ]
+        ],
+        toolbar:'#tit1',
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#user').datagrid('loadData', {total: 1, rows: [{account: "未找到相关信息！"}]});
+            }
+        },
+
+    });
+    $(window).resize(function () {
+        $('#user').datagrid('resize', {
+            height: tableHeight()
+        });
+    });
+    
+    
+
+});
+
+
+function edit() {
+    var rows = $('#user').datagrid('getSelections');
+    if (rows == undefined || rows == null || rows.length == 0) {
+        $.messager.alert('提示信息', '请选择一条记录', 'warn');
+        return;
+    }
+    if (rows.length > 1) {
+        $.messager.alert('提示信息', '只能选择一条记录', 'warn');
+        return;
+    }
+    editInfo(rows[0].id);
+
+}
+function editInfo(id) {
+    var href = "/sysUser/toEdit?id="+id;
+    var title = "修改用户";
+    parent.addTabGrid(title, href);
+}
+
+function add() {
+    var href = "/sysUser/toEdit";
+    var title = "添加用户";
+    parent.addTabGrid(title, href);
+}
+//删除
+function deleteHandler() {
+    var selections = $('#user').datagrid('getSelections');
+    if (selections.length == 0) {
+        $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+        return;
+    }
+    $.messager.confirm('提示信息', '确认要删除这' + selections.length + '条记录吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        var ids = "";
+		for(var i = 0;i<selections.length;i++){
+    		ids+=selections[i].id+",";
+    	}
+    	ids = ids.substring(0,ids.length-1);
+    	$.post("/sysUser/del", {"ids":ids},function(result){
+    		if(result.status==200){
+			    //更新treegrid数据
+    		    window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+			    $("#user").datagrid('reload');
+			}else{
+				$.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+			}
+    	}, "json");
+    });
+}
+function del(id) {
+    $.messager.confirm('提示信息', '确认要删除这条记录吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        var ids = "";
+    	$.post("/sysUser/del", {"ids":id},function(result){
+    		if(result.status==200){
+			    //更新treegrid数据
+    		    window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+			    $("#user").datagrid('reload');
+			}else{
+				$.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+			}
+    	}, "json");
+    });
+}
+//重置密码
+function resetPwd(id) {
+    $.messager.confirm('提示信息', '确认要重置密码为【000000】吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+    	$.post("/sysUser/resetPwd", {"ids":id},function(result){
+    		if(result.status==200){
+			    //更新treegrid数据
+    		    window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+			    $("#user").datagrid('reload');
+			}else{
+				$.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+			}
+    	}, "json");
+    });
+}
+//禁用用户
+function prohibitUser(id,flag) {
+    $.messager.confirm('提示信息', "确认要"+flag+"该用户吗？", function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        var f="";
+        if(flag=="启用"){
+        	f="y";
+        }else{
+        	f="n";
+        }
+    	$.post("/sysUser/prohibitUser", {"ids":id,"flag":f},function(result){
+    		if(result.status==200){
+			    //更新treegrid数据
+    		    window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+			    $("#user").datagrid('reload');
+			}else{
+				$.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+			}
+    	}, "json");
+    });
+}
+//重置
+function resetUser(){
+	$("#account").val("");
+	$("#name").val("");
+	$("#sex").val("");
+	$("#department").val("e67ddbe615664c6d9705cbe26a2001bf")
+	searchUser();
+}
+//查询
+function searchUser(){
+	var account = $("#account").val().trim();
+	var name = $("#name").val().trim();	
+	var sex = $("#sex").val();
+	var orgId=$("#department").val();
+    $('#user').datagrid({
+		queryParams: {
+			account:account,
+			name:name,
+			sex:sex,
+			orgId:orgId
+		}
+	}); 
+}
+
+</script>
+</body>
+</html>

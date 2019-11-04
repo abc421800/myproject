@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.cost.CostPriceLibraryMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.cost.CostPriceLibrary" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="task_id" property="taskId" jdbcType="VARCHAR" />
+    <result column="type_library" property="typeLibrary" jdbcType="VARCHAR" />
+    <result column="task_name" property="taskName" jdbcType="VARCHAR" />
+    <result column="task_code" property="taskCode" jdbcType="VARCHAR" />
+    <result column="task_person_liable" property="taskPersonLiable" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="contract_id" property="contractId" jdbcType="VARCHAR" />
+    <result column="contract_name" property="contractName" jdbcType="VARCHAR" />
+    <result column="contract_exe_department" property="contractExeDepartment" jdbcType="VARCHAR" />
+    <result column="document_name" property="documentName" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="feature" property="feature" jdbcType="VARCHAR" />
+    <result column="engineering_number" property="engineeringNumber" jdbcType="VARCHAR" />
+    <result column="use_position" property="usePosition" jdbcType="VARCHAR" />
+    <result column="basis" property="basis" jdbcType="VARCHAR" />
+    <result column="bidding_brand" property="biddingBrand" jdbcType="VARCHAR" />
+    <result column="use_brand" property="useBrand" jdbcType="VARCHAR" />
+    <result column="unit" property="unit" jdbcType="VARCHAR" />
+    <result column="contracting_price" property="contractingPrice" jdbcType="DECIMAL" />
+    <result column="supervisor_price" property="supervisorPrice" jdbcType="DECIMAL" />
+    <result column="settlement_price" property="settlementPrice" jdbcType="DECIMAL" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="update_time" property="updateTime" jdbcType="TIMESTAMP" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, task_id, type_library, task_name, task_code, task_person_liable, project_id, project_name, 
+    contract_id, contract_name, contract_exe_department, document_name, name, code, feature, engineering_number, 
+    use_position, basis, bidding_brand, use_brand, unit, contracting_price, supervisor_price, 
+    settlement_price, description, create_time, update_time
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.cost.CostPriceLibraryExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cost_price_library
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+   	select  p.name AS "projectName",c.name AS "contractName", o.`name` AS "contractExeDepartment",  pl.* 
+	FROM cost_price_library pl 
+	LEFT JOIN cost_project p ON p.id= pl.project_id
+	LEFT JOIN cost_contract c ON c.id = pl.contract_id
+	LEFT JOIN sys_org o ON o.id=c.executive_department
+     <where>
+     		<if test="typeLibrary != null and typeLibrary !=''" >
+     			FIND_IN_SET(pl.type_library,#{typeLibrary})
+   			</if>
+            <if test="name != null and name !=''" >
+     			and pl.name like concat('%',#{name},'%')
+   			</if>
+   			<if test="feature != null and feature !=''">
+   				and pl.feature like concat('%',#{feature},'%')
+   			</if>
+   			<if test="biddingBrand != null and biddingBrand !=''">
+   				and pl.bidding_brand like concat('%',#{biddingBrand},'%')
+   			</if>
+   			<if test="useBrand != null and useBrand !=''">
+   				and pl.use_brand like concat('%',#{useBrand},'%')
+   			</if>
+   			<if test="projectName != null and projectName !=''">
+   				and pl.project_name like concat('%',#{projectName},'%')
+   			</if>
+   			<if test="contractName != null and contractName !=''">
+   				and pl.contract_name like concat('%',#{contractName},'%')
+   			</if>
+   			<if test="taskPersonLiable != null and taskPersonLiable !=''">
+   				and pl.task_person_liable like concat('%',#{taskPersonLiable},'%')
+   			</if>
+   			 <if test="startTime != null and startTime !=''" >
+     			and <![CDATA[ pl.create_time>=#{startTime} ]]>
+   			 </if>
+
+   			 <if test="endTime != null and endTime !=''" >
+     			and <![CDATA[ pl.create_time<=#{endTime} ]]>
+   			 </if>
+        </where>
+        order by pl.create_time desc
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map" >
+    select count(*)  FROM cost_price_library pl 
+	LEFT JOIN cost_project p ON p.id= pl.project_id
+	LEFT JOIN cost_contract c ON c.id = pl.contract_id
+	LEFT JOIN sys_org o ON o.id=c.executive_department 
+     <where>
+     		<if test="typeLibrary != null and typeLibrary !=''" >
+     			FIND_IN_SET(pl.type_library,#{typeLibrary})
+   			</if>
+            <if test="name != null and name !=''" >
+     			and pl.name like concat('%',#{name},'%')
+   			</if>
+   			<if test="feature != null and feature !=''">
+   				and pl.feature like concat('%',#{feature},'%')
+   			</if>
+   			<if test="biddingBrand != null and biddingBrand !=''">
+   				and pl.bidding_brand like concat('%',#{biddingBrand},'%')
+   			</if>
+   			<if test="useBrand != null and useBrand !=''">
+   				and pl.use_brand like concat('%',#{useBrand},'%')
+   			</if>
+   			<if test="projectName != null and projectName !=''">
+   				and pl.project_name like concat('%',#{projectName},'%')
+   			</if>
+   			<if test="contractName != null and contractName !=''">
+   				and pl.contract_name like concat('%',#{contractName},'%')
+   			</if>
+   			<if test="taskPersonLiable != null and taskPersonLiable !=''">
+   				and pl.task_person_liable like concat('%',#{taskPersonLiable},'%')
+   			</if>
+   			 <if test="startTime != null and startTime !=''" >
+     			and <![CDATA[ pl.create_time>=#{startTime} ]]>
+   			 </if>
+
+   			 <if test="endTime != null and endTime !=''" >
+     			and <![CDATA[ pl.create_time<=#{endTime} ]]>
+   			 </if>
+        </where>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from cost_price_library
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from cost_price_library
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.cost.CostPriceLibraryExample" >
+    delete from cost_price_library
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.cost.CostPriceLibrary" >
+    insert into cost_price_library (id, task_id, type_library, 
+      task_name, task_code, task_person_liable, project_id, 
+      project_name, contract_id, contract_name, contract_exe_department, 
+      document_name, name, code, 
+      feature, engineering_number, use_position, 
+      basis, bidding_brand, use_brand, 
+      unit, contracting_price, supervisor_price, 
+      settlement_price, description, create_time, 
+      update_time)
+    values (#{id,jdbcType=VARCHAR}, #{taskId,jdbcType=VARCHAR}, #{typeLibrary,jdbcType=VARCHAR}, 
+      #{taskName,jdbcType=VARCHAR}, #{taskCode,jdbcType=VARCHAR}, #{taskPersonLiable,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR},
+      #{projectName,jdbcType=VARCHAR}, #{contractId,jdbcType=VARCHAR}, #{contractName,jdbcType=VARCHAR}, #{contractExeDepartment,jdbcType=VARCHAR}, 
+      #{documentName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, 
+      #{feature,jdbcType=VARCHAR}, #{engineeringNumber,jdbcType=VARCHAR}, #{usePosition,jdbcType=VARCHAR}, 
+      #{basis,jdbcType=VARCHAR}, #{biddingBrand,jdbcType=VARCHAR}, #{useBrand,jdbcType=VARCHAR}, 
+      #{unit,jdbcType=VARCHAR}, #{contractingPrice,jdbcType=DECIMAL}, #{supervisorPrice,jdbcType=DECIMAL}, 
+      #{settlementPrice,jdbcType=DECIMAL}, #{description,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.cost.CostPriceLibrary" >
+    insert into cost_price_library
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="taskId != null" >
+        task_id,
+      </if>
+      <if test="typeLibrary != null" >
+        type_library,
+      </if>
+      <if test="taskName != null" >
+        task_name,
+      </if>
+      <if test="taskCode != null" >
+        task_code,
+      </if>
+      <if test="taskPersonLiable != null" >
+        task_person_liable,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="projectName != null" >
+        project_name,
+      </if>
+      <if test="contractId != null" >
+        contract_id,
+      </if>
+      <if test="contractName != null" >
+        contract_name,
+      </if>
+      <if test="contractExeDepartment != null" >
+        contract_exe_department,
+      </if>
+      <if test="documentName != null" >
+        document_name,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="feature != null" >
+        feature,
+      </if>
+      <if test="engineeringNumber != null" >
+        engineering_number,
+      </if>
+      <if test="usePosition != null" >
+        use_position,
+      </if>
+      <if test="basis != null" >
+        basis,
+      </if>
+      <if test="biddingBrand != null" >
+        bidding_brand,
+      </if>
+      <if test="useBrand != null" >
+        use_brand,
+      </if>
+      <if test="unit != null" >
+        unit,
+      </if>
+      <if test="contractingPrice != null" >
+        contracting_price,
+      </if>
+      <if test="supervisorPrice != null" >
+        supervisor_price,
+      </if>
+      <if test="settlementPrice != null" >
+        settlement_price,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="updateTime != null" >
+        update_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="taskId != null" >
+        #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="typeLibrary != null" >
+        #{typeLibrary,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskCode != null" >
+        #{taskCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taskPersonLiable != null" >
+        #{taskPersonLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        #{contractId,jdbcType=VARCHAR},
+      </if>
+      <if test="contractName != null" >
+        #{contractName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractExeDepartment != null" >
+        #{contractExeDepartment,jdbcType=VARCHAR},
+      </if>
+      <if test="documentName != null" >
+        #{documentName,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="feature != null" >
+        #{feature,jdbcType=VARCHAR},
+      </if>
+      <if test="engineeringNumber != null" >
+        #{engineeringNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="usePosition != null" >
+        #{usePosition,jdbcType=VARCHAR},
+      </if>
+      <if test="basis != null" >
+        #{basis,jdbcType=VARCHAR},
+      </if>
+      <if test="biddingBrand != null" >
+        #{biddingBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="useBrand != null" >
+        #{useBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="contractingPrice != null" >
+        #{contractingPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="supervisorPrice != null" >
+        #{supervisorPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="settlementPrice != null" >
+        #{settlementPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.cost.CostPriceLibraryExample" resultType="java.lang.Integer" >
+    select count(*) from cost_price_library
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update cost_price_library
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskId != null" >
+        task_id = #{record.taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.typeLibrary != null" >
+        type_library = #{record.typeLibrary,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskName != null" >
+        task_name = #{record.taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskCode != null" >
+        task_code = #{record.taskCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.taskPersonLiable != null" >
+        task_person_liable = #{record.taskPersonLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectName != null" >
+        project_name = #{record.projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractName != null" >
+        contract_name = #{record.contractName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractExeDepartment != null" >
+        contract_exe_department = #{record.contractExeDepartment,jdbcType=VARCHAR},
+      </if>
+      <if test="record.documentName != null" >
+        document_name = #{record.documentName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.code != null" >
+        code = #{record.code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.feature != null" >
+        feature = #{record.feature,jdbcType=VARCHAR},
+      </if>
+      <if test="record.engineeringNumber != null" >
+        engineering_number = #{record.engineeringNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="record.usePosition != null" >
+        use_position = #{record.usePosition,jdbcType=VARCHAR},
+      </if>
+      <if test="record.basis != null" >
+        basis = #{record.basis,jdbcType=VARCHAR},
+      </if>
+      <if test="record.biddingBrand != null" >
+        bidding_brand = #{record.biddingBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="record.useBrand != null" >
+        use_brand = #{record.useBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="record.unit != null" >
+        unit = #{record.unit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractingPrice != null" >
+        contracting_price = #{record.contractingPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.supervisorPrice != null" >
+        supervisor_price = #{record.supervisorPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.settlementPrice != null" >
+        settlement_price = #{record.settlementPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="record.description != null" >
+        description = #{record.description,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.updateTime != null" >
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update cost_price_library
+    set id = #{record.id,jdbcType=VARCHAR},
+      task_id = #{record.taskId,jdbcType=VARCHAR},
+      type_library = #{record.typeLibrary,jdbcType=VARCHAR},
+      task_name = #{record.taskName,jdbcType=VARCHAR},
+      task_code = #{record.taskCode,jdbcType=VARCHAR},
+      task_person_liable = #{record.taskPersonLiable,jdbcType=VARCHAR},
+      project_name = #{record.projectName,jdbcType=VARCHAR},
+      contract_name = #{record.contractName,jdbcType=VARCHAR},
+      contract_exe_department = #{record.contractExeDepartment,jdbcType=VARCHAR},
+      document_name = #{record.documentName,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      code = #{record.code,jdbcType=VARCHAR},
+      feature = #{record.feature,jdbcType=VARCHAR},
+      engineering_number = #{record.engineeringNumber,jdbcType=VARCHAR},
+      use_position = #{record.usePosition,jdbcType=VARCHAR},
+      basis = #{record.basis,jdbcType=VARCHAR},
+      bidding_brand = #{record.biddingBrand,jdbcType=VARCHAR},
+      use_brand = #{record.useBrand,jdbcType=VARCHAR},
+      unit = #{record.unit,jdbcType=VARCHAR},
+      contracting_price = #{record.contractingPrice,jdbcType=DECIMAL},
+      supervisor_price = #{record.supervisorPrice,jdbcType=DECIMAL},
+      settlement_price = #{record.settlementPrice,jdbcType=DECIMAL},
+      description = #{record.description,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.cost.CostPriceLibrary" >
+    update cost_price_library
+    <set >
+      <if test="taskId != null" >
+        task_id = #{taskId,jdbcType=VARCHAR},
+      </if>
+      <if test="typeLibrary != null" >
+        type_library = #{typeLibrary,jdbcType=VARCHAR},
+      </if>
+      <if test="taskName != null" >
+        task_name = #{taskName,jdbcType=VARCHAR},
+      </if>
+      <if test="taskCode != null" >
+        task_code = #{taskCode,jdbcType=VARCHAR},
+      </if>
+      <if test="taskPersonLiable != null" >
+        task_person_liable = #{taskPersonLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractId != null" >
+        contract_id = #{contractId,jdbcType=VARCHAR},
+      </if>
+      <if test="contractName != null" >
+        contract_name = #{contractName,jdbcType=VARCHAR},
+      </if>
+      <if test="contractExeDepartment != null" >
+        contract_exe_department = #{contractExeDepartment,jdbcType=VARCHAR},
+      </if>
+      <if test="documentName != null" >
+        document_name = #{documentName,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="feature != null" >
+        feature = #{feature,jdbcType=VARCHAR},
+      </if>
+      <if test="engineeringNumber != null" >
+        engineering_number = #{engineeringNumber,jdbcType=VARCHAR},
+      </if>
+      <if test="usePosition != null" >
+        use_position = #{usePosition,jdbcType=VARCHAR},
+      </if>
+      <if test="basis != null" >
+        basis = #{basis,jdbcType=VARCHAR},
+      </if>
+      <if test="biddingBrand != null" >
+        bidding_brand = #{biddingBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="useBrand != null" >
+        use_brand = #{useBrand,jdbcType=VARCHAR},
+      </if>
+      <if test="unit != null" >
+        unit = #{unit,jdbcType=VARCHAR},
+      </if>
+      <if test="contractingPrice != null" >
+        contracting_price = #{contractingPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="supervisorPrice != null" >
+        supervisor_price = #{supervisorPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="settlementPrice != null" >
+        settlement_price = #{settlementPrice,jdbcType=DECIMAL},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="updateTime != null" >
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.cost.CostPriceLibrary" >
+    update cost_price_library
+    set task_id = #{taskId,jdbcType=VARCHAR},
+      type_library = #{typeLibrary,jdbcType=VARCHAR},
+      task_name = #{taskName,jdbcType=VARCHAR},
+      task_code = #{taskCode,jdbcType=VARCHAR},
+      task_person_liable = #{taskPersonLiable,jdbcType=VARCHAR},
+      project_id = #{projectId,jdbcType=VARCHAR},
+      project_name = #{projectName,jdbcType=VARCHAR},
+      contract_id = #{contractId,jdbcType=VARCHAR},
+      contract_name = #{contractName,jdbcType=VARCHAR},
+      contract_exe_department = #{contractExeDepartment,jdbcType=VARCHAR},
+      document_name = #{documentName,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      feature = #{feature,jdbcType=VARCHAR},
+      engineering_number = #{engineeringNumber,jdbcType=VARCHAR},
+      use_position = #{usePosition,jdbcType=VARCHAR},
+      basis = #{basis,jdbcType=VARCHAR},
+      bidding_brand = #{biddingBrand,jdbcType=VARCHAR},
+      use_brand = #{useBrand,jdbcType=VARCHAR},
+      unit = #{unit,jdbcType=VARCHAR},
+      contracting_price = #{contractingPrice,jdbcType=DECIMAL},
+      supervisor_price = #{supervisorPrice,jdbcType=DECIMAL},
+      settlement_price = #{settlementPrice,jdbcType=DECIMAL},
+      description = #{description,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = #{updateTime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

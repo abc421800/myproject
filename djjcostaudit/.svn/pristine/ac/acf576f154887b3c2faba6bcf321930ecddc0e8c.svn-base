@@ -1,0 +1,176 @@
+$(function() {
+    var bool=false;
+    $(".switchBtn").on('click',function () {
+        $(".filter").toggle();
+        if(!bool){
+            $(this).addClass("active");
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: $(window).height()  -40
+            });
+            bool=true;
+        }else{
+            $(this).removeClass("active");
+            bool=false;
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+    $('#comprehensiveAssessment').datagrid({
+        url: '/assess/list',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: true,
+        rownumbers: true,
+        height: tableHeight(),
+        fitColumns: true,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 10,
+        singleSelect: false,
+        columns: [
+            [
+                {
+                    field: 'id',
+                    title : '单选框',
+                    checkbox: true
+                },{
+                field: 'name',
+                title: '入库企业名称',
+                width: 250,
+                align: 'center',
+                sortable: false,
+                formatter: function(value, rowData, index) {
+                    if(value!=null){
+                        return "<a title="+value+" href=\"javascript:void(0)\" style=\"color:#549de3;overflow:hidden;text-overflow: ellipsis;white-space: nowrap;display:inline-block;max-width:100%;vertical-align: middle;\" onclick=\"rkCompanyDetail('"+rowData.id+"')\">"+value+"</a>";
+                    }else{
+                        return " "
+                    }
+
+                }
+
+            },{
+                field: 'rukuStatus',
+                title: '入库状态',
+                width: 120,
+                align: 'center',
+                sortable: false
+            },{
+                    field: 'year',
+                    title: '考核年份',
+                    align: 'center',
+                    width: 150,
+                    sortable: false
+
+            }, {
+                field:'assessScore',
+                title:'综合考核得分',
+                width:120,
+                align:'center',
+                sortable:false
+            }, {
+                field: 'scoreRank',
+                title: '综考得分排名',
+                width: 100,
+                align: 'center',
+                sortable: false
+
+            }, {
+                field: 'assessResult',
+                title: '年度综评',
+                width: 150,
+                align: 'center',
+                sortable: false
+            },{
+                field: 'yaohaoGrade',
+                title: '摇号档次',
+                align: 'center',
+                width: 100,
+                sortable: false,
+
+            }, {
+                field: 'createTime',
+                title: '评分时间',
+                align: 'center',
+                width: 100,
+                sortable: false
+
+            }, {
+                field: 'creater',
+                title: '登记人',
+                width: 120,
+                align: 'center',
+                sortable: false
+            }
+            ]
+        ],
+        toolbar:'#tit1'
+
+    });
+    $(window).resize(function () {
+        if(bool){
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+        }else{
+            $('#comprehensiveAssessment').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+
+    });
+
+});
+function rkCompanyDetail(){
+    top.addTabGrid('综合考核单登记', 'view/assess/assessAdd.jsp')
+}
+// function edit() {
+//     var rows = $('#comprehensiveAssessment').datagrid('getSelections');
+//     if (rows == undefined || rows == null || rows.length == 0) {
+//         $.messager.alert('提示信息', '请选择一条记录', 'warn');
+//         return;
+//     }
+//     if (rows.length > 1) {
+//         $.messager.alert('提示信息', '只能选择一条记录', 'warn');
+//         return;
+//     }
+//     editInfo(rows[0].id);
+//
+// }
+// function editInfo(zjkClId) {
+//     var href = "page/comprehensiveAssessment/comprehensiveAssessment_edit.html";
+//     var title = "入库企业修改";
+//     top.addTabGrid(title, href);
+// }
+function deleteHandler() {
+    var selections = $('#comprehensiveAssessment').datagrid('getSelections');
+    if (selections.length == 0) {
+        $.messager.alert('提示信息', '请至少选择一条记录', 'warn');
+        return;
+    }
+    $.messager.confirm('提示信息', '确认要删除这' + selections.length + '条记录吗？', function (isOk) {
+        if (!isOk) {
+            return;
+        }
+        $.messager.progress();
+        var ids = [];
+        for (var i in selections) {
+            ids[i] = selections[i].id;
+        }
+
+        $.ajax({
+            url: '/ajax/sat/zhzb/remove.do',
+            type: 'POST',
+            data: {'satGeneralZbkIds': ids},
+            traditional: true,
+            success: function (data) {
+                $.messager.progress('close');
+                if (data.success) {
+                    $('#comprehensiveAssessment').datagrid('reload');
+                } else if (data.code == 4) {
+                    $.messager.alert('提示信息', '不能删除已发布记录！', 'warn');
+                }
+            }
+        });
+    });
+}

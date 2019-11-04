@@ -1,0 +1,67 @@
+package com.cost168.costaudit.mapper.work;
+
+import com.cost168.costaudit.pojo.work.WorkRegister;
+import com.cost168.costaudit.pojo.work.WorkRegisterExample;
+import com.cost168.costaudit.pojo.work.vo.WorkAttendanceParam;
+import com.cost168.costaudit.pojo.work.vo.WorkAttendancePersonExportParam;
+import com.cost168.costaudit.pojo.work.vo.WorkRegisterVo;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
+import java.util.Map;
+
+public interface WorkRegisterMapper {
+    int countByExample(WorkRegisterExample example);
+
+    int deleteByExample(WorkRegisterExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(WorkRegister record);
+
+    int insertSelective(WorkRegister record);
+
+    List<WorkRegister> selectByExample(WorkRegisterExample example);
+
+    WorkRegister selectByPrimaryKey(String id);
+
+    WorkRegister selectByLeaveprocess(String leaveprocess);
+
+    int updateByExampleSelective(@Param("record") WorkRegister record, @Param("example") WorkRegisterExample example);
+
+    int updateByExample(@Param("record") WorkRegister record, @Param("example") WorkRegisterExample example);
+
+    int updateByPrimaryKeySelective(WorkRegister record);
+
+    int updateByPrimaryKey(WorkRegister record);
+
+    int updateByLeaveprocess(WorkRegister record);
+
+    List<WorkRegisterVo> selectListByMap(Map<String, Object> map);
+
+    //考勤人员台账
+    List<WorkAttendanceParam> selectWorkAttendancePerson(Map<String, Object> map);
+
+    int selectCountAttendancePersonByMap(Map<String, Object> map);
+
+    //查询导出考勤人员台账所需数据
+    List<WorkAttendancePersonExportParam> selectDataList(Map<String, Object> map);
+
+    //根据id查询需要导出数据
+    WorkAttendancePersonExportParam selectAttendanceById(Map<String, Object> map);
+
+    int exportCountAttendancePersonByMap(Map<String, Object> map);
+
+    int selectCountAttendanceEnterpriseByMap(Map<String, Object> map);
+
+    int selectCountByMap(Map<String, Object> map);
+
+    List<WorkRegister> selectByDay(Map<String, Object> map);
+
+    String selectYearList();
+
+    String selectMonthList();
+
+    String selectDayStr(Map<String, Object> map);
+
+}

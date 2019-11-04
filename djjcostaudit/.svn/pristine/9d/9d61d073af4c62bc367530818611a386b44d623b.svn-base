@@ -1,0 +1,82 @@
+package com.cost168.costaudit.service.work.impl;
+
+import com.cost168.costaudit.mapper.work.WorkRegisterMapper;
+import com.cost168.costaudit.pojo.work.vo.WorkAttendanceParam;
+import com.cost168.costaudit.pojo.work.vo.WorkAttendancePersonExportParam;
+import com.cost168.costaudit.service.work.WorkAttendancePersonService;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.io.FileInputStream;
+import java.io.OutputStream;
+import java.text.SimpleDateFormat;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @description: 考勤人员台账实现层
+ * @author: ZYL
+ * @create: 2019-05-24
+ */
+@Service
+public class WorkAttendancePersonServiceImpl implements WorkAttendancePersonService {
+    @Resource
+    private WorkRegisterMapper workRegisterMapper;
+
+    @Override
+    public List<WorkAttendanceParam> selectWorkAttendancePerson(Map<String, Object> map) {
+        return workRegisterMapper.selectWorkAttendancePerson(map);
+    }
+
+    @Override
+    public int selectCountAttendancePersonByMap(Map<String, Object> map) {
+        return workRegisterMapper.selectCountAttendancePersonByMap(map);
+    }
+
+    @Override
+    public List<WorkAttendancePersonExportParam> selectDataList(Map<String, Object> map) {
+        return workRegisterMapper.selectDataList(map);
+    }
+
+    /**
+     * created by ZYL on 2019/6/6
+     * 导出考勤人员台账
+     */
+    @Override
+    public void exportWorkAttendancePerson(String path, OutputStream out, List<WorkAttendancePersonExportParam> list) {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        Workbook wb = null;
+        try {
+            try {
+                FileInputStream input = new FileInputStream(path);
+                String ext = path.substring(path.lastIndexOf(".") + 1);
+                if (ext.equalsIgnoreCase("xls")) {
+                    //03版本及以下
+                    wb = new HSSFWorkbook(input);
+                } else if (ext.equalsIgnoreCase("xlsx")) {
+                    //07版本及以上
+                    wb = new XSSFWorkbook(input);
+                }
+            } catch (Exception e) {
+                throw new Exception("系统未知的Excel版本", e);
+            }
+            Sheet sheet = wb.getSheetAt(0);
+            //开始行
+            int index = 5;
+            for (WorkAttendancePersonExportParam param : list) {
+                Row row = sheet.createRow(index);
+                Cell cell = row.createCell(0);
+                index++;
+            }
+            Row row = sheet.createRow(index + 1);
+            Cell cell = row.createCell(0);
+            wb.write(out);
+            wb.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

@@ -1,0 +1,306 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.cost.CostEnterpriseMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoAutocodeMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoCandidateMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoCandidateRemoveMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoOrderMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoWinbidMapper;
+import com.cost168.costaudit.pojo.cost.CostEnterprise;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAutocode;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidate;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidateRemove;
+import com.cost168.costaudit.pojo.yaohao.YaohaoOrder;
+import com.cost168.costaudit.pojo.yaohao.YaohaoOrderExample;
+import com.cost168.costaudit.pojo.yaohao.YaohaoWinbid;
+import com.cost168.costaudit.service.yaohao.YaohaoOrderService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.JsonUtils;
+import com.cost168.costaudit.utils.OrderUtil;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+@Transactional(rollbackFor = Exception.class)
+public class YaohaoOrderServiceImpl implements YaohaoOrderService {
+
+	@Autowired
+	private YaohaoOrderMapper yaohaoOrderMapper;
+	@Autowired
+	private YaohaoWinbidMapper yaohaoWinbidMapper;
+	@Autowired
+	private CostEnterpriseMapper costEnterpriseMapper;
+	@Autowired
+	private YaohaoCandidateMapper yaohaoCandidateMapper;
+	@Autowired
+	private YaohaoAutocodeMapper yaohaoAutocodeMapper;
+	@Autowired
+	private YaohaoCandidateRemoveMapper yaohaoCandidateRemoveMapper;
+	
+	@Override
+	public List<YaohaoOrder> selectByExample(YaohaoOrderExample example) {
+		return yaohaoOrderMapper.selectByExample(example);
+	}
+
+	@Override
+	public YaohaoOrder selectByPrimaryKey(String id) {
+		return yaohaoOrderMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(YaohaoOrder record) {
+		return yaohaoOrderMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoOrder yaohaoOrder) {
+		return yaohaoOrderMapper.updateByPrimaryKeySelective(yaohaoOrder);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoOrderMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<YaohaoOrder> selectListByMap(Map<String, Object> map) {
+		return yaohaoOrderMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoOrderMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public int registerOrder(String winbid ,YaohaoOrder yaohaoOrder) throws Exception {
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		yaohaoOrder.setCreateTime(new Date());
+		yaohaoOrder.setCreater(currentUser.getName());
+		String tem="["+winbid+"]";
+		List<YaohaoWinbid> list=JsonUtils.jsonToList(tem, YaohaoWinbid.class);
+		if(null!=list && list.size()>0){
+			//判断中签项目是否重复
+			Set<String> strList=new HashSet<String>();
+			for(YaohaoWinbid bid:list){
+				strList.add(bid.getName());
+			}
+			if(list.size()!=strList.size()){
+				return 300;
+			}else{
+				yaohaoOrderMapper.insertSelective(yaohaoOrder);
+				for(YaohaoWinbid bid:list){
+					CostEnterprise ent= costEnterpriseMapper.selectByPrimaryKey(bid.getEnterpriseId());
+					YaohaoWinbid yaohaoWinbid=new YaohaoWinbid();
+					if(null!=ent){
+						yaohaoWinbid.setEnterpriseCode(ent.getCode());
+					}
+					yaohaoWinbid.setId(OrderUtil.buildOrderId(""));
+					yaohaoWinbid.setName(bid.getName());
+					yaohaoWinbid.setContacts(bid.getContacts());
+					yaohaoWinbid.setContactsPhone(bid.getContactsPhone());
+					yaohaoWinbid.setServiceAmount(bid.getServiceAmount());
+					yaohaoWinbid.setDecideAmount(bid.getDecideAmount());
+					yaohaoWinbid.setOrderCode(yaohaoOrder.getCode());
+					yaohaoWinbid.setYaohaoYear(yaohaoOrder.getYaohaoYear());
+					yaohaoWinbid.setCreater(currentUser.getName());
+					yaohaoWinbid.setCreateTime(new Date());
+					yaohaoWinbid.setCandidateId(bid.getCandidateId());
+					yaohaoWinbidMapper.insertSelective(yaohaoWinbid);
+					//候选人表加入摇号单
+					YaohaoCandidate can=yaohaoCandidateMapper.selectByPrimaryKey(bid.getCandidateId());
+					can.setBidFlag(yaohaoOrder.getCode());
+					yaohaoCandidateMapper.updateByPrimaryKeySelective(can);
+				}
+				//清空剔除机会企业
+				Map<String,Object> map=new HashMap<String, Object>();
+				map.put("orderCode", yaohaoOrder.getCode());
+				List<YaohaoCandidateRemove> crList=yaohaoCandidateRemoveMapper.selectListByMap(map);
+				if(null!=crList && crList.size()>0){
+					YaohaoCandidate cd=null;
+					for(YaohaoCandidateRemove cr:crList){
+						cd=yaohaoCandidateMapper.selectByPrimaryKey(cr.getCandidateId());
+						cd.setRemoveFlag("1");
+						yaohaoCandidateMapper.updateByPrimaryKeySelective(cd);
+						//yaohaoCandidateRemoveMapper.deleteByPrimaryKey(cr.getId());
+					}
+				}
+				//更新序号
+				getAutoCode(yaohaoOrder);
+			}
+			return 200;
+		}else{
+			return 500;
+		}
+		
+	}
+
+	private void getAutoCode(YaohaoOrder yaohaoOrder) {
+		Map<String,Object> map=new HashMap<String, Object>();
+		//更新序号
+		YaohaoAutocode code=yaohaoAutocodeMapper.selectByPrimaryKey("1");
+		if(yaohaoOrder.getYaohaoGrade().equals("第二档")){
+			map.put("yaohaoGrade", "第二档");
+			map.put("yaohaoYear", yaohaoOrder.getYaohaoYear());
+			map.put("roundNum", code.getLunNumB());
+			map.put("bidFlagNull", "bidFlagNull");
+			int yaohaoGradeB= yaohaoCandidateMapper.selectCountByMap(map);
+			if(0==yaohaoGradeB){
+				int l=code.getLunNumB()+1;
+				code.setCodeB("B-"+l+"-"+1);
+				code.setLunNumB(l);
+				code.setCiNumB(1);
+				//生成第二轮候选人
+				buildCandidate(yaohaoOrder, map, l);
+			}else{
+				int ci=code.getCiNumB()+1;
+				code.setCodeB("B-"+code.getLunNumB()+"-"+ci);
+				code.setLunNumB(yaohaoOrder.getLunNumber());
+				code.setCiNumB(ci);
+			}
+		}else{
+			map.put("yaohaoGrade", "第一档");
+			map.put("yaohaoYear", yaohaoOrder.getYaohaoYear());
+			map.put("roundNum", code.getLunNumA());
+			map.put("bidFlagNull", "bidFlagNull");
+			int yaohaoGradeA= yaohaoCandidateMapper.selectCountByMap(map);
+			if(0==yaohaoGradeA){
+				int l=code.getLunNumA()+1;
+				code.setCodeA("A-"+l+"-"+1);
+				code.setLunNumA(l);
+				code.setCiNumA(1);
+				//生成第二轮候选人
+				buildCandidate(yaohaoOrder, map, l);
+			}else{
+				int ci=code.getCiNumA()+1;
+				code.setCodeA("A-"+code.getLunNumA()+"-"+ci);
+				code.setLunNumA(yaohaoOrder.getLunNumber());
+				code.setCiNumA(ci);
+			}
+		}
+		yaohaoAutocodeMapper.updateByPrimaryKeySelective(code);
+	}
+
+	private void buildCandidate(YaohaoOrder yaohaoOrder,Map<String, Object> map, int l) {
+		//生成候选人
+		map.clear();
+		/*map.put("yaohaoGrade", yaohaoOrder.getYaohaoGrade());
+		map.put("yaohaoYear", yaohaoOrder.getYaohaoYear());
+		map.put("roundNum", yaohaoOrder.getLunNumber());
+		List<YaohaoCandidate> canList= yaohaoCandidateMapper.selectListByMap(map);*/
+		if("第二档".equals(yaohaoOrder.getYaohaoGrade())){
+			map.put("effectiveFlag", "在库");
+			map.put("batch", yaohaoOrder.getYaohaoYear());
+			List<CostEnterprise> eList=costEnterpriseMapper.selectListByMap(map);
+			YaohaoCandidate canNew=null;
+			for(CostEnterprise c: eList){
+				canNew=new YaohaoCandidate();
+				canNew.setId(OrderUtil.buildOrderId(""));
+				canNew.setEnterpriseCode(c.getCode());
+				canNew.setYaohaoYear(yaohaoOrder.getYaohaoYear());
+				canNew.setYaohaoGrade(yaohaoOrder.getYaohaoGrade());
+				canNew.setCreateTime(new Date());
+				canNew.setCreater(yaohaoOrder.getCreater());
+				canNew.setRoundNum(l);
+				canNew.setRemoveFlag("1");
+				yaohaoCandidateMapper.insertSelective(canNew);
+			}
+		}else{
+			//第一档
+			//map.put("yaohaoGrade", yaohaoOrder.getYaohaoGrade());
+			//map.put("yaohaoYear", yaohaoOrder.getYaohaoYear());
+			//map.put("roundNum", yaohaoOrder.getLunNumber());
+			//List<YaohaoCandidate> canList= yaohaoCandidateMapper.selectListByMap(map);
+			map.put("effectiveFlag", "在库");
+			map.put("batch", yaohaoOrder.getYaohaoYear());
+			int temp=Integer.parseInt(yaohaoOrder.getYaohaoYear());
+			int assess_year=temp-1;
+			map.put("year", assess_year);
+			map.put("assessResultRk", "第一档");
+			List<CostEnterprise> canList=costEnterpriseMapper.selectListByMap(map);
+			YaohaoCandidate canNew=null;
+			for(CostEnterprise c: canList){
+				canNew=new YaohaoCandidate();
+				canNew.setId(OrderUtil.buildOrderId(""));
+				canNew.setEnterpriseCode(c.getCode());
+				canNew.setYaohaoYear(yaohaoOrder.getYaohaoYear());
+				canNew.setYaohaoGrade(yaohaoOrder.getYaohaoGrade());
+				canNew.setCreateTime(new Date());
+				canNew.setCreater(c.getCreater());
+				canNew.setRoundNum(l);
+				canNew.setRemoveFlag("1");
+				yaohaoCandidateMapper.insertSelective(canNew);
+			}
+		}
+		
+	}
+
+	@Override
+	public int updRegisterOrder(String winbid, YaohaoOrder yaohaoOrder)throws Exception {
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		String tem="["+winbid+"]";
+		List<YaohaoWinbid> list=JsonUtils.jsonToList(tem, YaohaoWinbid.class);
+		if(null!=list && list.size()>0){
+			//判断中签项目是否重复
+			Set<String> strList=new HashSet<String>();
+			for(YaohaoWinbid bid:list){
+				strList.add(bid.getName());
+			}
+			if(list.size()!=strList.size()){
+				return 300;
+			}else{
+				yaohaoOrderMapper.updateByPrimaryKeySelective(yaohaoOrder);
+				yaohaoWinbidMapper.deleteByOrderCode(yaohaoOrder.getCode());
+				List<YaohaoCandidate> canList=yaohaoCandidateMapper.selectListByBidflag(yaohaoOrder.getCode());
+				List<String> eCodeList=new ArrayList<String>();
+				for(YaohaoWinbid bid:list){
+					CostEnterprise ent= costEnterpriseMapper.selectByPrimaryKey(bid.getEnterpriseId());
+					YaohaoWinbid yaohaoWinbid=new YaohaoWinbid();
+					if(null!=ent){
+						yaohaoWinbid.setEnterpriseCode(ent.getCode());
+					}
+					yaohaoWinbid.setId(OrderUtil.buildOrderId(""));
+					yaohaoWinbid.setName(bid.getName());
+					yaohaoWinbid.setContacts(bid.getContacts());
+					yaohaoWinbid.setContactsPhone(bid.getContactsPhone());
+					yaohaoWinbid.setServiceAmount(bid.getServiceAmount());
+					yaohaoWinbid.setDecideAmount(bid.getDecideAmount());
+					yaohaoWinbid.setOrderCode(yaohaoOrder.getCode());
+					yaohaoWinbid.setYaohaoYear(yaohaoOrder.getYaohaoYear());
+					yaohaoWinbid.setCreater(currentUser.getName());
+					yaohaoWinbidMapper.insertSelective(yaohaoWinbid);
+					//剔除掉候选名单bid_flag
+					eCodeList.add(yaohaoWinbid.getEnterpriseCode());
+				}
+				for(YaohaoCandidate c:canList){
+					if(!eCodeList.contains(c.getEnterpriseCode())){
+						c.setBidFlag("");
+						yaohaoCandidateMapper.updateByPrimaryKeySelective(c);
+					}
+				}
+				return 200;
+			}
+		}else{
+			return 500;
+		}
+		
+	}
+
+	@Override
+	public String selectYearList() {
+		return yaohaoOrderMapper.selectYearList();
+	}
+
+}

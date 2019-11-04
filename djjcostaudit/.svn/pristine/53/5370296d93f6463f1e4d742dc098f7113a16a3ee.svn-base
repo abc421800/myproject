@@ -1,0 +1,53 @@
+package com.cost168.costaudit.service.work.impl;
+
+import com.cost168.costaudit.mapper.work.WorkEnterpriseMapper;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.work.WorkEnterpriseExample;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Map;
+
+
+@Service
+public class WorkEnterpriseServiceImpl implements WorkEnterpriseService {
+    @Autowired
+    private WorkEnterpriseMapper workEnterpriseMapper;
+
+    @Override
+    public int insertSelective(WorkEnterprise record) {
+        return workEnterpriseMapper.insertSelective(record);
+    }
+
+    @Override
+    public int deleteByPrimaryKey(String id) {
+        return workEnterpriseMapper.deleteByPrimaryKey(id);
+    }
+
+    @Override
+    public List<WorkEnterprise> selectByExample(WorkEnterpriseExample example) {
+        return workEnterpriseMapper.selectByExample(example);
+    }
+
+    @Override
+    public WorkEnterprise selectByPrimaryKey(String id) {
+        return workEnterpriseMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int updateByPrimaryKeySelective(WorkEnterprise workEnterprise) {
+        return workEnterpriseMapper.updateByPrimaryKeySelective(workEnterprise);
+    }
+
+    @Override
+    public List<WorkEnterprise> selectListByMap(Map<String, Object> map) {
+        return workEnterpriseMapper.selectListByMap(map);
+    }
+
+    @Override
+    public int selectCountByMap(Map<String, Object> map) {
+        return workEnterpriseMapper.selectCountByMap(map);
+    }
+}

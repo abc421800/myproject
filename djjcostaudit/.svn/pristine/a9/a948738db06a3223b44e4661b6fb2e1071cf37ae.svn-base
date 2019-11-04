@@ -1,0 +1,30 @@
+package com.cost168.costaudit.mapper.yaohao;
+
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssessExample;
+import java.util.List;
+import org.apache.ibatis.annotations.Param;
+
+public interface YaohaoAssessMapper {
+    int countByExample(YaohaoAssessExample example);
+
+    int deleteByExample(YaohaoAssessExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(YaohaoAssess record);
+
+    int insertSelective(YaohaoAssess record);
+
+    List<YaohaoAssess> selectByExample(YaohaoAssessExample example);
+
+    YaohaoAssess selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") YaohaoAssess record, @Param("example") YaohaoAssessExample example);
+
+    int updateByExample(@Param("record") YaohaoAssess record, @Param("example") YaohaoAssessExample example);
+
+    int updateByPrimaryKeySelective(YaohaoAssess record);
+
+    int updateByPrimaryKey(YaohaoAssess record);
+}

@@ -1,0 +1,565 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.work.WorkPersonMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.work.WorkPerson" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="enterprise_id" property="enterpriseId" jdbcType="VARCHAR" />
+    <result column="account" property="account" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sex" property="sex" jdbcType="VARCHAR" />
+    <result column="phone" property="phone" jdbcType="VARCHAR" />
+    <result column="email" property="email" jdbcType="VARCHAR" />
+    <result column="wechat" property="wechat" jdbcType="VARCHAR" />
+    <result column="job" property="job" jdbcType="VARCHAR" />
+    <result column="plan_start_time" property="planStartTime" jdbcType="TIMESTAMP" />
+    <result column="plan_end_time" property="planEndTime" jdbcType="TIMESTAMP" />
+    <result column="actual_start_time" property="actualStartTime" jdbcType="TIMESTAMP" />
+    <result column="actual_end_time" property="actualEndTime" jdbcType="TIMESTAMP" />
+    <result column="total_day" property="totalDay" jdbcType="REAL" />
+    <result column="effective_flag" property="effectiveFlag" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="annualLeaveTotal" property="annualLeaveTotal" jdbcType="VARCHAR" />
+    <result column="annualLeaveUseup" property="annualLeaveUseup" jdbcType="VARCHAR" />
+    <result column="annualLeaveStartTime" property="annualLeaveStartTime" jdbcType="TIMESTAMP" />
+    <result column="annualLeaveEndTime" property="annualLeaveEndTime" jdbcType="TIMESTAMP" />
+    <result column="attendanceRate" property="attendanceRate" jdbcType="REAL" />
+    
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, enterprise_id,account, name, sex, phone, email, wechat, job, plan_start_time, plan_end_time, 
+    actual_start_time, actual_end_time, total_day, effective_flag, creater, create_time, 
+    remark, annualLeaveTotal, annualLeaveUseup,annualLeaveStartTime,annualLeaveEndTime,attendanceRate
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.work.WorkPersonExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from work_person
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+  	select
+    <include refid="Base_Column_List" />
+    from work_person p
+     <where>
+     		<if test="id != null and id !=''" >
+     			and p.id = #{id}
+   			</if>
+            <if test="nameEq != null and nameEq !=''" >
+               and p.name = #{nameEq}
+            </if>
+   			<if test="name != null and name !=''" >
+     			and p.name like concat('%',#{name},'%')
+   			</if>
+   			<if test="effectiveFlag != null and effectiveFlag !=''" >
+     			and p.effective_flag = #{effectiveFlag}
+   			</if>
+   			<if test="account != null and account !=''" >
+     			and p.account = #{account}
+   			</if>
+   			<if test="enterpriseId != null and enterpriseId !=''" >
+     			and p.enterprise_id = #{enterpriseId}
+   			</if>
+   			<if test="shenTime == 'planStartTime'">
+	   			<if test="startTime != null and startTime !=''" >
+	    			and <![CDATA[ p.plan_start_time>=#{startTime} ]]>
+	  			</if>
+	  			<if test="endTime != null and endTime !=''" >
+	    			and <![CDATA[ p.plan_start_time<=#{endTime} ]]>
+	  			</if>
+  			</if>
+  			<if test="shenTime == 'actualStartTime'">
+	  			<if test="startTime != null and startTime !=''" >
+	    			and <![CDATA[ p.actual_start_time>=#{startTime} ]]>
+	  			</if>
+	  			<if test="endTime != null and endTime !=''" >
+	    			and <![CDATA[ p.actual_start_time<=#{endTime} ]]>
+	  			</if>
+  			</if>
+        </where>
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map" >
+    select count(*)  from work_person p
+     <where>
+     		<if test="id != null and id !=''" >
+     			and p.id = #{id}
+   			</if>
+   			<if test="name != null and name !=''" >
+     			and p.name like concat('%',#{name},'%')
+   			</if>
+            <if test="nameEq != null and nameEq !=''" >
+               and p.name = #{nameEq}
+            </if>
+   			<if test="effectiveFlag != null and effectiveFlag !=''" >
+     			and p.effective_flag = #{effectiveFlag}
+   			</if>
+     		<if test="account != null and account !=''" >
+     			and p.account = #{account}
+   			</if>
+   			<if test="enterpriseId != null and enterpriseId !=''" >
+     			and p.enterprise_id = #{enterpriseId}
+   			</if>
+   			<if test="shenTime == 'planStartTime'">
+	   			<if test="startTime != null and startTime !=''" >
+	    			and <![CDATA[ p.plan_start_time>=#{startTime} ]]>
+	  			</if>
+	  			<if test="endTime != null and endTime !=''" >
+	    			and <![CDATA[ p.plan_start_time<=#{endTime} ]]>
+	  			</if>
+  			</if>
+  			<if test="shenTime == 'actualStartTime'">
+	  			<if test="startTime != null and startTime !=''" >
+	    			and <![CDATA[ p.actual_start_time>=#{startTime} ]]>
+	  			</if>
+	  			<if test="endTime != null and endTime !=''" >
+	    			and <![CDATA[ p.actual_start_time<=#{endTime} ]]>
+	  			</if>
+  			</if>
+        </where>
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from work_person
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from work_person
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.work.WorkPersonExample" >
+    delete from work_person
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.work.WorkPerson" >
+    insert into work_person (id, enterprise_id, name, 
+      sex, phone, email, 
+      wechat, job, plan_start_time, 
+      plan_end_time, actual_start_time, actual_end_time, 
+      total_day, effective_flag, creater, 
+      create_time, remark, annualLeaveTotal, annualLeaveUseup,annualLeaveStartTime,annualLeaveEndTime,attendanceRate)
+    values (#{id,jdbcType=VARCHAR}, #{enterpriseId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
+      #{wechat,jdbcType=VARCHAR}, #{job,jdbcType=VARCHAR}, #{planStartTime,jdbcType=TIMESTAMP}, 
+      #{planEndTime,jdbcType=TIMESTAMP}, #{actualStartTime,jdbcType=TIMESTAMP}, #{actualEndTime,jdbcType=TIMESTAMP}, 
+      #{totalDay,jdbcType=REAL}, #{effectiveFlag,jdbcType=VARCHAR}, #{creater,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{remark,jdbcType=VARCHAR}, #{annualLeaveTotal,jdbcType=VARCHAR},
+      #{annualLeaveUseup,jdbcType=VARCHAR},#{annualLeaveStartTime,jdbcType=TIMESTAMP},#{annualLeaveEndTime,jdbcType=TIMESTAMP},#{attendanceRate,jdbcType=REAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.work.WorkPerson" >
+    insert into work_person
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="enterpriseId != null" >
+        enterprise_id,
+      </if>
+      <if test="account != null" >
+        account,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+      <if test="wechat != null" >
+        wechat,
+      </if>
+      <if test="job != null" >
+        job,
+      </if>
+      <if test="planStartTime != null" >
+        plan_start_time,
+      </if>
+      <if test="planEndTime != null" >
+        plan_end_time,
+      </if>
+      <if test="actualStartTime != null" >
+        actual_start_time,
+      </if>
+      <if test="actualEndTime != null" >
+        actual_end_time,
+      </if>
+      <if test="totalDay != null" >
+        total_day,
+      </if>
+      <if test="effectiveFlag != null" >
+        effective_flag,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="annualLeaveTotal != null" >
+        annualLeaveTotal,
+      </if>
+      <if test="annualLeaveUseup != null" >
+        annualLeaveUseup,
+      </if>
+      <if test="annualLeaveStartTime != null" >
+        annualLeaveStartTime,
+      </if>
+       <if test="annualLeaveEndTime != null" >
+        annualLeaveEndTime,
+      </if>
+      <if test="attendanceRate != null" >
+        attendanceRate,
+      </if>
+      
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseId != null" >
+        #{enterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="account != null" >
+        #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="wechat != null" >
+        #{wechat,jdbcType=VARCHAR},
+      </if>
+      <if test="job != null" >
+        #{job,jdbcType=VARCHAR},
+      </if>
+      <if test="planStartTime != null" >
+        #{planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planEndTime != null" >
+        #{planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualStartTime != null" >
+        #{actualStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualEndTime != null" >
+        #{actualEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalDay != null" >
+        #{totalDay,jdbcType=REAL},
+      </if>
+      <if test="effectiveFlag != null" >
+        #{effectiveFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="annualLeaveTotal != null" >
+        #{annualLeaveTotal,jdbcType=VARCHAR},
+      </if>
+      <if test="annualLeaveUseup != null" >
+        #{annualLeaveUseup,jdbcType=VARCHAR},
+      </if>
+      <if test="annualLeaveStartTime != null" >
+        #{annualLeaveStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="annualLeaveEndTime != null" >
+        #{attendanceRate,jdbcType=REAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.work.WorkPersonExample" resultType="java.lang.Integer" >
+    select count(*) from work_person
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update work_person
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.enterpriseId != null" >
+        enterprise_id = #{record.enterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.account != null" >
+        account = #{record.account,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.sex != null" >
+        sex = #{record.sex,jdbcType=VARCHAR},
+      </if>
+      <if test="record.phone != null" >
+        phone = #{record.phone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.email != null" >
+        email = #{record.email,jdbcType=VARCHAR},
+      </if>
+      <if test="record.wechat != null" >
+        wechat = #{record.wechat,jdbcType=VARCHAR},
+      </if>
+      <if test="record.job != null" >
+        job = #{record.job,jdbcType=VARCHAR},
+      </if>
+      <if test="record.planStartTime != null" >
+        plan_start_time = #{record.planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.planEndTime != null" >
+        plan_end_time = #{record.planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.actualStartTime != null" >
+        actual_start_time = #{record.actualStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.actualEndTime != null" >
+        actual_end_time = #{record.actualEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.totalDay != null" >
+        total_day = #{record.totalDay,jdbcType=REAL},
+      </if>
+      <if test="record.effectiveFlag != null" >
+        effective_flag = #{record.effectiveFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creater != null" >
+        creater = #{record.creater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.annualLeaveTotal != null" >
+        annualLeaveTotal = #{record.annualLeaveTotal,jdbcType=VARCHAR},
+      </if>
+      <if test="record.annualLeaveUseup != null" >
+        annualLeaveUseup = #{record.annualLeaveUseup,jdbcType=VARCHAR},
+      </if>
+      <if test="record.attendanceRate != null" >
+        attendanceRate = #{record.attendanceRate,jdbcType=REAL},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update work_person
+    set id = #{record.id,jdbcType=VARCHAR},
+      enterprise_id = #{record.enterpriseId,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      sex = #{record.sex,jdbcType=VARCHAR},
+      phone = #{record.phone,jdbcType=VARCHAR},
+      email = #{record.email,jdbcType=VARCHAR},
+      wechat = #{record.wechat,jdbcType=VARCHAR},
+      job = #{record.job,jdbcType=VARCHAR},
+      plan_start_time = #{record.planStartTime,jdbcType=TIMESTAMP},
+      plan_end_time = #{record.planEndTime,jdbcType=TIMESTAMP},
+      actual_start_time = #{record.actualStartTime,jdbcType=TIMESTAMP},
+      actual_end_time = #{record.actualEndTime,jdbcType=TIMESTAMP},
+      total_day = #{record.totalDay,jdbcType=REAL},
+      effective_flag = #{record.effectiveFlag,jdbcType=VARCHAR},
+      creater = #{record.creater,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      annualLeaveTotal = #{record.annualLeaveTotal,jdbcType=VARCHAR},
+      annualLeaveUseup = #{record.annualLeaveUseup,jdbcType=VARCHAR}
+      attendanceRate = #{record.attendanceRate,jdbcType=REAL}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.work.WorkPerson" >
+    update work_person
+    <set >
+      <if test="enterpriseId != null" >
+        enterprise_id = #{enterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="account != null" >
+        account = #{account,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="email != null" >
+        email = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="wechat != null" >
+        wechat = #{wechat,jdbcType=VARCHAR},
+      </if>
+      <if test="job != null" >
+        job = #{job,jdbcType=VARCHAR},
+      </if>
+      <if test="planStartTime != null" >
+        plan_start_time = #{planStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="planEndTime != null" >
+        plan_end_time = #{planEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualStartTime != null" >
+        actual_start_time = #{actualStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="actualEndTime != null" >
+        actual_end_time = #{actualEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="totalDay != null" >
+        total_day = #{totalDay,jdbcType=REAL},
+      </if>
+      <if test="effectiveFlag != null" >
+        effective_flag = #{effectiveFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="annualLeaveTotal != null" >
+        annualLeaveTotal = #{annualLeaveTotal,jdbcType=VARCHAR},
+      </if>
+      <if test="annualLeaveUseup != null" >
+        annualLeaveUseup = #{annualLeaveUseup,jdbcType=VARCHAR},
+      </if>
+      <if test="annualLeaveStartTime != null" >
+        annualLeaveStartTime = #{annualLeaveStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="annualLeaveEndTime != null" >
+        annualLeaveEndTime = #{annualLeaveEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="attendanceRate != null" >
+        attendanceRate = #{attendanceRate,jdbcType=REAL},
+      </if>
+      
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.work.WorkPerson" >
+    update work_person
+    set enterprise_id = #{enterpriseId,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      wechat = #{wechat,jdbcType=VARCHAR},
+      job = #{job,jdbcType=VARCHAR},
+      plan_start_time = #{planStartTime,jdbcType=TIMESTAMP},
+      plan_end_time = #{planEndTime,jdbcType=TIMESTAMP},
+      actual_start_time = #{actualStartTime,jdbcType=TIMESTAMP},
+      actual_end_time = #{actualEndTime,jdbcType=TIMESTAMP},
+      total_day = #{totalDay,jdbcType=REAL},
+      effective_flag = #{effectiveFlag,jdbcType=VARCHAR},
+      creater = #{creater,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR},
+      annualLeaveTotal = #{annualLeaveTotal,jdbcType=VARCHAR},
+      annualLeaveUseup = #{annualLeaveUseup,jdbcType=VARCHAR},
+      annualLeaveStartTime = #{annualLeaveStartTime,jdbcType=TIMESTAMP},
+      annualLeaveEndTime = #{annualLeaveEndTime,jdbcType=TIMESTAMP}
+      attendanceRate = #{attendanceRate,jdbcType=REAL}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

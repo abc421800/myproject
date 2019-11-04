@@ -1,0 +1,55 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoOrderMapper;
+import com.cost168.costaudit.pojo.yaohao.YaohaoOrder;
+import com.cost168.costaudit.pojo.yaohao.YaohaoOrderExample;
+import com.cost168.costaudit.service.yaohao.YaohaoOrderService;
+
+@Service
+public class YaohaoOrderServiceImpl implements YaohaoOrderService {
+
+	@Autowired
+	private YaohaoOrderMapper yaohaoOrderMapper;
+	
+	@Override
+	public List<YaohaoOrder> selectByExample(YaohaoOrderExample example) {
+		return yaohaoOrderMapper.selectByExample(example);
+	}
+
+	@Override
+	public YaohaoOrder selectByPrimaryKey(String id) {
+		return yaohaoOrderMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(YaohaoOrder record) {
+		return yaohaoOrderMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoOrder yaohaoOrder) {
+		return yaohaoOrderMapper.updateByPrimaryKeySelective(yaohaoOrder);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoOrderMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<YaohaoOrder> selectListByMap(Map<String, Object> map) {
+		return yaohaoOrderMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoOrderMapper.selectCountByMap(map);
+	}
+
+}

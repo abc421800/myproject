@@ -1,0 +1,210 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import com.cost168.costaudit.mapper.yaohao.YaohaoAssessMapper;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+import com.cost168.costaudit.pojo.yaohao.param.YaohaoAssessParam;
+import com.cost168.costaudit.service.yaohao.YaohaoAssessService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.OrderUtil;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @description: 综合考核服务层
+ * @author: ZYL
+ * @created: 2019-07-08
+ */
+@Service
+public class YaohaoAssessServiceImpl implements YaohaoAssessService {
+    @Resource
+    private YaohaoAssessMapper assessMapper;
+
+    @Override
+    public YaohaoAssess selectByPrimaryKey(String id) {
+        return assessMapper.selectByPrimaryKey(id);
+    }
+
+    @Override
+    public int selectCountByMap(Map<String, Object> map) {
+        return assessMapper.selectCountByMap(map);
+    }
+
+    /**
+     * created by ZYL on 2019/7/10
+     * 批量删除
+     */
+    @Override
+    public GlobalResult deleteByPrimaryKey(HttpServletRequest request) {
+        GlobalResult result = new GlobalResult();
+        String ids = request.getParameter("ids");
+        String arr[] = ids.split(",");
+        try {
+            for (String id : arr) {
+                if (id != null && !"".equals(id)) {
+                    assessMapper.deleteByPrimaryKey(id);
+                }
+            }
+            result.setStatus(200);
+        } catch (Exception e) {
+            result.setStatus(500);
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/18
+     * 插入综合考勤单
+     */
+    @Override
+    public GlobalResult insert(YaohaoAssessParam assessParam, HttpServletRequest request) {
+        GlobalResult result = new GlobalResult();
+        //查询入库企业code
+        String code = assessMapper.selectEnterpriseCodeByName(assessParam.getEnterpriseName()).getCode();
+        assessParam.setEnterpriseCode(code);
+        assessParam.setCreateTime(new Date());
+        int temp = assessMapper.insert(assessParam);
+        if (temp > 0) {
+            result.setStatus(200);
+        } else {
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/18
+     * 跳转新增或者修改页面
+     */
+    @Override
+    public String toEdit(HttpServletRequest request) {
+        SysUser currentUser = shiroUtil.getInstance().currentUser();
+        String url = "";
+        String id = request.getParameter("id");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = sdf.format(new Date());
+        String regYear = currentDate.substring(0, 4);
+        if (null != id && !"".equals(id)) {
+            //修改
+            url = "/assess/update";
+            YaohaoAssessParam param = assessMapper.queryOne(id);
+            request.setAttribute("obj", param);
+        } else {
+            //新增
+            url = "/assess/insert";
+            YaohaoAssessParam param = new YaohaoAssessParam();
+            param.setId(OrderUtil.buildOrderId(""));
+            param.setCreater(currentUser.getName());
+            param.setYear(regYear);
+            request.setAttribute("obj", param);
+        }
+        request.setAttribute("url", url);
+        return "/yaohao/assess/assessAdd";
+    }
+
+    /**
+     * created by ZYL on 2019/7/17
+     * 更新综合考核单
+     */
+    @Override
+    public GlobalResult updateByPrimaryKeySelective(YaohaoAssessParam assessParam) {
+        GlobalResult result = new GlobalResult();
+        String code = assessMapper.selectEnterpriseCodeByName(assessParam.getEnterpriseName()).getCode();
+        assessParam.setEnterpriseCode(code);
+        int temp = assessMapper.updateByPrimaryKey(assessParam);
+        if (temp > 0) {
+            result.setStatus(200);
+        } else {
+            result.setStatus(500);
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/10
+     * 获取所有的考核年份
+     */
+    @Override
+    public String queryYear(HttpServletRequest request) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = sdf.format(new Date());
+        String currentYear = currentDate.substring(0, 4);
+        request.setAttribute("currentYear", currentYear);
+        request.setAttribute("years", assessMapper.queryYear());
+        return "/yaohao/assess/list";
+    }
+    /**
+     * created by ZYL on 2019/7/9
+     * 根据条件检索数据
+     */
+    @Override
+    public EUDataGridResult selectListByMap(HttpServletRequest request, int page, int rows, Map<String, Object> map) {
+        EUDataGridResult result = new EUDataGridResult();
+        String enterpriseName = request.getParameter("enterpriseName");
+        String rukuStatus = request.getParameter("rukuStatus");
+        String year = request.getParameter("year");
+        String assessResult = request.getParameter("assessResult");
+        String yaohaoGrade = request.getParameter("yaohaoGrade");
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        map.put("enterpriseName", enterpriseName);
+        map.put("rukuStatus", rukuStatus);
+        map.put("year", year);
+        map.put("assessResult", assessResult);
+        map.put("yaohaoGrade", yaohaoGrade);
+        map.put("startTime", startTime);
+        map.put("endTime", endTime);
+        map.put("isPage", true);
+        map.put("curPage", rows * (page - 1));
+        map.put("pageSize", rows);
+        List<YaohaoAssess> list = assessMapper.selectListByMap(map);
+        int total=assessMapper.selectCountByMap(map);
+        result.setRows(list);
+        result.setTotal(total);
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/17
+     * 查询有效时间内的入库企业
+     */
+    @Override
+    public EUDataGridResult queryEnterpriseByParam(HttpServletRequest request, int page, int rows, Map<String, Object> map) {
+        EUDataGridResult result = new EUDataGridResult();
+        String effectiveFlag = request.getParameter("effectiveFlag");
+        String enterpriseName = request.getParameter("enterpriseName");
+        map.put("enterpriseName", enterpriseName);
+        map.put("effectiveFlag", effectiveFlag);
+        map.put("isPage", true);
+        map.put("curPage", rows * (page - 1));
+        map.put("pageSize", rows);
+        List<YaohaoAssessParam> assessParamList = assessMapper.queryEnterpriseByParam(map);
+        int temp = assessMapper.countEnterpriseByParam(map);
+        if (assessParamList.size() > 0 && temp > 0) {
+            result.setRows(assessParamList);
+            result.setTotal(temp);
+        }
+        return result;
+    }
+
+    /**
+     * created by ZYL on 2019/7/9
+     * 综合考核导出excel表格
+     */
+    @Override
+    public EUDataGridResult exportExcel(HttpServletRequest request, HttpServletResponse response, String year) {
+        EUDataGridResult result = new EUDataGridResult();
+        String enterpriseIds = request.getParameter("enterpriseIds");
+        return result;
+    }
+}

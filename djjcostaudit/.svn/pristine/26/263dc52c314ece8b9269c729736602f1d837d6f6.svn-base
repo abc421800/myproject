@@ -1,0 +1,665 @@
+var myview = $.extend({}, $.fn.datagrid.defaults.view, {
+
+    renderFooter: function (target, container, frozen) {
+
+        var opts = $.data(target, 'datagrid').options;
+
+        var rows = $.data(target, 'datagrid').footer || [];
+
+        var fields = $(target).datagrid('getColumnFields', frozen);
+
+        var table = ['<table class="datagrid-ftable" cellspacing="0" cellpadding="0" border="0"><tbody>'];
+
+
+        for (var i = 0; i < rows.length; i++) {
+
+            var styleValue = opts.rowStyler ? opts.rowStyler.call(target, i, rows[i]) : '';
+
+            var style = styleValue ? 'style="' + styleValue + '"' : '';
+
+            table.push('<tr class="datagrid-row" datagrid-row-index="' + i + '"' + style + '>');
+
+            table.push(this.renderRow.call(this, target, fields, frozen, i, rows[i]));
+
+            table.push('</tr>');
+
+        }
+        table.push('</tbody></table>');
+
+        $(container).html(table.join(''));
+
+    }
+
+});
+
+$(function () {
+    personAccount();
+});
+
+function personAccount() {
+
+    var bool = false;
+    $(".switchBtn").on('click', function () {
+        $(".filter").toggle();
+        if (!bool) {
+            $(this).addClass("active");
+            $('#personAccount').datagrid('resize', {
+                height: $(window).height() - 60
+            });
+            bool = true;
+        } else {
+            $(this).removeClass("active");
+            bool = false;
+            $('#personAccount').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+
+    $('#personAccount').datagrid({
+        url: '/workAttendancePerson/listPerson',
+        loadMsg: '数据加载中,请稍候...',
+        nowrap: false,
+        rownumbers: true,
+        height: tableHeight(),
+        fitColumns: false,
+        striped: true,
+        collapsilble: true,
+        pagination: true, //分页控件
+        pageSize: 10,
+        singleSelect: true,
+        showFooter: true,
+        frozenColumns: [[
+            {
+                field: 'id',
+                title: '单选框',
+                checkbox: true
+            }, {
+                field: 'name',
+                title: '姓名',
+                width: 130,
+                align: 'center',
+                formatter: function (value, rowData, index) {
+                    if (value != "汇总") {
+                        if (value == undefined) {
+                            return "";
+                        }
+                        return "<a href='javascript:void()' title='" + value + "' style='color:#549de3;padding-left:2px;display: inline-block;' onclick='addPersonTab(\"" + rowData.id + "\")'>" + value + "</a>";
+                    } else {
+                        return "汇总";
+                    }
+                }
+            }
+        ]],
+        columns: [
+            [
+                {
+                    field: 'annual',
+                    title: '可修年假',
+                    width: 120,
+                    align: 'center',
+                    sortable: false,
+                    rowspan: 2
+                },
+                {
+                    title: '1月',
+                    align: 'center',
+                    width: 240,
+                    sortable: false,
+                    colspan: 4
+
+                }, {
+                title: '2月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '3月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '4月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '5月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '6月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '7月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '8月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '9月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '10月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '11月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            }, {
+                title: '12月',
+                align: 'center',
+                width: 240,
+                sortable: false,
+                colspan: 4
+
+            },
+                {
+                    title: '年度统计',
+                    align: 'center',
+                    width: 300,
+                    sortable: false,
+                    colspan: 5
+
+                },
+                {
+                    field: 'raking',
+                    title: '名次',
+                    width: 120,
+                    align: 'center',
+                    sortable: false,
+                    rowspan: 2
+                },
+                {
+                    field: 'status',
+                    title: '状态',
+                    width: 120,
+                    align: 'center',
+                    sortable: false,
+                    rowspan: 2
+                }
+
+
+            ], [
+                //1月
+                {
+                    field: 'monthOfWorkday1',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday1',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave1',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime1',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //2月
+                {
+                    field: 'monthOfWorkday2',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday2',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave2',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime2',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //3月
+                {
+                    field: 'monthOfWorkday3',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday3',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave3',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime3',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //4月
+                {
+                    field: 'monthOfWorkday4',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday4',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave4',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime4',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //5月
+                {
+                    field: 'monthOfWorkday5',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday5',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave5',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime5',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //6月
+                {
+                    field: 'monthOfWorkday6',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday6',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave6',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime6',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //7月
+                {
+                    field: 'monthOfWorkday7',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday7',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave7',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime7',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //8月
+                {
+                    field: 'monthOfWorkday8',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday8',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave8',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime8',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //9月
+                {
+                    field: 'monthOfWorkday9',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday9',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave9',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime9',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //10月
+                {
+                    field: 'monthOfWorkday10',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday10',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave10',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime10',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //11月
+                {
+                    field: 'monthOfWorkday11',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday11',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave11',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime11',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //12月
+                {
+                    field: 'monthOfWorkday12',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'monthOfRestday12',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'monthOfLeave12',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'monthOfOvertime12',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                //年底统计
+                {
+                    field: 'yearOfWork',
+                    title: '上班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false,
+                },
+                {
+                    field: 'yearOfRest',
+                    title: '休息',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'yearOfLeave',
+                    title: '请假',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+
+                },
+                {
+                    field: 'yearOvertime',
+                    title: '加班',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                },
+                {
+                    field: 'attendanceRate',
+                    title: '出勤率',
+                    width: 60,
+                    align: 'center',
+                    sortable: false
+                }
+            ]
+        ],
+        toolbar: '#tit1',
+        onLoadSuccess: function (data) {
+            if (data.total == 0) {
+                $('#personAccount').datagrid('loadData', {total: 1, rows: [{annual: "未找到相关信息！"}]});
+            }
+        },
+    });
+    $(window).resize(function () {
+        if (bool) {
+            $('#personAccount').datagrid('resize', {
+                height: $(window).height() - 40
+            });
+        } else {
+            $('#personAccount').datagrid('resize', {
+                height: tableHeight()
+            });
+        }
+    });
+}
+
+//查询
+function search() {
+    var name = $("#name").val().trim();
+    var enterpriseName = $("#enterpriseName").val().trim();
+    var morningOrAfternoon = $("#morningOrAfternoon").val().trim();
+    var regYear = $("#regYear").val();
+    var status = $("#status").val();
+    var attStarttime = $("#attStarttime").val();
+    var attEndtime = $("#attEndtime").val();
+    $('#personAccount').datagrid({
+        queryParams: {
+            name: name,
+            enterpriseName: enterpriseName,
+            morningOrAfternoon: morningOrAfternoon,
+            regYearMonth: regYear,
+            status: status,
+            attStarttime: attStarttime,
+            attEndtime: attEndtime
+        }
+    });
+}
+
+//重置
+function refresh() {
+    var json1 = {tabTitle: '考勤台账', url: '/forward_attendanceManager_attendanceManager'};
+    window.parent.refreshTab(json1);
+}
+
+function addPersonTab(id) {
+    top.addTabGrid('驻场人员详情', '/workAttendancePerson/toPersonEdit?id=' + id);
+}

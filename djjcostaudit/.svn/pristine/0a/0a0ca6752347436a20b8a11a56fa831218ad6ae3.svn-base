@@ -1,0 +1,736 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.cost.CostContractMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.cost.CostContract" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="project_name" property="projectName" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="audit_price_unit" property="auditPriceUnit" jdbcType="VARCHAR" />
+    <result column="contract_type" property="contractType" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="party_b" property="partyB" jdbcType="VARCHAR" />
+    <result column="signing_time" property="signingTime" jdbcType="TIMESTAMP" />
+    <result column="party_b_contacts" property="partyBContacts" jdbcType="VARCHAR" />
+    <result column="party_b_phone" property="partyBPhone" jdbcType="VARCHAR" />
+    <result column="contract_amount" property="contractAmount" jdbcType="DECIMAL" />
+    <result column="change_amount" property="changeAmount" jdbcType="DECIMAL" />
+    <result column="settlement_amount" property="settlementAmount" jdbcType="DECIMAL" />
+    <result column="temporary_amount" property="temporaryAmount" jdbcType="DECIMAL" />
+    <result column="executive_department" property="executiveDepartment" jdbcType="VARCHAR" />
+    <result column="operator" property="operator" jdbcType="VARCHAR" />
+    <result column="operator_phone" property="operatorPhone" jdbcType="VARCHAR" />
+    <result column="person_liable" property="personLiable" jdbcType="VARCHAR" />
+    <result column="description" property="description" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+    <result column="creater" property="creater" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="settlement" property="settlement" jdbcType="VARCHAR" />
+    <result column="parent_id" property="parentId" jdbcType="VARCHAR" />
+    <result column="main_flag" property="mainFlag" jdbcType="VARCHAR" />
+    <result column="mainFlagAmount" property="mainFlagAmount" jdbcType="DECIMAL" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, project_id, name, project_name, code, audit_price_unit, contract_type, status, 
+    party_b, signing_time, party_b_contacts, party_b_phone, contract_amount, change_amount, 
+    settlement_amount, executive_department, operator, operator_phone, person_liable, 
+    description, remark, creater, create_time, temporary_amount, settlement, parent_id, main_flag,
+    mainFlagAmount
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.cost.CostContractExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cost_contract
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+   <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+   select 
+   c.*,org.name as 'department',
+   p.name AS 'projectNameShow'
+   FROM cost_contract c 
+   LEFT JOIN cost_task t ON c.id=t.contract_id
+   LEFT JOIN cost_project p ON p.id=c.project_id
+   LEFT JOIN sys_org org on org.id=c.executive_department
+     <where>
+     		<if test="mainFlag != null and mainFlag !=''" >
+     			and c.main_flag = #{mainFlag}
+   			</if>
+    		<if test="projectId != null and projectId !=''" >
+     			and c.project_id = #{projectId}
+   			</if>
+   			<if test="parentId != null and parentId !=''" >
+     			and c.parent_id = #{parentId}
+   			</if>
+            <if test="name != null and name !=''" >
+     			and c.name like concat('%',#{name},'%')
+   			 </if>
+   			 <if test="code != null and code !=''" >
+   			 	and c.code like concat('%',#{code},'%')
+   			 </if>
+   			 <if test="codeNoLike != null and codeNoLike !=''" >
+   			 	and c.code =#{codeNoLike}
+   			 </if>
+   			 <if test="nameNoLike != null and nameNoLike !=''" >
+   			 	and c.name =#{nameNoLike}
+   			 </if>
+   			 <if test="contractType != null and contractType !=''" >
+     			and c.contract_type = #{contractType}
+   			 </if>
+   			 <if test="projectName != null and projectName !=''" >
+   			 	and p.name like concat('%',#{projectName},'%')
+   			 </if>
+   			  <if test="personLiable != null and personLiable !=''" >
+     			and c.person_liable like concat('%',#{personLiable},'%')
+   			 </if>
+   			 <if test="currentPerson != null and currentPerson !=''" >
+     			and (c.person_liable = #{currentPerson} or c.creater = #{currentPerson})
+   			 </if>
+   			 <if test="startTime != null and startTime !=''" >
+     			and <![CDATA[ c.signing_time>=#{startTime} ]]>
+   			 </if>
+   			 <if test="endTime != null and endTime !=''" >
+     			and <![CDATA[ c.signing_time<=#{endTime} ]]>
+   			 </if>
+   			 <if test="noid != null and noid !=''" >
+     			and c.id != #{noid}
+   			 </if>
+   			 <if test="executiveDepartment != null and executiveDepartment !=''" >
+     			and org.name like  concat('%',#{executiveDepartment},'%')
+   			 </if>
+   			 <if test="selectDepartMent != null and selectDepartMent !=''" >
+	   			 AND FIND_IN_SET(c.executive_department,#{selectDepartMent})
+   			 </if>
+   			 <if test="settlement != null and settlement !=''" >
+     			and c.settlement = #{settlement}
+   			 </if>
+   			 <if test="status != null and status !=''" >
+   			 	and c.status like concat('%',#{status},'%')
+   			 </if>
+   			  <if test="partyB != null and partyB !=''" >
+     			and c.party_b like concat('%',#{partyB},'%')
+   			 </if>
+        </where>
+        GROUP BY c.id
+        order by create_time desc
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+   <select id="selectChildrenListByMap" resultMap="BaseResultMap" parameterType="map" >
+   select c.*,
+   c.*,org.name as 'department',
+   p.name AS 'projectNameShow'
+   FROM cost_contract c 
+   LEFT JOIN cost_task t ON c.id=t.contract_id
+   LEFT JOIN cost_project p ON p.id=c.project_id
+   LEFT JOIN sys_org org on org.id=c.executive_department
+     <where>	
+     		<if test="projectId != null and projectId !=''" >
+     			and c.project_id = #{projectId}
+   			 </if>
+   			 <if test="parentId != null and parentId !=''" >
+     			and c.parent_id != #{parentId}
+   			 </if>
+        </where>
+        GROUP BY c.id
+        order by create_time desc
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map" >
+    SELECT COUNT(m.id) FROM(
+	select c.id FROM cost_contract c LEFT JOIN cost_task t ON c.id=t.contract_id
+	LEFT JOIN cost_project p ON p.id=c.project_id
+	 LEFT JOIN sys_org org on org.id=c.executive_department
+     <where>
+     		 <if test="projectId != null and projectId !=''" >
+     			and c.project_id = #{projectId}
+   			 </if>
+   			 <if test="mainFlag != null and mainFlag !=''" >
+     			and c.main_flag = #{mainFlag}
+   			</if>
+   			 <if test="parentId != null and parentId !=''" >
+     			and c.parent_id = #{parentId}
+   			</if>
+             <if test="name != null and name !=''" >
+     			and c.name like concat('%',#{name},'%')
+   			 </if>
+   			 <if test="code != null and code !=''" >
+   			 	and c.code like concat('%',#{code},'%')
+   			 </if>
+   			 <if test="codeNoLike != null and codeNoLike !=''" >
+   			 	and c.code = #{codeNoLike}
+   			 </if>
+   			 <if test="nameNoLike != null and nameNoLike !=''" >
+   			 	and c.name =#{nameNoLike}
+   			 </if>
+   			 <if test="contractType != null and contractType !=''" >
+     			and c.contract_type = #{contractType}
+   			 </if>
+   			 <if test="projectName != null and projectName !=''" >
+   			 	and p.name like concat('%',#{projectName},'%')
+   			 </if>
+   			  <if test="personLiable != null and personLiable !=''" >
+     			and c.person_liable like concat('%',#{personLiable},'%')
+   			 </if>
+   			 <if test="currentPerson != null and currentPerson !=''" >
+     			and (c.person_liable = #{currentPerson} or c.creater = #{currentPerson})
+   			 </if>
+   			 <if test="startTime != null and startTime !=''" >
+     			and <![CDATA[ c.signing_time>=#{startTime} ]]>
+   			 </if>
+   			 <if test="endTime != null and endTime !=''" >
+     			and <![CDATA[ c.signing_time<=#{endTime} ]]>
+   			 </if>
+   			 <if test="noid != null and noid !=''" >
+     			and c.id != #{noid}
+   			 </if>
+   			  <if test="executiveDepartment != null and executiveDepartment !=''" >
+     			and org.name like  concat('%',#{executiveDepartment},'%')
+   			 </if>
+   			 <if test="selectDepartMent != null and selectDepartMent !=''" >
+	   			 AND FIND_IN_SET(c.executive_department,#{selectDepartMent})
+   			 </if>
+   			 <if test="settlement != null and settlement !=''" >
+     			and c.settlement = #{settlement}
+   			 </if>
+   			 <if test="status != null and status !=''" >
+   			 	and c.status like concat('%',#{status},'%')
+   			 </if>
+   			  <if test="partyB != null and partyB !=''" >
+     			and c.party_b like concat('%',#{partyB},'%')
+   			 </if>
+        </where>
+        GROUP BY c.id)m
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select SUM(CASE WHEN t.audit_price_typecn ='合同变更' THEN t.decide_amount ELSE 0 END ) AS 'changeAmountSum',
+    SUM(CASE WHEN t.audit_price_type ='结算审核' THEN t.decide_amount ELSE 0 END ) AS 'settlementAmount',c.* ,p.name AS 'projectNameShow'
+    FROM cost_contract c 
+    LEFT JOIN cost_task t ON c.id=t.contract_id
+    LEFT JOIN cost_project p ON p.id=c.project_id
+    where c.id = #{id,jdbcType=VARCHAR}
+    GROUP BY c.id
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from cost_contract
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.cost.CostContractExample" >
+    delete from cost_contract
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.cost.CostContract" >
+    insert into cost_contract (id, project_id, name, 
+      project_name, code, audit_price_unit, 
+      contract_type, status, party_b, 
+      signing_time, party_b_contacts, party_b_phone, 
+      contract_amount, change_amount, settlement_amount, 
+      executive_department, operator, operator_phone, 
+      person_liable, description, remark, 
+      creater, create_time, temporary_amount, settlement,
+      parent_id, main_flag, getContractSumAmount)
+    values (#{id,jdbcType=VARCHAR}, #{projectId,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{projectName,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{auditPriceUnit,jdbcType=VARCHAR}, 
+      #{contractType,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, #{partyB,jdbcType=VARCHAR}, 
+      #{signingTime,jdbcType=TIMESTAMP}, #{partyBContacts,jdbcType=VARCHAR}, #{partyBPhone,jdbcType=VARCHAR}, 
+      #{contractAmount,jdbcType=DECIMAL}, #{changeAmount,jdbcType=DECIMAL}, #{settlementAmount,jdbcType=DECIMAL}, 
+      #{executiveDepartment,jdbcType=VARCHAR}, #{operator,jdbcType=VARCHAR}, #{operatorPhone,jdbcType=VARCHAR}, 
+      #{personLiable,jdbcType=VARCHAR}, #{description,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}, 
+      #{creater,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, #{temporaryAmount,jdbcType=DECIMAL}, #{settlement,jdbcType=VARCHAR},
+      #{parentId,jdbcType=VARCHAR}, #{mainFlag,jdbcType=VARCHAR}, #{mainFlagAmount,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.cost.CostContract" >
+    insert into cost_contract
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="projectName != null" >
+        project_name,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="auditPriceUnit != null" >
+        audit_price_unit,
+      </if>
+      <if test="contractType != null" >
+        contract_type,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="partyB != null" >
+        party_b,
+      </if>
+      <if test="signingTime != null" >
+        signing_time,
+      </if>
+      <if test="partyBContacts != null" >
+        party_b_contacts,
+      </if>
+      <if test="partyBPhone != null" >
+        party_b_phone,
+      </if>
+      <if test="contractAmount != null" >
+        contract_amount,
+      </if>
+      <if test="changeAmount != null" >
+        change_amount,
+      </if>
+      <if test="settlementAmount != null" >
+        settlement_amount,
+      </if>
+      <if test="executiveDepartment != null" >
+        executive_department,
+      </if>
+      <if test="operator != null" >
+        operator,
+      </if>
+      <if test="operatorPhone != null" >
+        operator_phone,
+      </if>
+      <if test="personLiable != null" >
+        person_liable,
+      </if>
+      <if test="description != null" >
+        description,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+      <if test="creater != null" >
+        creater,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="temporaryAmount != null" >
+        temporary_amount,
+      </if>
+      <if test="settlement != null" >
+        settlement,
+      </if>
+      <if test="parentId != null" >
+        parent_id,
+      </if>
+      <if test="mainFlag != null" >
+        main_flag,
+      </if>
+      <if test="mainFlagAmount != null" >
+        mainFlagAmount,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceUnit != null" >
+        #{auditPriceUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="contractType != null" >
+        #{contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="partyB != null" >
+        #{partyB,jdbcType=VARCHAR},
+      </if>
+      <if test="signingTime != null" >
+        #{signingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="partyBContacts != null" >
+        #{partyBContacts,jdbcType=VARCHAR},
+      </if>
+      <if test="partyBPhone != null" >
+        #{partyBPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="contractAmount != null" >
+        #{contractAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="changeAmount != null" >
+        #{changeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settlementAmount != null" >
+        #{settlementAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="executiveDepartment != null" >
+        #{executiveDepartment,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="operatorPhone != null" >
+        #{operatorPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="temporaryAmount != null" >
+        #{temporaryAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settlement != null" >
+        #{settlement,jdbcType=VARCHAR},
+      </if>
+       <if test="parentId != null" >
+        #{parentId,jdbcType=VARCHAR},
+      </if>
+       <if test="mainFlag != null" >
+        #{mainFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="mainFlagAmount != null" >
+        #{mainFlagAmount,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.cost.CostContractExample" resultType="java.lang.Integer" >
+    select count(*) from cost_contract
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update cost_contract
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectId != null" >
+        project_id = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.name != null" >
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.projectName != null" >
+        project_name = #{record.projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.code != null" >
+        code = #{record.code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.auditPriceUnit != null" >
+        audit_price_unit = #{record.auditPriceUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractType != null" >
+        contract_type = #{record.contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=VARCHAR},
+      </if>
+      <if test="record.partyB != null" >
+        party_b = #{record.partyB,jdbcType=VARCHAR},
+      </if>
+      <if test="record.signingTime != null" >
+        signing_time = #{record.signingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.partyBContacts != null" >
+        party_b_contacts = #{record.partyBContacts,jdbcType=VARCHAR},
+      </if>
+      <if test="record.partyBPhone != null" >
+        party_b_phone = #{record.partyBPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.contractAmount != null" >
+        contract_amount = #{record.contractAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.changeAmount != null" >
+        change_amount = #{record.changeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.settlementAmount != null" >
+        settlement_amount = #{record.settlementAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.executiveDepartment != null" >
+        executive_department = #{record.executiveDepartment,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operator != null" >
+        operator = #{record.operator,jdbcType=VARCHAR},
+      </if>
+      <if test="record.operatorPhone != null" >
+        operator_phone = #{record.operatorPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="record.personLiable != null" >
+        person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="record.description != null" >
+        description = #{record.description,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+      <if test="record.creater != null" >
+        creater = #{record.creater,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.temporaryAmount != null" >
+        temporary_amount = #{record.temporaryAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="record.settlement != null" >
+        settlement = #{record.settlement,jdbcType=VARCHAR},
+      </if>
+      <if test="record.parentId != null" >
+        parent_id = #{record.parentId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mainFlag != null" >
+        main_flag = #{record.mainFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="record.mainFlagAmount != null" >
+        mainFlagAmount = #{record.mainFlagAmount,jdbcType=DECIMAL},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update cost_contract
+    set id = #{record.id,jdbcType=VARCHAR},
+      project_id = #{record.projectId,jdbcType=VARCHAR},
+      name = #{record.name,jdbcType=VARCHAR},
+      project_name = #{record.projectName,jdbcType=VARCHAR},
+      code = #{record.code,jdbcType=VARCHAR},
+      audit_price_unit = #{record.auditPriceUnit,jdbcType=VARCHAR},
+      contract_type = #{record.contractType,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=VARCHAR},
+      party_b = #{record.partyB,jdbcType=VARCHAR},
+      signing_time = #{record.signingTime,jdbcType=TIMESTAMP},
+      party_b_contacts = #{record.partyBContacts,jdbcType=VARCHAR},
+      party_b_phone = #{record.partyBPhone,jdbcType=VARCHAR},
+      contract_amount = #{record.contractAmount,jdbcType=DECIMAL},
+      change_amount = #{record.changeAmount,jdbcType=DECIMAL},
+      settlement_amount = #{record.settlementAmount,jdbcType=DECIMAL},
+      executive_department = #{record.executiveDepartment,jdbcType=VARCHAR},
+      operator = #{record.operator,jdbcType=VARCHAR},
+      operator_phone = #{record.operatorPhone,jdbcType=VARCHAR},
+      person_liable = #{record.personLiable,jdbcType=VARCHAR},
+      description = #{record.description,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR},
+      creater = #{record.creater,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      temporary_amount = #{record.temporaryAmount,jdbcType=DECIMAL},
+      settlement = #{record.settlement,jdbcType=VARCHAR},
+       parent_id = #{record.parentId,jdbcType=VARCHAR},
+       main_flag = #{record.mainFlag,jdbcType=VARCHAR},
+       mainFlagAmount = #{record.mainFlagAmount,jdbcType=DECIMAL}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.cost.CostContract" >
+    update cost_contract
+    <set >
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="projectName != null" >
+        project_name = #{projectName,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="auditPriceUnit != null" >
+        audit_price_unit = #{auditPriceUnit,jdbcType=VARCHAR},
+      </if>
+      <if test="contractType != null" >
+        contract_type = #{contractType,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="partyB != null" >
+        party_b = #{partyB,jdbcType=VARCHAR},
+      </if>
+      <if test="signingTime != null" >
+        signing_time = #{signingTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="partyBContacts != null" >
+        party_b_contacts = #{partyBContacts,jdbcType=VARCHAR},
+      </if>
+      <if test="partyBPhone != null" >
+        party_b_phone = #{partyBPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="contractAmount != null" >
+        contract_amount = #{contractAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="changeAmount != null" >
+        change_amount = #{changeAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="settlementAmount != null" >
+        settlement_amount = #{settlementAmount,jdbcType=DECIMAL},
+      </if>
+      <if test="executiveDepartment != null" >
+        executive_department = #{executiveDepartment,jdbcType=VARCHAR},
+      </if>
+      <if test="operator != null" >
+        operator = #{operator,jdbcType=VARCHAR},
+      </if>
+      <if test="operatorPhone != null" >
+        operator_phone = #{operatorPhone,jdbcType=VARCHAR},
+      </if>
+      <if test="personLiable != null" >
+        person_liable = #{personLiable,jdbcType=VARCHAR},
+      </if>
+      <if test="description != null" >
+        description = #{description,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="creater != null" >
+        creater = #{creater,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+        temporary_amount = #{temporaryAmount,jdbcType=DECIMAL},
+      <if test="settlement != null" >
+        settlement = #{settlement,jdbcType=VARCHAR},
+      </if>
+       <if test="parentId != null" >
+        parent_id = #{parentId,jdbcType=VARCHAR},
+      </if>
+       <if test="mainFlag != null" >
+        main_flag = #{mainFlag,jdbcType=VARCHAR},
+      </if>
+      <if test="mainFlagAmount != null" >
+        mainFlagAmount = #{mainFlagAmount,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.cost.CostContract" >
+    update cost_contract
+    set project_id = #{projectId,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      project_name = #{projectName,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      audit_price_unit = #{auditPriceUnit,jdbcType=VARCHAR},
+      contract_type = #{contractType,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      party_b = #{partyB,jdbcType=VARCHAR},
+      signing_time = #{signingTime,jdbcType=TIMESTAMP},
+      party_b_contacts = #{partyBContacts,jdbcType=VARCHAR},
+      party_b_phone = #{partyBPhone,jdbcType=VARCHAR},
+      contract_amount = #{contractAmount,jdbcType=DECIMAL},
+      change_amount = #{changeAmount,jdbcType=DECIMAL},
+      settlement_amount = #{settlementAmount,jdbcType=DECIMAL},
+      executive_department = #{executiveDepartment,jdbcType=VARCHAR},
+      operator = #{operator,jdbcType=VARCHAR},
+      operator_phone = #{operatorPhone,jdbcType=VARCHAR},
+      person_liable = #{personLiable,jdbcType=VARCHAR},
+      description = #{description,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR},
+      creater = #{creater,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      temporary_amount = #{temporaryAmount,jdbcType=DECIMAL},
+      settlement = #{settlement,jdbcType=VARCHAR},
+      parent_id = #{parentId,jdbcType=VARCHAR},
+      main_flag = #{mainFlag,jdbcType=VARCHAR},
+      mainFlagAmount = #{mainFlagAmount,jdbcType=DECIMAL}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

@@ -1,0 +1,414 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"  pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>登录页</title>
+   <link rel="shortcut icon " type="images/x-icon" href="${pageContext.request.contextPath}/res/images/home/favicon.ico">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/fonts/icomoon/style.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/fonts/Font-Awesome-4.7.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/home/bootstrap.min.css"/>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/login/login.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/bootstrap/easyui.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/icon.css">
+    <script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/jquery.min.js"></script>
+    <script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/jquery.easyui.min.js"></script>
+    <script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/locale/easyui-lang-zh_CN.js"></script>
+    <script src="${pageContext.request.contextPath}/res/js/home/tether.min.js"></script>
+    <script src="${pageContext.request.contextPath}/res/js/home/bootstrap.min.js"></script>
+    <style type="text/css">
+        .checkUserPassword
+        {
+            margin: 0 auto 0px auto;
+            text-align: center;
+            font-size: 14px;
+            color: #red;
+        }
+        .app-header
+        {
+            padding: 0;
+            background: #ffffff;
+            border-bottom: 1px solid #e8ebf4;
+            position: fixed;
+            z-index: 1020;
+            top: 0;
+            left: 0;
+            right: 0;
+        }
+        .container-fluid
+        {
+            padding-right: 20px;
+            padding-left: 10px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+        .menu-left
+        {
+            width: calc(100% - 380px);
+            float: left;
+            position: relative;
+            min-height: 1px;
+            padding-right: 10px;
+            padding-left: 25px;
+        }
+        .menu-right
+        {
+            width: 300px;
+            float: right;
+            position: relative;
+            min-height: 1px;
+            padding-right: 10px;
+            padding-left: 25px;
+        }
+        .header-actions > li .dropdown-menu
+        {
+            margin-top: 0;
+        }
+        .dropdown-menu
+        {
+            position: absolute;
+            top: 100%;
+            left: -238px;
+            z-index: 1000;
+            display: none;
+            float: left;
+            min-width: 160px;
+            padding: 5px 0;
+            margin: 2px 0 0;
+            font-size: 14px;
+            text-align: left;
+            list-style: none;
+            background-color: #fff;
+            -webkit-background-clip: padding-box;
+            background-clip: padding-box;
+            border: 1px solid #ccc;
+            border: 1px solid rgba(0, 0, 0, .15);
+            border-radius: 4px;
+            -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, .175);
+        }
+        .dropdown-menu.lg-new
+        {
+            left: -238px;
+        }
+        .dropdown-menu.lg
+        {
+            left: -186px;
+        }
+        .imgLogo
+        {
+            width: 48px;
+            height: 48px;
+            border-radius: 0px;
+            border: 1px solid transparent;
+        }
+        .title
+        {
+            width: auto;
+            text-align: left !important;
+            vertical-align: bottom;
+            font-size: 25px;
+            font-weight: bold;
+            color: #145293;
+        }
+        .tab-item.on, .tab-item:hover
+        {
+            color: #f60;
+        }
+        .tab-item
+        {
+            width: 50%;
+            height: 30px;
+            color: #4A90E2;
+            position: relative;
+            float: left;
+            line-height: 20px;
+            font-size: 16px;
+            overflow: hidden;
+            border-bottom: 1px solid #eee;
+        }
+        .tab-item.on, .tab-item:hover
+        {
+            color: #f60;
+        }
+        .tab-item.on i
+        {
+            display: block;
+        }
+        .tab-item i
+        {
+            display: none;
+            position: absolute;
+            width: 70px;
+            height: 4px;
+            background: #f60;
+            bottom: -1px;
+            left: 50%;
+            margin-left: -35px;
+        }
+        #wwopen\2e ssoPage_\24 > div > div > div.waiting.panelContent > div.wrp_code > img
+        {
+            width: 50px !important;
+        }
+    </style>
+    <script type="text/javascript">
+        var loginType = parseInt('0');
+        $(function () {
+            var h1 = $(".wrap").height();
+            var h3 = $(".product_con").height();
+            var h4 = $(".footer").height();
+            var h = $(window).height();
+            $(".content").height(h - h1 - h3 - h4);
+            $(".content").css(
+                { "padding-top": ((h - h1 - h3 - h4 - 385) / 2 + 20) + "px"
+                });
+            $("#username").on("focus", function () {
+            });
+
+            $("input").focus(function () {
+                $("#cue").text("");
+            });
+            var flag = $("#flag").val();
+            if (flag) {
+                $("#cue").text(flag);
+                $("#cue").css("display", "block").css("color", "red");
+            }
+            var winWidth = $(document.body).outerWidth(true);
+            if (winWidth > 1096) {
+                $(".content").width(1096);
+                $(".product_con").width(1096);
+            } else {
+                $(".content").width(1024);
+                $(".product_con").width(1024);
+            }
+            if (loginType == 1) {
+                showLoginUI();
+            }
+        });    
+        function checkspace(checkstr) {
+            var str = '';
+            for (i = 0; i < checkstr.length; i++) {
+                str = str + ' ';
+            }
+            return (str == checkstr);
+        }
+        //提交验证
+        function validateLogin() {
+             if (checkspace(document.loginform.username.value)) {
+                 $("#error").empty();
+                 var html='<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> 账号不能为空!';
+                 $("#error").append(html);
+                 document.loginform.username.focus();
+                 return;
+             }
+             if (checkspace(document.loginform.password.value)) {
+                 $("#error").empty();
+                 var html='<i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> 密码不能为空!';
+                 $("#error").append(html);
+                 document.loginform.password.focus();
+                 return;
+             }
+             document.loginform.submit();
+            return true;
+        };
+
+        document.onkeydown = keyListener;
+        function keyListener(e) {
+            e = e ? e : event;
+            //判断用户名和密码是否为空
+            if (e.keyCode == 13) {
+                validateLogin();
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        function UrlEncode(str) {
+            return transform(str);
+        }
+
+        function transform(s) {
+            var hex = ''
+            var i, j, t
+
+            j = 0
+            for (i = 0; i < s.length; i++) {
+                t = hexfromdec(s.charCodeAt(i));
+                if (t == '25') {
+                    t = '';
+                }
+                hex += '%' + t;
+            }
+            return hex;
+        }
+
+        function hexfromdec(num) {
+            if (num > 65535) { return ("err!") }
+            first = Math.round(num / 4096 - .5);
+            temp1 = num - first * 4096;
+            second = Math.round(temp1 / 256 - .5);
+            temp2 = temp1 - second * 256;
+            third = Math.round(temp2 / 16 - .5);
+            fourth = temp2 - third * 16;
+            return ("" + getletter(third) + getletter(fourth));
+        }
+
+        function getletter(num) {
+            if (num < 10) {
+                return num;
+            }
+            else {
+                if (num == 10) { return "A" }
+                if (num == 11) { return "B" }
+                if (num == 12) { return "C" }
+                if (num == 13) { return "D" }
+                if (num == 14) { return "E" }
+                if (num == 15) { return "F" }
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        $(window).resize(function () {
+            window.location.reload(); ;
+        })        
+    </script>
+</head>
+<body>
+    <div class="wrap">
+        <header class="app-header">
+            <div class="container-fluid">
+                <div class="row gutters">
+                    <div class="col-xl-5 col-lg-5 col-md-5 col-sm-3 col-4 menu-left">
+                        <a href="javascript:location.reload(true);" class="logo title">
+                            <img alt="" id="imgLogo" class="imgLogo" name="imgLogo" src="${pageContext.request.contextPath}/res/images/login/logo_login.png" />&nbsp广州市代建局造价审核管理系统
+                        </a>
+                    </div>
+                    <div class="col-xl-5 col-lg-5 col-md-5 col-sm-3 col-4 menu-right">
+                        <ul class="header-actions">
+                            <li><a href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true"><i class="icon-guide orange">
+                            </i><span class="count-label"></span><span class="info-name orange">帮助</span> </a>
+                                <div class="dropdown-menu dropdown-menu-right lg-new" aria-labelledby="help">
+                                    <div class="stats-widget-help">
+                                        <div id="login-help">
+                                            1. 没有账号？ 请联系部门负责人申请开通。<br>2. 忘记密码？ 请联系系统管理员重置密码后再重新登录。
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li><a href="javascript:void(0)" id="todos"  data-toggle="dropdown" aria-haspopup="true"><i class="icon-shouce blue"></i>
+                            <span class="count-label"></span><span class="info-name blue">手册</span> </a>
+                            
+                              <div class="dropdown-menu dropdown-menu-right lg-new" aria-labelledby="help">
+                                    <div class="stats-widget-help">
+                                        <div id="login-help">
+                                            1.【基础手册】。请&nbsp;<a href="javascript:void(0);" onclick="uploadSC()" style="color:#4a90e2;">点击下载</a><br>2.【考勤管理】操作手册。请&nbsp;<a href="javascript:void(0);" onclick="uploadKQ()" style="color:#4a90e2;">点击下载</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                <%-- <div class="dropdown-menu dropdown-menu-right lg" aria-labelledby="todos">
+                                    <ul class="stats-widget">
+                                        <li>
+                                            <div class="title">
+                                                <i class="icon-tel"></i>华联科技技术服务热线</div>
+                                            <span class="tel">
+                                                020-83643165</span> </li>
+                                        <li>
+                                            <div class="title">
+                                                
+                                                <i class="nav_qq">
+                                                    <img style="vertical-align: top;" src="${pageContext.request.contextPath}/res/images/login/QQ.png" alt="客服QQ" />
+                                                </i> 客服QQ
+                                            </div>
+                                            <span class="tel">
+                                                4000201168</span> </li>
+                                    </ul>
+                                </div> --%>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+    </div>
+    <div class="content">
+        <div class="banner fl">
+                <img src="${pageContext.request.contextPath}/res/images/login/pic.png" alt="" width="560" height="auto">
+        </div>
+        <div class="box fr">
+                 <div class="login_box">
+                     <!--<div class="switch-type">-->
+                         <!--<div class="scancode_img">-->
+                             <!--<a href="#"></a>-->
+                         <!--</div>-->
+                         <!--<div class="pwdlogin_img">-->
+                             <!--<a href="#"></a>-->
+                         <!--</div>-->
+                     <!--</div>-->
+                     <div class="login_title">
+                         <!--<span class="t1">微信登录</span>-->
+                         <span class="t2">账号登录</span>
+                     </div>
+                     <div class="loginBox">
+                         <!--<div class="login_content">-->
+                             <!--<img src="img/login/qcodeImg.png" alt="">-->
+                             <!--<span>请使用绑定的个人微信扫码</span>-->
+                         <!--</div>-->
+                         <div class="pwdlogin_content ">
+                             <form action="${pageContext.request.contextPath}/loginHome" method="post" id="loginform" name="loginform">
+                                 <div class="form-group" data-toggle="tooltip" data-placement="bottom" title="请输入用户名">
+                                     <i class="icon-user"></i>
+                                     <input type="text" name="username" id="username" onfocus="$('#msg').text('');" placeholder="请输入账号" value="">
+                                 </div>
+                                 <div class="form-group"  data-toggle="tooltip" data-placement="bottom" title="请输入密码">
+                                     <i class="icon-pwd"></i>
+                                     <input type="password"  name="password" id="password" onfocus="$('#msg').text('');" placeholder="请输入密码" value="">
+                                 </div>
+                                 <!--<a href="" class="wxLogin">微信登录</a>-->
+                                 <div class="text-center">
+                                     <a href="javascript:void(0);" onClick="validateLogin()">登&nbsp;&nbsp;录</a>
+                                 </div>
+                                 <div class="suggest">
+                                 	<span style="color: red;" id="error"></span>
+						            <c:if test="${!empty msg }">
+							            <span style="color: red;" id="msg"><i class="fa fa-info-circle fa-lg" aria-hidden="true"></i> ${msg }</span>
+						            </c:if>
+							     </div>
+                             </form>
+                         </div>
+
+                     </div>
+                 </div>
+        </div>
+    </div>
+    <div class="product">
+        <div class="line_02">
+        </div>
+        <div class="product_con clearfix" style="text-align: center;">
+            <p style="height: 30px,display: block; -webkit-margin-before: 1em; -webkit-margin-after: 1em;
+                -webkit-margin-start: 0px; -webkit-margin-end: 0px; font-size: 12px; line-height: 150%;
+                font-family: arial,'microsoft yahei'; margin: 0; padding: 0px; box-sizing: border-box;
+                color: Green; margin-top: 44px;">
+                适用浏览器：FireFox、Chrome、360、QQ、不支持IE8及以下浏览器。
+            </p>
+        </div>
+    </div>
+    <div class="footer">
+        <h6 style="color: #848890; font-size: 12px;padding-top: 5px;">
+            &copy; 2018-2019&emsp;<a target="_blank" href="http://www.cost168.com/" style="color: #848890;
+                font-size: 12px;">广东华联软件科技有限公司</a>保留所有权&emsp;版本：1.0</h6>
+        
+    </div>
+</body>
+<script type="text/javascript">
+function uploadSC(){
+	window.location.href = "/costEnterprise/uploadSC";
+}
+function uploadKQ(){
+	window.location.href = "/costEnterprise/uploadKQ";
+}
+</script>
+</html>

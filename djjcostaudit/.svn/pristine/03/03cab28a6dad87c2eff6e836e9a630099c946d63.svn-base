@@ -1,0 +1,179 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>入库企业添加</title>
+<jsp:include page="${pageContext.request.contextPath}/res/common/easyui/easyui-common.jsp"></jsp:include>
+
+</head>
+<body>
+<div id="loading-wrapper">
+    <div id="loader">
+        <div class="line1"></div>
+        <div class="line2"></div>
+        <div class="line3"></div>
+        <div class="line4"></div>
+        <div class="line5"></div>
+        <div class="line6"></div>
+    </div>
+</div>
+    <form action="" id="formId">
+    	<c:if test="${!empty obj.id}">
+				<input type="hidden" value="${obj.id}" name="id" id="documentId">
+		</c:if>
+        	<table class="table_edit" id="table_edit" cellspacing="0" cellpadding="0" >
+                <tbody>
+                    <tr>
+                        <td style="width:15%;" class="bgcolor"><strong>*</strong>简称：</td>
+                        <td style="width:35%;">
+                            <input type="text" id="simpleName" name="simpleName" value="${obj.simpleName}" placeholder="请输入简称" style="width:100%;">
+                        </td>
+                        <td style="width:15%;" class="bgcolor"><strong>*</strong>入库企业名称：</td>
+                        <td style="width:35%;">
+                            <input type="text" id="name" name="name" value="${obj.name}" placeholder="请输入入库企业名称" style="width:100%;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>*</strong>企业编号：</td>
+                        <td >
+                            <input type="text" id="code" name="code" value="${obj.code}" placeholder="请输入企业编号" style="width:100%;">
+                        </td>
+                        <td class="bgcolor"><strong>*</strong>联系人：</td>
+                        <td >
+                            <input type="text" id="contacts" name="contacts" value="${obj.contacts}" placeholder="请输入联系人" style="width:100%;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>*</strong>联系电话：</td>
+                        <td>
+                            <input type="text" id="contactsPhone" name="contactsPhone" value="${obj.contactsPhone}" onkeyup="(this.v=function(){this.value=this.value.replace(/[^0-9-_/]+/,'');}).call(this)" onblur="this.v();"  placeholder="请输入联系电话" style="width:100%;">
+                        </td>
+                        <td class="bgcolor"><strong>&nbsp;</strong>邮箱：</td>
+                        <td>
+                       		<div class="parentCls">
+                       		       <input type="text" name="email" value="${obj.email}" placeholder="请输入邮箱"  style="width:100%;" id="email" onkeyup="(this.v=function(){this.value=this.value.replace(/[^0-9_+-.+a-z+A-Z+@]+/,'');}).call(this)" onblur="this.v();" class='inputElem'>
+                       		</div>
+                     
+                        </td>
+                    </tr>
+                    <tr>
+
+                        <td class="bgcolor"><strong>&nbsp;</strong>传真：</td>
+                        <td>
+                            <input type="text" name="fax" value="${obj.fax}" placeholder="请输入传真" style="width:100%;">
+                        </td>
+                        <td class="bgcolor"><strong>*</strong>入库批次：</td>
+                        <td>
+                            <input type="text" id="batch" name="batch" value="${obj.batch}" placeholder="请输入入库批次" style="width:100%;">
+                        </td>
+                    </tr>
+                    <tr>
+                    	<td class="bgcolor"><strong>*</strong>地址：</td>
+                        <td>
+                            <input type="text" id="address" name="address" value="${obj.address}" placeholder="请输入地址" style="width:100%;">
+                        </td>
+                        <td class="bgcolor"><strong>*</strong>是否有效：</td>
+                        <td style="text-align: left">
+                            <select id="effectiveFlag" name="effectiveFlag" class="custom-select" style="width:100px;">
+                                <c:forTokens items="请选择,是,否" delims="," var="i">
+                                	<option <c:if test="${i eq obj.effectiveFlag}">selected = "selected"</c:if>  value="${i}">${i}</option>
+                             	</c:forTokens>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bgcolor"><strong>&nbsp;</strong>备注：</td>
+                        <td colspan="3">
+                            <textarea name="description"cols="3" rows="4">${obj.description}</textarea>
+                        </td>
+                    </tr>
+                    <c:if test="${param.editFlag eq 'y' && user.name eq obj.creater or dataUpdate eq true}">
+                    <tr style="height:40px">
+                        <td colspan="4" style="text-align: center">
+                            <input type="button" id="save" class="btn btn-primary" onclick="" value="保存">&nbsp;&nbsp;
+                            <input type="button" onclick="top.closeWindow('入库企业添加');top.closeWindow('入库企业修改')" class="btn btn-success" value="取消">
+                        </td>
+                    </tr>
+                    </c:if>
+                </tbody>
+            </table>
+
+    </form>
+<script>
+    <!-- 禁用所有Form表单 -->
+    function disableForm(formId,isDisabled) {
+        var attr="disable";
+        if(!isDisabled){
+            attr="enable";
+        }
+        $("form[id='"+formId+"'] :text").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] textarea").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] select").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :radio").attr("readonly",isDisabled);
+        $("form[id='"+formId+"'] :checkbox").attr("readonly",isDisabled);
+    }
+    var url="${url}";
+    var editFlag="${param.editFlag}";
+		$(function(){
+			if(editFlag=="n"){
+				disableForm("formId",true);
+			}
+			$("#save").click(function(){
+			var simpleName=$("#simpleName").val();
+			var name=$("#name").val();
+			var code=$("#code").val();
+			var contacts=$("#contacts").val();
+			var contactsPhone=$("#contactsPhone").val();
+			var batch=$("#batch").val();
+			var effectiveFlag=$("#effectiveFlag").val();
+			if(simpleName==""){
+               	$.messager.alert({title:'温馨提示', msg:'请填写简称 ！', icon: 'error', top:100});
+               	return;
+           	}else if(name==""){
+               	$.messager.alert({title:'温馨提示', msg:'请填写入库企业名称 ！', icon: 'error', top:100});
+               	return;
+           	}else if(code==""){
+               	$.messager.alert({title:'温馨提示', msg:'请填写企业编号 ！', icon: 'error', top:100});
+               	return;
+           	}else if(contacts==""){
+               	$.messager.alert({title:'温馨提示', msg:'请填写联系人 ！', icon: 'error', top:100});
+               	return;
+           	}else if(contactsPhone==""){
+               	$.messager.alert({title:'温馨提示', msg:'请填写联系电话 ！', icon: 'error', top:100});
+               	return;
+           	}else if(batch==""){
+               	$.messager.alert({title:'温馨提示', msg:'请填写入库批次 ！', icon: 'error', top:100});
+               	return;
+           	}else if(effectiveFlag=="请选择"){
+               	$.messager.alert({title:'温馨提示', msg:'请选择是否有效！', icon: 'error', top:100});
+               	return;
+           	}
+				$.ajax({
+				  	url: url,
+				  	dataType: "json",
+				  	type:"post",
+				  	async: false,
+				  	data: $("#formId").serialize(),
+				  	success: function(result){
+					  	if(result.status==200){
+					  		url="/costEnterprise/upd";
+					  	 	window.parent.showMessager("温馨提示", "<b>操作成功!</b>", 5000, "slide");
+					  	 	var json1={tabTitle:'入库企业',url:'/forward_enterprise_list'};
+						 	window.parent.refreshTab(json1);
+					  	}else if(result.status==300){
+					  			$.messager.alert({title:'温馨提示', msg:result.msg, icon: 'error', top:100});
+               					return;
+					  	}else{
+							$.messager.alert("温馨提示","操作异常,请联系管理员!", "error");
+					  	}
+				  	}
+				});
+			});
+		});
+</script>
+</body>
+</html>

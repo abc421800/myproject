@@ -1,0 +1,17 @@
+package com.cost168.costaudit.service.work;
+
+import com.cost168.costaudit.pojo.work.vo.WorkAttendanceParam;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @description: 考勤人员台账服务层
+ * @author: ZYL
+ * @create: 2019-05-24
+ */
+public interface WorkAttendancePersonService {
+    List<WorkAttendanceParam> selectWorkAttendancePerson(Map<String, Object> map);
+
+    int selectCountAttendancePersonByMap(Map<String, Object> map);
+}

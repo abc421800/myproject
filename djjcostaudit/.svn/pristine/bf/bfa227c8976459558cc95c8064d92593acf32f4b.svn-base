@@ -1,0 +1,145 @@
+package com.cost168.costaudit.service.yaohao.impl;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.cost168.costaudit.mapper.cost.CostEnterpriseMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoAutocodeMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoCandidateMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoOrderMapper;
+import com.cost168.costaudit.mapper.yaohao.YaohaoWinbidMapper;
+import com.cost168.costaudit.pojo.cost.CostEnterprise;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAutocode;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidate;
+import com.cost168.costaudit.pojo.yaohao.YaohaoOrder;
+import com.cost168.costaudit.pojo.yaohao.YaohaoOrderExample;
+import com.cost168.costaudit.pojo.yaohao.YaohaoWinbid;
+import com.cost168.costaudit.service.yaohao.YaohaoOrderService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.JsonUtils;
+import com.cost168.costaudit.utils.OrderUtil;
+
+@Service
+public class YaohaoOrderServiceImpl implements YaohaoOrderService {
+
+	@Autowired
+	private YaohaoOrderMapper yaohaoOrderMapper;
+	@Autowired
+	private YaohaoWinbidMapper yaohaoWinbidMapper;
+	@Autowired
+	private CostEnterpriseMapper costEnterpriseMapper;
+	@Autowired
+	private YaohaoCandidateMapper yaohaoCandidateMapper;
+	@Autowired
+	private YaohaoAutocodeMapper yaohaoAutocodeMapper;
+	
+	@Override
+	public List<YaohaoOrder> selectByExample(YaohaoOrderExample example) {
+		return yaohaoOrderMapper.selectByExample(example);
+	}
+
+	@Override
+	public YaohaoOrder selectByPrimaryKey(String id) {
+		return yaohaoOrderMapper.selectByPrimaryKey(id);
+	}
+
+	@Override
+	public int insertSelective(YaohaoOrder record) {
+		return yaohaoOrderMapper.insertSelective(record);
+	}
+
+	@Override
+	public int updateByPrimaryKeySelective(YaohaoOrder yaohaoOrder) {
+		return yaohaoOrderMapper.updateByPrimaryKeySelective(yaohaoOrder);
+	}
+
+	@Override
+	public int deleteByPrimaryKey(String id) {
+		return yaohaoOrderMapper.deleteByPrimaryKey(id);
+	}
+
+	@Override
+	public List<YaohaoOrder> selectListByMap(Map<String, Object> map) {
+		return yaohaoOrderMapper.selectListByMap(map);
+	}
+
+	@Override
+	public int selectCountByMap(Map<String, Object> map) {
+		return yaohaoOrderMapper.selectCountByMap(map);
+	}
+
+	@Override
+	public void registerOrder(String winbid ,YaohaoOrder yaohaoOrder) throws Exception {
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		yaohaoOrder.setCreateTime(new Date());
+		yaohaoOrder.setCreater(currentUser.getName());
+		yaohaoOrderMapper.insertSelective(yaohaoOrder);
+		String tem="["+winbid+"]";
+		List<YaohaoWinbid> list=JsonUtils.jsonToList(tem, YaohaoWinbid.class);
+		if(null!=list && list.size()>0){
+			for(YaohaoWinbid bid:list){
+				CostEnterprise ent= costEnterpriseMapper.selectByPrimaryKey(bid.getEnterpriseId());
+				YaohaoWinbid yaohaoWinbid=new YaohaoWinbid();
+				if(null!=ent){
+					yaohaoWinbid.setEnterpriseCode(ent.getCode());
+				}
+				yaohaoWinbid.setId(OrderUtil.buildOrderId(""));
+				yaohaoWinbid.setName(bid.getName());
+				yaohaoWinbid.setContacts(bid.getContacts());
+				yaohaoWinbid.setContactsPhone(bid.getContactsPhone());
+				yaohaoWinbid.setServiceAmount(bid.getServiceAmount());
+				yaohaoWinbid.setDecideAmount(bid.getDecideAmount());
+				yaohaoWinbid.setOrderCode(yaohaoOrder.getCode());
+				yaohaoWinbid.setYaohaoYear(yaohaoOrder.getYaohaoYear());
+				yaohaoWinbid.setCreater(currentUser.getName());
+				yaohaoWinbid.setCreateTime(new Date());
+				yaohaoWinbid.setCandidateId(bid.getCandidateId());
+				yaohaoWinbidMapper.insertSelective(yaohaoWinbid);
+				//候选人表加入摇号单
+				YaohaoCandidate can=yaohaoCandidateMapper.selectByPrimaryKey(bid.getCandidateId());
+				can.setBidFlag(yaohaoOrder.getCode());
+				yaohaoCandidateMapper.updateByPrimaryKeySelective(can);
+				//更新序号
+				
+			}
+		}
+		
+	}
+
+	@Override
+	public void updRegisterOrder(String winbid, YaohaoOrder yaohaoOrder)throws Exception {
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		yaohaoOrderMapper.updateByPrimaryKeySelective(yaohaoOrder);
+		String tem="["+winbid+"]";
+		List<YaohaoWinbid> list=JsonUtils.jsonToList(tem, YaohaoWinbid.class);
+		if(null!=list && list.size()>0){
+			yaohaoWinbidMapper.deleteByOrderCode(yaohaoOrder.getCode());
+			for(YaohaoWinbid bid:list){
+				CostEnterprise ent= costEnterpriseMapper.selectByPrimaryKey(bid.getEnterpriseId());
+				YaohaoWinbid yaohaoWinbid=new YaohaoWinbid();
+				if(null!=ent){
+					yaohaoWinbid.setEnterpriseCode(ent.getCode());
+				}
+				yaohaoWinbid.setId(OrderUtil.buildOrderId(""));
+				yaohaoWinbid.setName(bid.getName());
+				yaohaoWinbid.setContacts(bid.getContacts());
+				yaohaoWinbid.setContactsPhone(bid.getContactsPhone());
+				yaohaoWinbid.setServiceAmount(bid.getServiceAmount());
+				yaohaoWinbid.setDecideAmount(bid.getDecideAmount());
+				yaohaoWinbid.setOrderCode(yaohaoOrder.getCode());
+				yaohaoWinbid.setYaohaoYear(yaohaoOrder.getYaohaoYear());
+				yaohaoWinbid.setCreater(currentUser.getName());
+				yaohaoWinbidMapper.insertSelective(yaohaoWinbid);
+				
+			}
+		}
+		
+	}
+
+}

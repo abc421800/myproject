@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.cost.CostUnitProjectMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.cost.CostUnitProject" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="number" property="number" jdbcType="DOUBLE" />
+    <result column="project_id" property="projectId" jdbcType="VARCHAR" />
+    <result column="name" property="name" jdbcType="VARCHAR" />
+    <result column="sub_project_cost" property="subProjectCost" jdbcType="DECIMAL" />
+    <result column="step_item_cost" property="stepItemCost" jdbcType="DECIMAL" />
+    <result column="other_project_fee" property="otherProjectFee" jdbcType="DECIMAL" />
+    <result column="fees_taxes" property="feesTaxes" jdbcType="DECIMAL" />
+    <result column="count" property="count" jdbcType="DECIMAL" />
+    <result column="unit_project_percen" property="unitProjectPercen" jdbcType="VARCHAR" />
+    <result column="covered_area" property="coveredArea" jdbcType="VARCHAR" />
+    <result column="unilateral_indicators" property="unilateralIndicators" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, number,name, project_id,sub_project_cost, step_item_cost, other_project_fee, fees_taxes,
+    count, unit_project_percen, covered_area, unilateral_indicators, remark
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.cost.CostUnitProjectExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from cost_unit_project
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="getUnitByProjectIdList" resultMap="BaseResultMap" parameterType="java.util.Map"  >
+    select
+    <include refid="Base_Column_List" />
+    from cost_unit_project
+    where project_id = #{pid,jdbcType=VARCHAR}
+    order by id asc
+    <if test="isPage==true">
+      limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="getUnitByProjectId" resultMap="BaseResultMap" parameterType="java.util.Map"  >
+    select
+    <include refid="Base_Column_List" />
+    from cost_unit_project
+    where project_id = #{pid,jdbcType=VARCHAR}
+    order by id asc
+  </select>
+  <select id="countByExample" parameterType="java.util.Map" resultType="java.lang.Integer" >
+    select count(*) from cost_unit_project where project_id = #{pid,jdbcType=VARCHAR}
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from cost_unit_project
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from cost_unit_project
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.cost.CostUnitProjectExample" >
+    delete from cost_unit_project
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.cost.CostUnitProject" >
+    insert into cost_unit_project (id, number, project_id, 
+      sub_project_cost, step_item_cost, other_project_fee, 
+      fees_taxes, count, unit_project_percen, 
+      covered_area, unilateral_indicators, remark
+      )
+    values (#{id,jdbcType=VARCHAR}, #{number,jdbcType=DOUBLE}, #{projectId,jdbcType=VARCHAR}, 
+      #{subProjectCost,jdbcType=DECIMAL}, #{stepItemCost,jdbcType=DECIMAL}, #{otherProjectFee,jdbcType=DECIMAL}, 
+      #{feesTaxes,jdbcType=DECIMAL}, #{count,jdbcType=DECIMAL}, #{unitProjectPercen,jdbcType=VARCHAR}, 
+      #{coveredArea,jdbcType=VARCHAR}, #{unilateralIndicators,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.cost.CostUnitProject" >
+    insert into cost_unit_project
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="number != null" >
+        number,
+      </if>
+      <if test="projectId != null" >
+        project_id,
+      </if>
+      <if test="name != null" >
+        name,
+      </if>
+      <if test="subProjectCost != null" >
+        sub_project_cost,
+      </if>
+      <if test="stepItemCost != null" >
+        step_item_cost,
+      </if>
+      <if test="otherProjectFee != null" >
+        other_project_fee,
+      </if>
+      <if test="feesTaxes != null" >
+        fees_taxes,
+      </if>
+      <if test="count != null" >
+        count,
+      </if>
+      <if test="unitProjectPercen != null" >
+        unit_project_percen,
+      </if>
+      <if test="coveredArea != null" >
+        covered_area,
+      </if>
+      <if test="unilateralIndicators != null" >
+        unilateral_indicators,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="number != null" >
+        #{number,jdbcType=DOUBLE},
+      </if>
+      <if test="projectId != null" >
+        #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="name != null" >
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="subProjectCost != null" >
+        #{subProjectCost,jdbcType=DECIMAL},
+      </if>
+      <if test="stepItemCost != null" >
+        #{stepItemCost,jdbcType=DECIMAL},
+      </if>
+      <if test="otherProjectFee != null" >
+        #{otherProjectFee,jdbcType=DECIMAL},
+      </if>
+      <if test="feesTaxes != null" >
+        #{feesTaxes,jdbcType=DECIMAL},
+      </if>
+      <if test="count != null" >
+        #{count,jdbcType=DECIMAL},
+      </if>
+      <if test="unitProjectPercen != null" >
+        #{unitProjectPercen,jdbcType=VARCHAR},
+      </if>
+      <if test="coveredArea != null" >
+        #{coveredArea,jdbcType=VARCHAR},
+      </if>
+      <if test="unilateralIndicators != null" >
+        #{unilateralIndicators,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update cost_unit_project
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.number != null" >
+        number = #{record.number,jdbcType=DOUBLE},
+      </if>
+      <if test="record.projectId != null" >
+        project_id = #{record.projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.subProjectCost != null" >
+        sub_project_cost = #{record.subProjectCost,jdbcType=DECIMAL},
+      </if>
+      <if test="record.stepItemCost != null" >
+        step_item_cost = #{record.stepItemCost,jdbcType=DECIMAL},
+      </if>
+      <if test="record.otherProjectFee != null" >
+        other_project_fee = #{record.otherProjectFee,jdbcType=DECIMAL},
+      </if>
+      <if test="record.feesTaxes != null" >
+        fees_taxes = #{record.feesTaxes,jdbcType=DECIMAL},
+      </if>
+      <if test="record.count != null" >
+        count = #{record.count,jdbcType=DECIMAL},
+      </if>
+      <if test="record.unitProjectPercen != null" >
+        unit_project_percen = #{record.unitProjectPercen,jdbcType=VARCHAR},
+      </if>
+      <if test="record.coveredArea != null" >
+        covered_area = #{record.coveredArea,jdbcType=VARCHAR},
+      </if>
+      <if test="record.unilateralIndicators != null" >
+        unilateral_indicators = #{record.unilateralIndicators,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update cost_unit_project
+    set id = #{record.id,jdbcType=VARCHAR},
+      number = #{record.number,jdbcType=DOUBLE},
+      project_id = #{record.projectId,jdbcType=VARCHAR},
+      sub_project_cost = #{record.subProjectCost,jdbcType=DECIMAL},
+      step_item_cost = #{record.stepItemCost,jdbcType=DECIMAL},
+      other_project_fee = #{record.otherProjectFee,jdbcType=DECIMAL},
+      fees_taxes = #{record.feesTaxes,jdbcType=DECIMAL},
+      count = #{record.count,jdbcType=DECIMAL},
+      unit_project_percen = #{record.unitProjectPercen,jdbcType=VARCHAR},
+      covered_area = #{record.coveredArea,jdbcType=VARCHAR},
+      unilateral_indicators = #{record.unilateralIndicators,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.cost.CostUnitProject" >
+    update cost_unit_project
+    <set >
+      <if test="number != null" >
+        number = #{number,jdbcType=DOUBLE},
+      </if>
+      <if test="projectId != null" >
+        project_id = #{projectId,jdbcType=VARCHAR},
+      </if>
+      <if test="subProjectCost != null" >
+        sub_project_cost = #{subProjectCost,jdbcType=DECIMAL},
+      </if>
+      <if test="stepItemCost != null" >
+        step_item_cost = #{stepItemCost,jdbcType=DECIMAL},
+      </if>
+      <if test="otherProjectFee != null" >
+        other_project_fee = #{otherProjectFee,jdbcType=DECIMAL},
+      </if>
+      <if test="feesTaxes != null" >
+        fees_taxes = #{feesTaxes,jdbcType=DECIMAL},
+      </if>
+      <if test="count != null" >
+        count = #{count,jdbcType=DECIMAL},
+      </if>
+      <if test="unitProjectPercen != null" >
+        unit_project_percen = #{unitProjectPercen,jdbcType=VARCHAR},
+      </if>
+      <if test="coveredArea != null" >
+        covered_area = #{coveredArea,jdbcType=VARCHAR},
+      </if>
+      <if test="unilateralIndicators != null" >
+        unilateral_indicators = #{unilateralIndicators,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.cost.CostUnitProject" >
+    update cost_unit_project
+    set number = #{number,jdbcType=DOUBLE},
+      project_id = #{projectId,jdbcType=VARCHAR},
+      sub_project_cost = #{subProjectCost,jdbcType=DECIMAL},
+      step_item_cost = #{stepItemCost,jdbcType=DECIMAL},
+      other_project_fee = #{otherProjectFee,jdbcType=DECIMAL},
+      fees_taxes = #{feesTaxes,jdbcType=DECIMAL},
+      count = #{count,jdbcType=DECIMAL},
+      unit_project_percen = #{unitProjectPercen,jdbcType=VARCHAR},
+      covered_area = #{coveredArea,jdbcType=VARCHAR},
+      unilateral_indicators = #{unilateralIndicators,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>

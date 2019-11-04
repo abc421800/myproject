@@ -1,0 +1,75 @@
+package com.cost168.costaudit.mapper.cost;
+
+import com.cost168.costaudit.pojo.cost.CostProject;
+import com.cost168.costaudit.pojo.cost.CostProjectExample;
+import com.cost168.costaudit.vo.cost.ContractJsCountVo;
+import com.cost168.costaudit.vo.cost.ProjectJsCountVo;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+public interface CostProjectMapper {
+    int countByExample(CostProjectExample example);
+
+    int deleteByExample(CostProjectExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(CostProject record);
+
+    int insertSelective(CostProject record);
+
+    List<CostProject> selectByExample(CostProjectExample example);
+
+    CostProject selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") CostProject record, @Param("example") CostProjectExample example);
+
+    int updateByExample(@Param("record") CostProject record, @Param("example") CostProjectExample example);
+
+    int updateByPrimaryKeySelective(CostProject record);
+
+    int updateByPrimaryKey(CostProject record);
+
+    List<CostProject> getList(Map<String, Object> map);
+
+    int getCount(Map<String, Object> map);
+
+    List<ProjectJsCountVo> getProjectJsList(Map<String, Object> map);
+
+    int getProjectJsCount(Map<String, Object> map);
+
+    List<ProjectJsCountVo> getProjectJsListAll(Map<String, Object> map);
+
+    int getProjectJsCountAll(Map<String, Object> map);
+
+    List<ProjectJsCountVo> getProjectJsContractList(Map<String, Object> map);
+
+    List<ProjectJsCountVo> getProjectJsContractListAll(Map<String, Object> map);
+
+    List<ProjectJsCountVo> getProjectJsContractChildrenList(Map<String, Object> map);
+
+    List<ContractJsCountVo> getContractJsList(Map<String, Object> map);
+
+    int getContractJsCount(Map<String, Object> map);
+
+    List<ContractJsCountVo> getContractJsList2(Map<String, Object> map);
+
+    int getContractJsCount2(Map<String, Object> map);
+
+    List<ContractJsCountVo> getContractJsGroup(Map<String, Object> map);
+
+    BigDecimal getTaskSumDecideAmount(Map<String, Object> map);
+
+    BigDecimal getContractSumAmount(Map<String, Object> map);
+
+    String getAAA(String projectId);
+
+    String getBBB(String id);
+
+    String getContractAmount(Map<String, Object> map);
+
+}

@@ -1,0 +1,929 @@
+package com.cost168.costaudit.controller.cost;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.cost168.costaudit.mapper.cost.CostContractMapper;
+import com.cost168.costaudit.pojo.cost.CostAttachment;
+import com.cost168.costaudit.pojo.cost.CostContract;
+import com.cost168.costaudit.pojo.cost.CostContractType;
+import com.cost168.costaudit.pojo.cost.CostDocument;
+import com.cost168.costaudit.pojo.cost.CostDpctRelation;
+import com.cost168.costaudit.pojo.cost.CostProject;
+import com.cost168.costaudit.pojo.cost.CostTask;
+import com.cost168.costaudit.pojo.sys.SysOrg;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.service.cost.CostAttachmentService;
+import com.cost168.costaudit.service.cost.CostContractService;
+import com.cost168.costaudit.service.cost.CostContractTypeService;
+import com.cost168.costaudit.service.cost.CostDocumentService;
+import com.cost168.costaudit.service.cost.CostDpctRelationService;
+import com.cost168.costaudit.service.cost.CostProjectService;
+import com.cost168.costaudit.service.cost.CostTaskService;
+import com.cost168.costaudit.service.sys.SysOrgService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.ExcelUtil;
+import com.cost168.costaudit.utils.Global;
+import com.cost168.costaudit.utils.GlobalResult;
+import com.cost168.costaudit.utils.JsonUtils;
+
+/**
+ * 
+ * @author YiLi
+ *
+ */
+
+@Controller
+@RequestMapping("/costContract")
+public class CostContractController {
+
+	@Autowired
+	private CostContractService costContractService;
+	@Autowired
+	private CostDocumentService costDocumentService;
+	@Autowired
+	private CostContractTypeService costContractTypeService;
+	@Autowired
+	private CostDpctRelationService costDpctRelationService;
+	@Autowired
+	private CostTaskService costTaskService;
+	@Autowired
+	private CostProjectService costProjectService;
+	@Autowired
+	private CostAttachmentService costAttachmentService;
+	@Autowired
+	private CostContractMapper costContractMapper;
+	@Autowired
+	private SysOrgService sysOrgService;
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,CostContract costContract, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			String orgId=request.getParameter("orgId");
+			String startTime =request.getParameter("startTime");
+			String endTime =request.getParameter("endTime");
+			String noid=request.getParameter("noid");
+			Map<String,Object> selectMap=JsonUtils.object2Map(costContract);
+			if(null!=startTime && !"".equals(startTime)){
+				map.put("startTime", startTime+" 00:00:00");
+				Global.CON_END_TIME = startTime;
+			}
+			if(null!=endTime && !"".equals(endTime)){
+				map.put("endTime", endTime+" 24:00:00");
+				Global.CON_END_TIME = endTime;
+			}
+			if(null!=orgId && !"".equals(orgId)){
+				map.put("selectDepartMent", orgId);
+			}
+			if(null!=noid && !"".equals(noid)){
+				map.put("noid", noid);
+			}
+			map.putAll(selectMap);
+			map.put("isPage", true);
+		    map.put("curPage", rows*(page-1));
+		    map.put("pageSize", rows);
+		    map.put("page", page);
+		    List<CostContract> list= costContractService.selectListByMap(map);
+		    Global.CON_EXPORT_LIST = list;
+		    int total= costContractService.selectCountByMap(map);
+		    //map.clear();
+		    //map.put("mainFlag", "从合同");
+		    //int totalCong= costContractService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/listContractCong")
+	public EUDataGridResult listContractCong(HttpServletRequest request,CostContract costContract) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			Map<String,Object> selectMap=JsonUtils.object2Map(costContract);
+			map.putAll(selectMap);
+		    List<CostContract> list= costContractService.selectListByMap(map);
+		    int i=1;
+		    for(CostContract l:list){
+		    	l.setPriority(i+"");
+		    	i++;
+		    }
+		    int total= costContractService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/getContractChildren")
+	@ResponseBody
+	public EUDataGridResult getContractJsGroup(HttpServletRequest request){
+		EUDataGridResult result=new EUDataGridResult();
+	    Map<String,Object> map=new HashMap<String,Object>();
+	    String projectId = request.getParameter("projectId");
+	    String parentId = request.getParameter("parentId");
+	    map.put("projectId", projectId);
+	    map.put("parentId", parentId);
+	    List<CostContract> list = costContractService.selectChildrenListByMap(map);
+	    result.setRows(list);
+		return result;
+	}
+	@RequestMapping("/toEdit")
+	public String toEdit(HttpServletRequest request){
+		String url="";
+		String id=request.getParameter("id");
+		if(null!=id && !"".equals(id)) {
+			url="/costContract/upd";
+			CostContract costContract = costContractService.selectByPrimaryKey(id);
+			if(null!=costContract.getExecutiveDepartment()&&!"".equals(costContract.getExecutiveDepartment())){
+				String department=costContract.getExecutiveDepartment().replace(".0", "");
+				costContract.setExecutiveDepartment(department);
+			}
+			request.setAttribute("obj", costContract);
+		}else{
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			url="/costContract/save";
+			String contractId=UUID.randomUUID().toString().replace("-", "");
+			CostContract costContract=new CostContract();
+			costContract.setCreater(currentUser.getName());
+			costContract.setId(contractId);
+			request.setAttribute("obj", costContract);
+		}
+		List<CostContractType> lsit = costContractTypeService.selectByExample(null);
+		request.setAttribute("conTypeList", lsit);
+		request.setAttribute("url", url);
+		return "contract/add";
+	}
+	
+	@RequestMapping("/toEditChildren")
+	public String toEditChildren(HttpServletRequest request){
+		String url="";
+		String id=request.getParameter("id");
+		String pid=request.getParameter("pid");
+		CostContract parent =costContractService.selectByPrimaryKey(pid);
+		CostProject project=costProjectService.selectByPrimaryKey(parent.getProjectId());
+		if(null!=id && !"".equals(id)) {
+			url="/costContract/upd";
+			CostContract costContract = costContractService.selectByPrimaryKey(id);
+			request.setAttribute("obj", costContract);
+			request.setAttribute("add_edit", "edit");
+		}else{
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			url="/costContract/save";
+			String contractId=UUID.randomUUID().toString().replace("-", "");
+			CostContract costContract=new CostContract();
+			costContract.setCreater(currentUser.getName());
+			costContract.setId(contractId);
+			request.setAttribute("obj", costContract);
+			request.setAttribute("add_edit", "add");
+		}
+		request.setAttribute("project", project);
+		request.setAttribute("parent", parent);
+		List<CostContractType> lsit = costContractTypeService.selectByExample(null);
+		request.setAttribute("conTypeList", lsit);
+		request.setAttribute("url", url);
+		return "contract/addChildren";
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,CostContract costContract){
+		GlobalResult result=new GlobalResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			if(null!=costContract.getSigningTimeStr() && !"".equals(costContract.getSigningTimeStr())){
+				costContract.setSigningTime(sdf.parse(costContract.getSigningTimeStr()));
+			}
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			costContract.setCreater(currentUser.getName());
+			costContract.setCreateTime(new Date());
+			//判断合同编码是否重复
+			map.put("codeNoLike", costContract.getCode());
+			List<CostContract> contractList_code= costContractService.selectListByMap(map);
+			if(null!=contractList_code && contractList_code.size()>0){
+				result.setStatus(500);
+				return result;
+			}
+			costContractService.insertSelective(costContract);
+			//汇总主+从合同金额
+			mainFlagAmountSum(costContract);
+			//在附件表新增文件夹名称（新增主材单价审批表）
+			CostAttachment att=new CostAttachment();
+			att.setId(UUID.randomUUID().toString().replace("-", ""));
+			att.setTypeId(costContract.getId());
+			att.setName("送审资料");
+			att.setSuffix("文件夹");
+			att.setDataType("tendering");
+			att.setCreater(currentUser.getName());
+			att.setCreaterTime(new Date());
+			costAttachmentService.insertSelective(att);
+			CostAttachment att2=new CostAttachment();
+			att2.setId(UUID.randomUUID().toString().replace("-", ""));
+			att2.setTypeId(costContract.getId());
+			att2.setName("审定资料");
+			att2.setSuffix("文件夹");
+			att2.setDataType("tendering");
+			att2.setCreater(currentUser.getName());
+			att2.setCreaterTime(new Date());
+			costAttachmentService.insertSelective(att2);
+			//更新项目里的合同价汇总
+			map.clear();
+			map.put("projectId", costContract.getProjectId());
+			BigDecimal contractAmount= costProjectService.getContractSumAmount(map);
+			CostProject project =costProjectService.selectByPrimaryKey(costContract.getProjectId());
+			if(null==contractAmount){
+				contractAmount=new BigDecimal(0);
+			}
+			project.setSumHtjJe(contractAmount);
+			costProjectService.updateByPrimaryKeySelective(project);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/upd")
+	public GlobalResult upd(HttpServletRequest request,CostContract costContract){
+		GlobalResult result=new GlobalResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			SimpleDateFormat sd=new SimpleDateFormat("yyyy-MM-dd");
+			if(null!=costContract.getSigningTimeStr() && !"".equals(costContract.getSigningTimeStr())){
+				costContract.setSigningTime(sd.parse(costContract.getSigningTimeStr()));
+			}
+			//判断合同编码是否重复
+			map.put("codeNoLike", costContract.getCode());
+			map.put("noid", costContract.getId());
+			List<CostContract> contractList_code= costContractService.selectListByMap(map);
+			System.out.println(contractList_code.size());
+			if(null!=contractList_code && contractList_code.size()>0){
+				result.setStatus(500);
+				return result;
+			}
+			costContractService.updateByPrimaryKeySelective(costContract);
+			//汇总主+从合同金额
+			mainFlagAmountSum(costContract);
+			//有变更所属项目需更新关联信息
+			List<CostDpctRelation> cdrList=costDpctRelationService.selectByContractId(costContract.getId());
+			if(null!=cdrList && cdrList.size()>0){
+				for(CostDpctRelation cdr:cdrList){
+					cdr.setProjectId(costContract.getProjectId());
+					costDpctRelationService.updateByPrimaryKeySelective(cdr);
+					if(null!=cdr.getTaskId() && !"".equals(cdr.getTaskId())){
+						CostTask task=costTaskService.selectByPrimaryKey(cdr.getTaskId());
+						if(null!=task){
+							task.setProjectId(costContract.getProjectId());
+							task.setProjectName(costContract.getProjectName());
+							costTaskService.updateByPrimaryKeySelective(task);
+						}
+					}
+				}
+			}
+			//更新项目里的合同价汇总
+			map.clear();
+			map.put("projectId", costContract.getProjectId());
+			BigDecimal contractAmount= costProjectService.getContractSumAmount(map);
+			CostProject project =costProjectService.selectByPrimaryKey(costContract.getProjectId());
+			if(null==contractAmount){
+				contractAmount=new BigDecimal(0);
+			}
+			project.setSumHtjJe(contractAmount);
+			costProjectService.updateByPrimaryKeySelective(project);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/deleteProject")
+	public GlobalResult deleteProject(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		String ids=request.getParameter("ids");
+		String arr[]=ids.split(",");
+		try {
+			for(String i:arr){
+				if(i!=null && !"".equals(i)){
+					delChidren(i);
+				}
+			}
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	private void delChidren(String id){
+		Map<String,Object> map=new HashMap<String,Object>();
+		map.put("parentId", id);
+		List<CostContract> list=costContractService.selectListByMap(map);
+		CostContract costContract =costContractService.selectByPrimaryKey(id);
+		costContractService.deleteByPrimaryKey(id);
+		//汇总主+从合同金额
+		if(null!=costContract.getParentId()){
+			CostContract conParent =costContractService.selectByPrimaryKey(costContract.getParentId());
+			if(null!=conParent){
+				mainFlagAmountSum(costContract);
+			}
+		}
+		//更新项目里的合同价汇总
+		map.clear();
+		map.put("projectId", costContract.getProjectId());
+		BigDecimal contractAmount= costProjectService.getContractSumAmount(map);
+		CostProject project =costProjectService.selectByPrimaryKey(costContract.getProjectId());
+		if(null==contractAmount){
+			contractAmount=new BigDecimal(0);
+		}
+		project.setSumHtjJe(contractAmount);
+		costProjectService.updateByPrimaryKeySelective(project);
+		if(null!=list&&list.size()>0){
+			for(CostContract c:list){
+				delChidren(c.getId());
+			}
+		}
+		
+	}
+	
+	@ResponseBody
+	@RequestMapping("/docList")
+	public EUDataGridResult getDocumentList(HttpServletRequest request,CostDocument costDocument,int page, int rows) throws ParseException{
+		EUDataGridResult result = new EUDataGridResult();
+		String contractId = request.getParameter("contractId");
+		Map<String,Object> map= new HashMap<String, Object>();
+		String startTime =request.getParameter("startTime");
+		String endTime =request.getParameter("endTime");
+		Map<String,Object> selectMap=JsonUtils.object2Map(costDocument);
+		map.put("startTime", startTime);
+		map.put("endTime", endTime);
+		map.putAll(selectMap);
+		if(null!=contractId && !"".equals(contractId)){
+			map.put("contractId", contractId);
+		}
+		map.put("isPage", true);
+	    map.put("curPage", rows*(page-1));
+	    map.put("pageSize", rows);
+		List<CostDocument> list = costDocumentService.selectRelationDocListByMap(map);
+		Global.DOC_EXPORT_LIST = list;
+		int total = costDocumentService.selectRelationDocCountByMap(map);
+		result.setRows(list);
+		result.setTotal(total);
+		return result;
+	}
+	
+	//合同台账导出
+	@ResponseBody
+	@RequestMapping("/exportContract")
+	public void exportContract(HttpServletRequest request,CostContract contract,HttpServletResponse response){
+		List<CostContract> list =new ArrayList<CostContract>();
+		String ids=request.getParameter("ids");
+		Map<String,Object> map1=new HashMap<String, Object>();
+		try {
+			if(null!=ids && !"".equals(ids)){
+				String arr[]=ids.split(",");
+				for(String id:arr){
+					CostContract doc=costContractService.selectByPrimaryKey(id);
+					list.add(doc);
+				}
+			}else{
+				String projectId=request.getParameter("projectId");
+				if(null!=projectId){
+					map1.put("projectId", projectId);
+				}
+				list= costContractMapper.selectListByMap(map1);
+			}
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String startTime = Global.CON_START_TIME;
+			String endTime = Global.CON_END_TIME;
+			String path=request.getSession().getServletContext().getRealPath("/template/report/contract_template.xlsx");
+			String newPath="";
+			if(null!=startTime && !"".equals(startTime) && null!=endTime && !"".equals(endTime)){
+				newPath=request.getSession().getServletContext().getRealPath("/template/temp/合同台账导出_"+startTime+"-"+endTime+".xlsx");
+			}
+			else{
+				String dateString = formatter.format(new Date());
+				newPath=request.getSession().getServletContext().getRealPath("/template/temp/合同台账导出_"+dateString+".xlsx");
+			}
+			Map<String,List<List<String>>>  date=new HashMap<String, List<List<String>>>();
+			List<List<String>> rowList=new ArrayList<List<String>>(); 
+			List<String> cellList=new ArrayList<String>();
+			Map<String,Object> map=new HashMap<String, Object>();
+			for(CostContract l:list){
+				cellList =new ArrayList<String>();
+				cellList.add(l.getCode());
+				cellList.add(l.getName());
+				cellList.add(l.getContractType());
+				cellList.add(l.getProjectNameShow());
+				cellList.add(l.getMainFlag());
+				cellList.add(l.getStatus());
+				cellList.add(l.getSettlement());
+				cellList.add(l.getContractAmount()!=null?l.getContractAmount()+"":"");
+				cellList.add(l.getChangeAmount()!=null && l.getChangeAmount().compareTo(BigDecimal.ZERO)>0?l.getChangeAmount()+"":"");
+				cellList.add(l.getSettlementAmount()!=null && l.getSettlementAmount().compareTo(BigDecimal.ZERO)>0?l.getSettlementAmount()+"":"");
+				cellList.add(l.getPartyB());
+				cellList.add(l.getPartyBContacts());
+				cellList.add(l.getPartyBPhone());
+				cellList.add(l.getAuditPriceUnit());
+				String department=l.getExecutiveDepartment();
+				if(department.contains(".0")){
+					department=department.replace(".0", "");
+				}
+				if(null!=department&&!"".equals(department)){
+					SysOrg org= sysOrgService.selectByPrimaryKey(department);
+					cellList.add(org.getName());
+				}else{
+					cellList.add("");
+				}
+				cellList.add(l.getOperator());
+				cellList.add(null!=l.getSigningTime()&&!"".equals(l.getSigningTime())?formatter.format(l.getSigningTime()):"");
+				cellList.add(l.getPersonLiable());
+				cellList.add(l.getCreater());
+				rowList.add(cellList);
+				//重合同
+				map.put("parentId", l.getId());
+				List<CostContract> conList=costContractService.selectListByMap(map);
+				if(null!=conList && conList.size()>0){
+					for(CostContract c:conList){
+						cellList =new ArrayList<String>();
+						cellList.add(c.getCode());
+						cellList.add(c.getName());
+						cellList.add(c.getContractType());
+						cellList.add(c.getProjectNameShow());
+						cellList.add(c.getMainFlag());
+						cellList.add(c.getStatus());
+						cellList.add(c.getSettlement());
+						cellList.add(c.getContractAmount()!=null?c.getContractAmount()+"":"");
+						cellList.add(c.getChangeAmount()!=null && c.getChangeAmount().compareTo(BigDecimal.ZERO)>0?c.getChangeAmount()+"":"");
+						cellList.add(c.getSettlementAmount()!=null && c.getSettlementAmount().compareTo(BigDecimal.ZERO)>0?c.getSettlementAmount()+"":"");
+						cellList.add(c.getPartyB());
+						cellList.add(c.getPartyBContacts());
+						cellList.add(c.getPartyBPhone());
+						cellList.add(c.getAuditPriceUnit());
+						String departments=c.getExecutiveDepartment();
+						if(department.contains(".0")){
+							departments=departments.replace(".0", "");
+						}
+						if(null!=departments&&!"".equals(departments)){
+							SysOrg org= sysOrgService.selectByPrimaryKey(departments);
+							cellList.add(org.getName());
+						}else{
+							cellList.add("");
+						}
+						cellList.add(c.getOperator());
+						System.out.println("---------"+c.getCode());
+						cellList.add(null!=c.getSigningTime()&&!"".equals(c.getSigningTime())?formatter.format(c.getSigningTime()):"");
+						cellList.add(c.getPersonLiable());
+						cellList.add(c.getCreater());
+						rowList.add(cellList);
+					}
+				}
+				
+				
+				
+			}
+			date.put("合同台账", rowList);
+			try {
+				ExcelUtil.copyExcel(1,date,path,newPath,request,response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//审价任务导出
+	@ResponseBody
+	@RequestMapping("/exportTask")
+	public void exportTaskGa(HttpServletRequest request,CostTask task,HttpServletResponse response){
+		try {
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			String startTime = Global.TAS_START_TIME;
+			String endTime = Global.TAS_END_TIME;
+			List<CostTask> list = Global.TAS_EXPORT_LIST;
+			String path=request.getSession().getServletContext().getRealPath("/template/report/cosTask_template.xlsx");
+			String newPath="";
+			if(null!=startTime && !"".equals(startTime) && null!=endTime && !"".equals(endTime)){
+				newPath=request.getSession().getServletContext().getRealPath("/template/temp/审价任务_"+startTime+"-"+endTime+".xlsx");
+			}
+			else{
+				String dateString = formatter.format(new Date());
+				newPath=request.getSession().getServletContext().getRealPath("/template/temp/审价任务_"+dateString+".xlsx");
+			}
+			Map<String,List<List<String>>>  date=new HashMap<String, List<List<String>>>();
+			List<List<String>> rowList=new ArrayList<List<String>>(); 
+			List<String> cellList=new ArrayList<String>();
+			for(CostTask l:list){
+				cellList =new ArrayList<String>();
+				cellList.add(l.getCode());
+				cellList.add(l.getProjectName());
+				cellList.add(l.getContractName());
+				cellList.add(l.getName());
+				cellList.add(l.getAuditPriceType());
+				cellList.add(l.getContractAmount()!=null?l.getContractAmount()+"":"");
+				cellList.add(l.getGiveAmount()!=null?l.getGiveAmount()+"":"");
+				cellList.add(l.getMyAuditAmount()!=null?l.getMyAuditAmount()+"":"");
+				cellList.add(l.getAgencyAuditAmount()!=null?l.getAgencyAuditAmount()+"":"");
+				cellList.add(l.getDecideAmount()!=null?l.getDecideAmount()+"":"");
+				BigDecimal decideAmount=l.getDecideAmount();
+				BigDecimal contractAmount=l.getContractAmount();
+				if(null==decideAmount || decideAmount.equals(BigDecimal.ZERO) || null==contractAmount || contractAmount.equals(BigDecimal.ZERO)){
+					cellList.add("");
+				}else{
+					cellList.add((decideAmount.divide(contractAmount, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)))+""+"%");
+				}
+				cellList.add(l.getCreater());
+				cellList.add(l.getPersonLiable());
+				cellList.add(l.getAuditPriceUnit());
+				cellList.add(l.getStatus());
+				cellList.add(l.getFinalizeNumber());
+				cellList.add(l.getReceiveTime()!=null?formatter.format(l.getReceiveTime()):"");
+				cellList.add(l.getDecideTime()!=null?formatter.format(l.getDecideTime()):"");
+				cellList.add(l.getCoordinateFlag());
+				rowList.add(cellList);
+			}
+			date.put("审价任务", rowList);
+			try {
+				ExcelUtil.copyExcel(1,date,path,newPath,request,response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	//导入正式的
+	@ResponseBody
+	@RequestMapping("importContract")
+	public GlobalResult importContract(HttpServletRequest request){
+		GlobalResult result=new GlobalResult();
+		try {
+			List<CostContract> contractList = costContractService.importContract(request);
+			if(null!=contractList && contractList.size()>0){
+				result.setData(contractList);
+				result.setStatus(300);
+			}else{
+				result.setStatus(200);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	//临时导入
+	@ResponseBody
+	@RequestMapping("importContract2")
+	public GlobalResult importContract2(HttpServletRequest request){
+		GlobalResult result=new GlobalResult();
+		try {
+			List<CostContract> contractList = costContractService.importContract2(request);
+			if(null!=contractList && contractList.size()>0){
+				result.setData(contractList);
+				result.setStatus(300);
+			}else{
+				result.setStatus(200);
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	//下载导入模板
+	@ResponseBody
+	@RequestMapping("/importCon")
+	public void importCon(HttpServletRequest request,HttpServletResponse response){
+		try {
+			String path=request.getSession().getServletContext().getRealPath("/template/report/合同台账导入模版.xlsx");
+			try {
+				ExcelUtil.downLoad(path, "合同台账导入模版.xlsx", request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/gx")
+	public GlobalResult gx(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		try {
+		String taskId=request.getParameter("taskId");
+		String contractId =request.getParameter("contractId");
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		List<CostAttachment> conAttList= costAttachmentService.selectByRelationId(contractId);
+		List<CostAttachment> taskAttList= costAttachmentService.selectByRelationId(taskId);
+			for(CostAttachment cAtt:conAttList){
+				 if("送审资料".equals(cAtt.getName())){
+					 for(CostAttachment tAtt:taskAttList){
+						 if("songshen".equals(tAtt.getDataType())){
+							 if(null==tAtt.getPid() || "".equals(tAtt.getPid())){
+								 String taskAttRootId=tAtt.getId();
+								 String conAttRootId=UUID.randomUUID().toString().replace("-", "");
+								 tAtt.setId(conAttRootId);
+								 tAtt.setTypeId(contractId);
+								 tAtt.setPid(cAtt.getId());
+								 tAtt.setDataType("tendering");
+								 tAtt.setCreater(currentUser.getName());
+								 tAtt.setCreaterTime(new Date());
+								 costAttachmentService.insertSelective(tAtt);
+								 getchildren(tAtt,taskAttRootId,currentUser);
+							 }
+						 }
+					 }
+				 }
+				 if("审定资料".equals(cAtt.getName())){
+					 for(CostAttachment tAtt:taskAttList){
+						 if("shending".equals(tAtt.getDataType())){
+							 if(null==tAtt.getPid() || "".equals(tAtt.getPid())){
+								 String taskAttRootId=tAtt.getId();
+								 String conAttRootId=UUID.randomUUID().toString().replace("-", "");
+								 tAtt.setId(conAttRootId);
+								 tAtt.setTypeId(contractId);
+								 tAtt.setPid(cAtt.getId());
+								 tAtt.setDataType("tendering");
+								 tAtt.setCreater(currentUser.getName());
+								 tAtt.setCreaterTime(new Date());
+								 costAttachmentService.insertSelective(tAtt);
+								 getchildren(tAtt,taskAttRootId,currentUser);
+							 }
+						 }
+					 }
+				 }
+			 }
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	private void getchildren(CostAttachment rootAttachment,String id ,SysUser currentUser){
+		if(null!=rootAttachment){
+			 List<CostAttachment> costAttachmentList= costAttachmentService.selectByPid(id);
+			 if(null!=costAttachmentList && costAttachmentList.size()>0){
+				 for(CostAttachment att:costAttachmentList){
+					 String temId=UUID.randomUUID().toString().replace("-", "");
+					 String oldId=att.getId();
+					 att.setId(temId);
+					 att.setTypeId(rootAttachment.getTypeId());
+					 att.setPid(rootAttachment.getId());
+					 att.setDataType("tendering");
+					 att.setCreater(currentUser.getName());
+					 att.setCreaterTime(new Date());
+					 costAttachmentService.insertSelective(att);
+					 getchildren(att,oldId,currentUser);
+				 }
+			 }
+		}
+	}
+	/**
+	 * 
+	 * @Description: TODO
+	 * @param @param request
+	 * @param @return   
+	 * @return GlobalResult  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-3-20下午5:14:53
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@ResponseBody
+	@RequestMapping("/relationTask")
+	public GlobalResult relationTask(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		try {
+			String taskIds=request.getParameter("taskIds");
+			String contractId=request.getParameter("contractId");
+			String projectId=request.getParameter("projectId");
+			String parentId=request.getParameter("parentId");
+			String arr[]=taskIds.split(",");
+			CostTask task=null;
+			for(String tid:arr){
+				 task=new CostTask();
+				 task.setId(tid);
+				 task.setContractCongId(contractId);
+				 costTaskService.updateByPrimaryKeySelective(task);
+			}
+			SumAumont(projectId, parentId);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+
+	private void SumAumont(String projectId, String parentId) {
+		//项目汇总变更价金额 
+		Map<String,Object> map=new HashMap<String,Object>();
+		CostProject project=costProjectService.selectByPrimaryKey(projectId);
+		map.put("projectId", projectId);
+		map.put("auditPriceTypeCn", "合同变更");
+		BigDecimal  amount=costProjectService.getTaskSumDecideAmount(map);
+		if(null==amount){
+			amount=new BigDecimal(0);
+		}
+		project.setSumBgjJe(amount);
+		//汇总项目的结余资金=项目的概算金额-∑（主合同金额+从合同金额）-∑合同变更定审金额（未关联从合同的）
+		BigDecimal contractAmount= costProjectService.getContractSumAmount(map);
+		if(null==contractAmount){
+			contractAmount=new BigDecimal(0);
+		}
+		if(null!=project.getSumGsJe()){
+			BigDecimal sumJyJe= project.getSumGsJe().subtract(contractAmount).subtract(amount);
+			project.setSumJyJe(sumJyJe);
+		}
+		costProjectService.updateByPrimaryKeySelective(project);
+		//汇总合同变更价
+		CostContract parentCon=costContractService.selectByPrimaryKey(parentId);
+		map.put("contractId", parentCon.getId());
+		BigDecimal  conAmount=costProjectService.getTaskSumDecideAmount(map);
+		if(null==conAmount){
+			conAmount=new BigDecimal(0);
+		}
+		parentCon.setChangeAmount(conAmount);
+		costContractService.updateByPrimaryKeySelective(parentCon);
+	}
+	
+	@ResponseBody
+	@RequestMapping("/removeRelationTask")
+	public GlobalResult removeRelationTask(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		try {
+			String taskIds=request.getParameter("taskIds");
+			//String contractId=request.getParameter("contractId");
+			String projectId=request.getParameter("projectId");
+			String parentId=request.getParameter("parentId");
+			String arr[]=taskIds.split(",");
+			CostTask task=null;
+			for(String tid:arr){
+				 task=new CostTask();
+				 task.setId(tid);
+				 task.setContractCongId("");
+				 costTaskService.updateByPrimaryKeySelective(task);
+			}
+			SumAumont(projectId, parentId);
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/downgrade")
+	public GlobalResult downgrade(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		try {
+			String contractCongId=request.getParameter("contractCongId");
+			String parentId=request.getParameter("parentId");
+			CostContract contract=costContractService.selectByPrimaryKey(contractCongId);
+			CostContract parentCon=costContractService.selectByPrimaryKey(parentId);
+			Map<String,Object> map=new HashMap<String,Object>();
+			map.put("parentId", contract.getId());
+			List<CostContract> conList=costContractService.selectListByMap(map);
+			if(null!=conList && conList.size()>0){
+				for(CostContract con:conList){
+					con.setParentId(parentId);
+					con.setProjectId(parentCon.getProjectId());
+					con.setMainFlag("从合同");
+					costContractService.updateByPrimaryKeySelective(con);
+					//汇总主+从合同金额
+					mainFlagAmountSum(con);
+				}
+			}
+			contract.setParentId(parentId);
+			contract.setProjectId(parentCon.getProjectId());
+			contract.setMainFlag("从合同");
+			costContractService.updateByPrimaryKeySelective(contract);
+			//汇总主+从合同金额
+			mainFlagAmountSum(contract);
+			
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	/**
+	 * 
+	 * @Description: 汇总主+从合同金额
+	 * @param @param contract   
+	 * @return void  
+	 * @throws
+	 * @author lixiang
+	 * @date 2019-5-14下午2:09:21
+	 * @Company  广东华联软件科技有限公司
+	 */
+	@RequestMapping("/mainFlagAmountSum")
+	public void mainFlagAmountSum(CostContract contract){
+		String mainFlag= contract.getMainFlag();
+		if(null!=mainFlag && mainFlag.equals("主合同")){
+			Map<String,Object> map=new HashMap<String, Object>();
+			map.put("parentId", contract.getId());
+			List<CostContract> congConList= costContractService.selectListByMap(map);
+			BigDecimal contractAmount=new BigDecimal(0);
+			if(null!=congConList&&congConList.size()>0){
+				for(CostContract con :congConList){
+					contractAmount=con.getContractAmount()!=null?contractAmount.add(con.getContractAmount()):contractAmount;
+				}
+			}
+			System.out.println("-----------"+contract.getCode());
+			contract.setMainFlagAmount(contractAmount.add(contract.getContractAmount()!=null?contract.getContractAmount():new BigDecimal(0)));
+			costContractService.updateByPrimaryKeySelective(contract);
+		}else{
+			CostContract con= costContractService.selectByPrimaryKey(contract.getParentId());
+			mainFlagAmountSum(con);
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/testMainFlagAmountSum")
+	public int testMainFlagAmountSum(){
+		Map<String,Object> map=new HashMap<String, Object>();
+		map.put("mainFlag", "主合同");
+		List<CostContract> congConList= costContractService.selectListByMap(map);
+		for(CostContract con :congConList){
+			mainFlagAmountSum(con);
+		}
+		return congConList.size();
+	}
+	
+	/*@ResponseBody
+	@RequestMapping("/creatFile")
+	public void creatFile(){
+		SysUser currentUser=shiroUtil.getInstance().currentUser();
+		Map<String,Object> map=new HashMap<String,Object>();
+		map.put("mainFlag", "主合同");
+		List<CostContract> list=costContractService.selectListByMap(map);
+		Calendar calendar = Calendar.getInstance();
+        calendar.add (Calendar.SECOND, 1);
+		for(CostContract costContract:list){
+			//在附件表新增文件夹名称（新增主材单价审批表）
+			CostAttachment att=new CostAttachment();
+			att.setId(UUID.randomUUID().toString().replace("-", ""));
+			att.setTypeId(costContract.getId());
+			att.setName("送审资料");
+			att.setSuffix("文件夹");
+			att.setDataType("tendering");
+			att.setCreater(currentUser.getName());
+			calendar.add (Calendar.SECOND, 1);
+			att.setCreaterTime(calendar.getTime());
+			costAttachmentService.insertSelective(att);
+			CostAttachment att2=new CostAttachment();
+			att2.setId(UUID.randomUUID().toString().replace("-", ""));
+			att2.setTypeId(costContract.getId());
+			att2.setName("审定资料");
+			att2.setSuffix("文件夹");
+			att2.setDataType("tendering");
+			att2.setCreater(currentUser.getName());
+			calendar.add (Calendar.SECOND, 2);
+			att2.setCreaterTime(calendar.getTime());
+			costAttachmentService.insertSelective(att2);
+		}
+		
+	}*/
+	
+}

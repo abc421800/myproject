@@ -1,0 +1,51 @@
+package com.cost168.costaudit.service.yaohao;
+
+import com.cost168.costaudit.pojo.yaohao.YaohaoAssess;
+import com.cost168.costaudit.pojo.yaohao.param.YaohaoAssessParam;
+import com.cost168.costaudit.utils.EUDataGridResult;
+import com.cost168.costaudit.utils.GlobalResult;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ * @description: 综合考核
+ * @author: ZYL
+ * @created: 2019-07-08
+ */
+public interface YaohaoAssessService {
+
+    YaohaoAssess selectByPrimaryKey(String id);
+
+    GlobalResult insert(YaohaoAssessParam assessParam, HttpServletRequest request);
+
+    GlobalResult updateByPrimaryKeySelective(YaohaoAssessParam assessParam);
+
+    GlobalResult deleteByPrimaryKey(HttpServletRequest request);
+
+    EUDataGridResult selectListByMap(HttpServletRequest request, int page, int rows, Map<String, Object> map);
+
+    int selectCountByMap(Map<String, Object> map);
+
+    EUDataGridResult exportExcel(HttpServletRequest request, HttpServletResponse response, String year);
+
+    String toEdit(HttpServletRequest request);
+
+    String queryYear(HttpServletRequest request);
+
+    EUDataGridResult queryEnterpriseByParam(HttpServletRequest request, int page, int rows, Map<String, Object> map);
+
+    GlobalResult addYaohaoName(HttpServletRequest request, String year);
+
+    GlobalResult addYaohaoNameBtnShow(HttpServletRequest request, String year);
+    
+    List<YaohaoAssess> selectList(Map<String, Object> map);
+    
+    int selectCount(Map<String, Object> map);
+
+    EUDataGridResult assessList(HttpServletRequest request, int page,int rows, Map<String, Object> map);
+			
+}

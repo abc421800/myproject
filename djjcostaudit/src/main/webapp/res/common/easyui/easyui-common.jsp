@@ -1,0 +1,59 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
+<!--easyui模块-->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/home/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/bootstrap/datagrid.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/bootstrap/linkbutton.css">
+<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/themes/icon.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/pagecommon/base.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/pagecommon/button.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/fonts/icomoon/style.css"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/plugin/My97DatePicker/4.8/skin/WdatePicker.css"/>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/pagecommon/common.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/pagecommon/allstyle.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/home/index.css">
+<!-- 编辑表单页面样式 -->
+<link rel="stylesheet" href="${pageContext.request.contextPath}/res/css/document/edit.css"/>
+
+<script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/jquery.easyui.min.js"></script>
+<script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/jquery.easyui.datagrid.column.js"></script>
+<script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/locale/easyui-lang-zh_CN.js"></script>
+<script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/datagrid-detailview.js"></script>
+<!-- 行拖拽插件 -->
+<script src="${pageContext.request.contextPath}/res/plugin/jquery-easyui-1.5.4.2/treegrid-dnd.js"></script> 
+<script src="${pageContext.request.contextPath}/res/js/home/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/res/plugin/My97DatePicker/4.8/WdatePicker.js"></script>
+<script src="${pageContext.request.contextPath}/res/js/pagecommon/page.js"></script>
+
+
+<!--bootstrap-fileinput -->
+<link href="${pageContext.request.contextPath}/res/plugin/bootstrap-fileinput-master/css/fileinput.css" rel="stylesheet" type="text/css" /> 
+<script  src="${pageContext.request.contextPath}/res/plugin/bootstrap-fileinput-master/js/fileinput.js" type="text/javascript" charset="UTF-8"></script> 
+<script  src="${pageContext.request.contextPath}/res/plugin/bootstrap-fileinput-master/js/locales/zh.js" type="text/javascript" charset="UTF-8"></script>
+
+<script src="${pageContext.request.contextPath}/res/js/pagecommon/emailAutoComplete.js"></script>
+
+
+
+<!--一段js代码：系统是否过期 -->
+<script type="text/javascript">
+$(function(){
+	$.ajaxSetup({
+		statusCode:{
+			700: function(){
+				$.messager.alert("温馨提示","登录已过期,请重新登录！", "error",function(){
+					top.location="/login";
+				});
+			},
+			701:function(){
+				$.messager.alert("温馨提示","无此操作权限,请联系管理员！", "error");
+			}
+		}
+	});
+});
+</script>

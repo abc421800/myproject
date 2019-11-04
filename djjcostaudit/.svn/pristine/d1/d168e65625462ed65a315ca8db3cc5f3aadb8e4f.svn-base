@@ -1,0 +1,41 @@
+package com.cost168.costaudit.mapper.yaohao;
+
+import com.cost168.costaudit.pojo.yaohao.YaohaoPunish;
+import com.cost168.costaudit.pojo.yaohao.YaohaoPunishExample;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.ibatis.annotations.Param;
+
+public interface YaohaoPunishMapper {
+    int countByExample(YaohaoPunishExample example);
+
+    int deleteByExample(YaohaoPunishExample example);
+
+    int deleteByPrimaryKey(String id);
+
+    int insert(YaohaoPunish record);
+
+    int insertSelective(YaohaoPunish record);
+
+    List<YaohaoPunish> selectByExample(YaohaoPunishExample example);
+
+    YaohaoPunish selectByPrimaryKey(String id);
+
+    int updateByExampleSelective(@Param("record") YaohaoPunish record, @Param("example") YaohaoPunishExample example);
+
+    int updateByExample(@Param("record") YaohaoPunish record, @Param("example") YaohaoPunishExample example);
+
+    int updateByPrimaryKeySelective(YaohaoPunish record);
+
+    int updateByPrimaryKey(YaohaoPunish record);
+    
+    List<YaohaoPunish> selectListByMap(Map<String, Object> map);
+
+	int selectCountByMap(Map<String, Object> map);
+	
+	List<YaohaoPunish> selectListTzByMap(Map<String, Object> map);
+
+	int selectCountTzByMap(Map<String, Object> map);
+	
+}

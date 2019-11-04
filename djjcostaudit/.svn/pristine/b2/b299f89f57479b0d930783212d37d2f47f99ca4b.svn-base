@@ -1,0 +1,565 @@
+package com.cost168.costaudit.controller.cost;
+
+import com.cost168.costaudit.pojo.cost.CostEnterprise;
+import com.cost168.costaudit.pojo.cost.CostEnterpriseRecord;
+import com.cost168.costaudit.pojo.sys.SysUser;
+import com.cost168.costaudit.pojo.work.WorkEnterprise;
+import com.cost168.costaudit.pojo.yaohao.YaohaoAutocode;
+import com.cost168.costaudit.pojo.yaohao.YaohaoCandidate;
+import com.cost168.costaudit.service.cost.CostEnterpriseRecordService;
+import com.cost168.costaudit.service.cost.CostEnterpriseService;
+import com.cost168.costaudit.service.work.WorkEnterpriseService;
+import com.cost168.costaudit.service.yaohao.YaohaoAutocodeService;
+import com.cost168.costaudit.service.yaohao.YaohaoCandidateService;
+import com.cost168.costaudit.shiro.shiroUtil;
+import com.cost168.costaudit.utils.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
+ * 
+ * @author YiLi
+ *
+ */
+
+@Controller
+@RequestMapping("/costEnterprise")
+public class CostEnterpriseController {
+	
+	@Autowired
+	private CostEnterpriseService costEnterpriseService;
+	
+	@Autowired
+	private WorkEnterpriseService workEnterpriseService;
+	@Autowired
+	private YaohaoCandidateService yaohaoCandidateService;
+	@Autowired
+	private YaohaoAutocodeService yaohaoAutocodeService;
+	@Autowired
+	private CostEnterpriseRecordService costEnterpriseRecordService;
+	
+	
+	@ResponseBody
+	@RequestMapping("/list")
+	public EUDataGridResult list(HttpServletRequest request,CostEnterprise costEnterprise, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			Map<String,Object> selectMap=JsonUtils.object2Map(costEnterprise);
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String startTime =request.getParameter("startTime");
+			String endTime =request.getParameter("endTime");
+			if(null!=startTime && !"".equals(startTime)){
+				map.put("startTime", startTime+" 00:00:00");
+			}
+			if(null!=endTime && !"".equals(endTime)){
+				map.put("endTime", endTime+" 24:00:00");
+			}
+            String currentDate = sdf.format(new Date());
+            String entYear = currentDate.substring(0, 4);
+            int temp=Integer.parseInt(entYear);
+			int assess_year=temp-1;
+            map.put("year", assess_year);
+			map.putAll(selectMap);
+			map.put("isPage", true);
+		    map.put("curPage", rows*(page-1));
+		    map.put("pageSize", rows);
+		    List<CostEnterprise> list= costEnterpriseService.selectListByMap(map);
+		    Global.ENT_EXPORT_LIST = list;
+		    int total= costEnterpriseService.selectCountByMap(map);
+			result.setRows(list);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/candidateEnterpriseList")
+	public EUDataGridResult candidateEnterpriseList(HttpServletRequest request,CostEnterprise costEnterprise, int page, int rows) {
+		EUDataGridResult result=new EUDataGridResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			String currentDate = sdf.format(new Date());
+			String entYear = currentDate.substring(0, 4);
+			Map<String,Object> selectMap=JsonUtils.object2Map(costEnterprise);
+			String yaohaoGradeFlag=request.getParameter("yaohaoGradeFlag");
+			map.putAll(selectMap);
+		    //map.put("year", entYear);
+		    List<CostEnterprise> list= costEnterpriseService.selectListByMap(map);
+		    List<YaohaoCandidate> yhList=null;
+		    List<String> str=new ArrayList<String>();
+		    List<CostEnterprise> newEntList=new ArrayList<CostEnterprise>();
+		    if("B".equals(yaohaoGradeFlag)){
+		    	yhList=yaohaoCandidateService.selectCandidateCurrentYaohaoGrade(entYear, "第二档");
+			}else{
+				yhList=yaohaoCandidateService.selectCandidateCurrentYaohaoGrade(entYear, "第一档");
+			}
+	    	for(YaohaoCandidate y:yhList){
+	    		str.add(y.getEnterpriseCode());
+	    	}
+		    for(CostEnterprise e:list){
+		    	if(!str.contains(e.getCode())){
+		    		newEntList.add(e);
+		    	}
+		    }
+		    int total= newEntList.size();
+			result.setRows(newEntList);
+			result.setTotal(total);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return result;
+	}
+	
+	@RequestMapping("/toEdit")
+	public String toEdit(HttpServletRequest request){
+		String url="";
+		String id=request.getParameter("id");
+		if(null!=id && !"".equals(id)) {
+			url="/costEnterprise/upd";
+			CostEnterprise costEnterprise = costEnterpriseService.selectByPrimaryKey(id);
+			WorkEnterprise we= workEnterpriseService.selectByWorkEnterpriseName(costEnterprise.getName());
+			Map<String,Object> map=new HashMap<String, Object>();
+			map.put("enterpriseId", id);
+			List<CostEnterpriseRecord> erList=costEnterpriseRecordService.selectListByMap(map);
+			if(null!=we){
+				costEnterprise.setStationing("是");
+				request.setAttribute("workEnterpriseId", we.getId());
+			}else{
+				costEnterprise.setStationing("否");
+				request.setAttribute("workEnterpriseId", "没有");
+			}
+			request.setAttribute("obj", costEnterprise);
+		}else{
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			String currentDate = sdf.format(new Date());
+			String currentYear = currentDate.substring(0, 4);
+			int s=Integer.parseInt(currentYear);
+			int e=s+2;
+			String enterpriseStart=s+"-01"+"-01";
+			String enterpriseEnd=e+"-12"+"-31";
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			url="/costEnterprise/save";
+			String enterpriseId=UUID.randomUUID().toString().replace("-", "");
+			CostEnterprise costEnterprise=new CostEnterprise();
+			costEnterprise.setId(enterpriseId);
+			costEnterprise.setCreater(currentUser.getName());
+			try {
+				costEnterprise.setEnterpriseStart(sdf.parse(enterpriseStart));
+				costEnterprise.setEnterpriseEnd(sdf.parse(enterpriseEnd));
+			} catch (ParseException e1) {
+				e1.printStackTrace();
+			}
+			request.setAttribute("workEnterpriseId", "没有");
+			request.setAttribute("obj", costEnterprise);
+		}
+		request.setAttribute("url", url);
+		return "enterprise/add";
+	}
+	
+	
+	@ResponseBody
+	@RequestMapping("/save")
+	public GlobalResult save(HttpServletRequest request,CostEnterprise costEnterprise){
+		GlobalResult result=new GlobalResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			String enterpriseTime =request.getParameter("enterpriseTime");
+			String start=enterpriseTime.substring(0, 10); 
+			String end=enterpriseTime.substring(enterpriseTime.length()-10, enterpriseTime.length());
+			costEnterprise.setEnterpriseStart(sdf.parse(start));
+			costEnterprise.setEnterpriseEnd(sdf.parse(end));
+			SysUser currentUser=shiroUtil.getInstance().currentUser();
+			costEnterprise.setCreaterTime(new Date());
+			costEnterprise.setCreater(currentUser.getName());
+			costEnterprise.setDeleteFlag(1);
+			boolean flag_name=false;
+			boolean flag_code=false;
+			boolean flag_simpleName=false;
+			StringBuffer sb=new StringBuffer();
+			if("出库".equals(costEnterprise.getEffectiveFlag())){
+				costEnterpriseService.insertSelective(costEnterprise);
+				result.setStatus(200);
+			}else{
+				map.put("nameNoLike", costEnterprise.getName());
+				List<CostEnterprise> enterpriseList_name= costEnterpriseService.selectListByMap(map);
+				map.clear();
+				map.put("code", costEnterprise.getCode());
+				List<CostEnterprise> enterpriseList_code= costEnterpriseService.selectListByMap(map);
+				map.clear();
+				map.put("simpleName", costEnterprise.getSimpleName());
+				List<CostEnterprise> enterpriseList_simpleName= costEnterpriseService.selectListByMap(map);
+				//判断名字是否重复
+				if(null!=enterpriseList_name && enterpriseList_name.size()>0){
+					for(CostEnterprise e:enterpriseList_name){
+						if("在库".equals(e.getEffectiveFlag())){
+							flag_name=true;
+						}
+					}
+				}
+				//判断编码是否重复
+				if(null!=enterpriseList_code && enterpriseList_code.size()>0){
+					for(CostEnterprise e:enterpriseList_code){
+						if("在库".equals(e.getEffectiveFlag())){
+							flag_code=true;
+						}
+					}
+				}
+				//判断简称是否重复
+				if(null!=enterpriseList_simpleName && enterpriseList_simpleName.size()>0){
+					for(CostEnterprise e:enterpriseList_simpleName){
+						if("在库".equals(e.getEffectiveFlag())){
+							flag_simpleName=true;
+						}
+					}
+				}
+				if(flag_name){
+					sb.append("企业名称重复 ");
+				}
+				if(flag_code){
+					sb.append("企业编码重复 ");
+				}
+				if(flag_simpleName){
+					sb.append("企业简称重复 ");
+				}
+				if(!flag_name && !flag_code && !flag_simpleName){
+					costEnterpriseService.insertSelective(costEnterprise);
+					//更新摇号名单
+				    String currentDate = sdf.format(new Date());
+				    String currentYear = currentDate.substring(0, 4);
+					YaohaoAutocode code=yaohaoAutocodeService.getCodeAorB();
+					YaohaoCandidate canNew=new YaohaoCandidate();
+					canNew.setId(OrderUtil.buildOrderId(""));
+					canNew.setEnterpriseCode(costEnterprise.getCode());
+					canNew.setYaohaoYear(currentYear);
+					canNew.setYaohaoGrade("第二档");
+					canNew.setCreateTime(new Date());
+					canNew.setCreater(currentUser.getName());
+					canNew.setRoundNum(code.getLunNumB());
+					canNew.setRemoveFlag("1");
+					yaohaoCandidateService.insertSelective(canNew);
+					result.setStatus(200);
+					result.setMsg(sb.toString());
+				}else{
+					result.setStatus(300);
+					result.setMsg(sb.toString());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/upd")
+	public GlobalResult upd(HttpServletRequest request,CostEnterprise costEnterprise){
+		GlobalResult result=new GlobalResult();
+		Map<String,Object> map=new HashMap<String,Object>();
+		try {
+			SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
+			String enterpriseTime =request.getParameter("enterpriseTime");
+			String start=enterpriseTime.substring(0, 10); 
+			String end=enterpriseTime.substring(enterpriseTime.length()-10, enterpriseTime.length());
+			costEnterprise.setEnterpriseStart(sdf.parse(start));
+			costEnterprise.setEnterpriseEnd(sdf.parse(end));
+			costEnterprise.setCreaterTime(new Date());
+			boolean flag_name=false;
+			boolean flag_code=false;
+			boolean flag_simpleName=false;
+			StringBuffer sb=new StringBuffer();
+			if("出库".equals(costEnterprise.getEffectiveFlag()) || "暂停".equals(costEnterprise.getEffectiveFlag())){
+				costEnterpriseService.updateByPrimaryKeySelective(costEnterprise);
+				//摇号名单剔除该企业
+				String currentDate = sdf.format(new Date());
+				String currentYear = currentDate.substring(0, 4);
+				List<YaohaoCandidate>  yhOne=yaohaoCandidateService.selectCandidateCurrentYaohaoGrade(currentYear, "第一档");
+				List<YaohaoCandidate>  yhTwo=yaohaoCandidateService.selectCandidateCurrentYaohaoGrade(currentYear, "第二档");
+				yhTwo.addAll(yhOne);
+				for(YaohaoCandidate yh:yhTwo){
+					if(costEnterprise.getCode().equals(yh.getEnterpriseCode())){
+						yaohaoCandidateService.deleteByPrimaryKey(yh.getId());
+					}
+				}
+				result.setStatus(200);
+			}else{
+				map.put("nameNoLike", costEnterprise.getName());
+				map.put("noid", costEnterprise.getId());
+				List<CostEnterprise> enterpriseList_name= costEnterpriseService.selectListByMap(map);
+				map.clear();
+				map.put("code", costEnterprise.getCode());
+				map.put("noid", costEnterprise.getId());
+				List<CostEnterprise> enterpriseList_code= costEnterpriseService.selectListByMap(map);
+				map.clear();
+				map.put("simpleName", costEnterprise.getSimpleName());
+				map.put("noid", costEnterprise.getId());
+				List<CostEnterprise> enterpriseList_simpleName= costEnterpriseService.selectListByMap(map);
+				//判断名字是否重复
+				if(null!=enterpriseList_name && enterpriseList_name.size()>0){
+					for(CostEnterprise e:enterpriseList_name){
+						if("在库".equals(e.getEffectiveFlag())){
+							flag_name=true;
+						}
+					}
+				}
+				//判断编码是否重复
+				if(null!=enterpriseList_code && enterpriseList_code.size()>0){
+					for(CostEnterprise e:enterpriseList_code){
+						if("在库".equals(e.getEffectiveFlag())){
+							flag_code=true;
+						}
+					}
+				}
+				//判断简称是否重复
+				if(null!=enterpriseList_simpleName && enterpriseList_simpleName.size()>0){
+					for(CostEnterprise e:enterpriseList_simpleName){
+						if("在库".equals(e.getEffectiveFlag())){
+							flag_simpleName=true;
+						}
+					}
+				}
+				if(flag_name){
+					sb.append("企业名称重复 ");
+				}
+				if(flag_code){
+					sb.append("企业编码重复 ");
+				}
+				if(flag_simpleName){
+					sb.append("企业简称重复 ");
+				}
+				if(!flag_name && !flag_code && !flag_simpleName){
+					CostEnterprise e=costEnterpriseService.selectByPrimaryKey(costEnterprise.getId());
+					costEnterpriseService.updateByPrimaryKeySelective(costEnterprise);
+					//摇号名单
+					if(!"在库".equals(e.getEffectiveFlag())){
+						if("在库".equals(costEnterprise.getEffectiveFlag())){
+								SysUser currentUser=shiroUtil.getInstance().currentUser();
+								String currentDate = sdf.format(new Date());
+							    String currentYear = currentDate.substring(0, 4);
+								YaohaoAutocode code=yaohaoAutocodeService.getCodeAorB();
+								YaohaoCandidate canNew=new YaohaoCandidate();
+								canNew.setId(OrderUtil.buildOrderId(""));
+								canNew.setEnterpriseCode(costEnterprise.getCode());
+								canNew.setYaohaoYear(currentYear);
+								canNew.setYaohaoGrade("第二档");
+								canNew.setCreateTime(new Date());
+								canNew.setCreater(currentUser.getName());
+								canNew.setRoundNum(code.getLunNumB());
+								yaohaoCandidateService.insertSelective(canNew);
+						}
+					}
+					result.setStatus(200);
+					result.setMsg(sb.toString());
+				}else{
+					result.setStatus(300);
+					result.setMsg(sb.toString());
+				}
+			}
+		}
+		 catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	@ResponseBody
+	@RequestMapping("/deleteProject")
+	public GlobalResult deleteProject(HttpServletRequest request) {
+		GlobalResult result=new GlobalResult();
+		String ids=request.getParameter("ids");
+		String arr[]=ids.split(",");
+		try {
+			CostEnterprise costEnterprise=null;
+			for(String i:arr){
+				if(i!=null && !"".equals(i)){
+					costEnterprise=new CostEnterprise();
+					costEnterprise.setId(i);
+					costEnterprise.setDeleteFlag(2);
+					costEnterpriseService.updateByPrimaryKeySelective(costEnterprise);
+				}
+			}
+			result.setStatus(200);
+		} catch (Exception e) {
+			e.printStackTrace();
+			result.setStatus(500);
+		}
+		return result;
+	}
+	
+	//导出
+	@RequestMapping("/exportEnterprise")
+	@ResponseBody
+	public void exportEnterprise(HttpServletRequest request,CostEnterprise enterprise,HttpServletResponse response){
+		List<CostEnterprise> list =new ArrayList<CostEnterprise>();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		try {
+				Map<String,Object> map=new HashMap<String,Object>();
+				String flag=request.getParameter("flag");
+				if("zk".equals(flag)){
+					map.put("effectiveFlag", "在库");
+				}else if("zt".equals(flag)){
+					map.put("effectiveFlag", "暂停");
+				}else{
+					map.put("effectiveFlag", "出库");
+				}
+				String currentDate = sdf.format(new Date());
+		        String entYear = currentDate.substring(0, 4);
+		        int temp=Integer.parseInt(entYear);
+		        int assess_year=temp-1;
+		        map.put("year", assess_year);
+				list= costEnterpriseService.selectListByMap(map);
+			String path=request.getSession().getServletContext().getRealPath("/template/report/enterprise_template.xlsx");
+			String newPath=request.getSession().getServletContext().getRealPath("/template/temp/入库企业.xlsx");
+			Map<String,List<List<String>>>  date=new HashMap<String, List<List<String>>>();
+			List<List<String>> rowList=new ArrayList<List<String>>(); 
+			List<String> cellList=new ArrayList<String>();
+			for(CostEnterprise l:list){
+				cellList =new ArrayList<String>();
+				cellList.add(l.getName());
+				cellList.add(l.getSimpleName());
+				cellList.add(l.getContacts());
+				cellList.add(l.getContactsPhone());
+				cellList.add(l.getEffectiveFlag());
+				cellList.add(l.getBatch());
+				cellList.add(l.getAssessResultRk());
+				cellList.add(l.getYaohaoGradeRk());
+				cellList.add(l.getWinNum());
+				cellList.add(null!=l.getServiceAmountRk()?l.getServiceAmountRk().toString():"");
+				cellList.add(l.getStationingStr());
+				WorkEnterprise worEnt= 	workEnterpriseService.selectByWorkEnterpriseName(l.getName());
+		    	if(null!=worEnt){
+		    		l.setServiceEndTime(worEnt.getServiceEndStr());
+		    	}
+				cellList.add(l.getServiceEndTime());
+				rowList.add(cellList);
+			}
+			date.put("入库企业", rowList);
+			try {
+				ExcelUtil.copyExcel(1,date,path,newPath,request,response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	//下载导入模板
+	@ResponseBody
+	@RequestMapping("/importEnt")
+	public void importEnt(HttpServletRequest request,HttpServletResponse response){
+		try {
+			String path=request.getSession().getServletContext().getRealPath("/template/report/入库企业导入模版.xlsx");
+			try {
+				ExcelUtil.downLoad(path, "入库企业导入模版.xlsx", request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//导入
+	@ResponseBody
+	@RequestMapping("importEnterprise")
+	public GlobalResult importEnterprise(HttpServletRequest request){
+		GlobalResult result=new GlobalResult();
+		int status = costEnterpriseService.importEnterprise(request);
+		result.setStatus(status);
+		return result;
+	}
+	//下载z手册
+	@ResponseBody
+	@RequestMapping("/uploadSC")
+	public void uploadSC(HttpServletRequest request,HttpServletResponse response){
+		try {
+			String path=request.getSession().getServletContext().getRealPath("/template/report/广州市代建局造价审核管理系统-用户手册.pdf");
+			String fileName = "广州市代建局造价审核管理系统-用户手册.pdf";
+			try {
+				if (IeEncordingUtil.isMSBrowser(request)) {
+					fileName = URLEncoder.encode(fileName, "UTF8");
+				}
+				ExcelUtil.downLoad(path, fileName, request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	//下载考勤管理
+	@ResponseBody
+	@RequestMapping("/uploadKQ")
+	public void uploadKQ(HttpServletRequest request,HttpServletResponse response){
+		try {
+			String path=request.getSession().getServletContext().getRealPath("/template/report/广州市代建局造价审核管理系统-考勤管理.pdf");
+			String fileName = "广州市代建局造价审核管理系统-考勤管理.pdf";
+			try {
+				if (IeEncordingUtil.isMSBrowser(request)) {
+					fileName = URLEncoder.encode(fileName, "UTF8");
+				}
+				ExcelUtil.downLoad(path, fileName, request, response);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/buildYearRecode")
+	public void buildYearRecode(HttpServletRequest request,HttpServletResponse response){
+		try {
+			 List<CostEnterprise> list= costEnterpriseService.selectByExample(null);
+			 CostEnterpriseRecord cr=null;
+			 for(CostEnterprise e:list){
+				 String year=e.getBatch();
+				 int y=Integer.parseInt(year);
+				 int m=y+2;
+				 for(int a=y;a<=m;a++){
+					 cr= new CostEnterpriseRecord();
+					 cr.setId(OrderUtil.buildOrderId(""));
+					 cr.setEnterpriseId(e.getId());
+					 cr.setStatus("在库");
+					 cr.setYear(a+"");
+					 cr.setOperator("admin");
+					 cr.setCreateTime(new Date());
+					 costEnterpriseRecordService.insertSelective(cr);
+				 }
+					
+			 }
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@ResponseBody
+	@RequestMapping("/bugtest")
+	public void bugtest(HttpServletRequest request,HttpServletResponse response){
+		try {
+			costEnterpriseRecordService.testBug();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}

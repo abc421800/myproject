@@ -1,0 +1,33 @@
+package com.cost168.costaudit.service.work;
+
+import java.util.List;
+import java.util.Map;
+
+import com.cost168.costaudit.pojo.work.WorkProcessApply;
+import com.cost168.costaudit.pojo.work.WorkProcessApplyExample;
+
+/**
+ * 
+ * ClassName: WorkProcessApplyService 
+ * @Description: TODO
+ * @author lixiang
+ * @date 2019-5-30上午9:58:06
+ * @Company  广东华联软件科技有限公司
+ */
+public interface WorkProcessApplyService {
+	
+	List<WorkProcessApply> selectByExample(WorkProcessApplyExample example);
+
+	WorkProcessApply selectByPrimaryKey(String id);
+
+    int insertSelective(WorkProcessApply record);
+
+    int updateByPrimaryKeySelective(WorkProcessApply workProcessApply);
+
+    int deleteByPrimaryKey(String id);
+
+    List<WorkProcessApply> selectListByMap(Map<String,Object> map);
+
+    int selectCountByMap(Map<String,Object> map);
+
+}

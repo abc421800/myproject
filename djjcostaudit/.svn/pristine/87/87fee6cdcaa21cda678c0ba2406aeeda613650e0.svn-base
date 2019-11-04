@@ -1,0 +1,455 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.cost168.costaudit.mapper.work.WorkProcessApplyMapper" >
+  <resultMap id="BaseResultMap" type="com.cost168.costaudit.pojo.work.WorkProcessApply" >
+    <id column="id" property="id" jdbcType="VARCHAR" />
+    <result column="code" property="code" jdbcType="VARCHAR" />
+    <result column="proposer" property="proposer" jdbcType="VARCHAR" />
+    <result column="nextPerson" property="nextperson" jdbcType="VARCHAR" />
+    <result column="enterprise_id" property="enterpriseId" jdbcType="VARCHAR" />
+    <result column="status" property="status" jdbcType="VARCHAR" />
+    <result column="create_time" property="createTime" jdbcType="TIMESTAMP" />
+    <result column="content" property="content" jdbcType="VARCHAR" />
+    <result column="type" property="type" jdbcType="VARCHAR" />
+    <result column="mor_aft_all" property="morAftAll" jdbcType="VARCHAR" />
+    <result column="leave_start_time" property="leaveStartTime" jdbcType="TIMESTAMP" />
+    <result column="leave_end_time" property="leaveEndTime" jdbcType="TIMESTAMP" />
+    <result column="leave_days" property="leaveDays" jdbcType="REAL" />
+    <result column="kxnj" property="kxnj" jdbcType="REAL" />
+    <result column="related_id" property="relatedId" jdbcType="VARCHAR" />
+    <result column="remark" property="remark" jdbcType="VARCHAR" />
+  </resultMap>
+  <sql id="Example_Where_Clause" >
+    <where >
+      <foreach collection="oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause" >
+    <where >
+      <foreach collection="example.oredCriteria" item="criteria" separator="or" >
+        <if test="criteria.valid" >
+          <trim prefix="(" suffix=")" prefixOverrides="and" >
+            <foreach collection="criteria.criteria" item="criterion" >
+              <choose >
+                <when test="criterion.noValue" >
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue" >
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue" >
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue" >
+                  and ${criterion.condition}
+                  <foreach collection="criterion.value" item="listItem" open="(" close=")" separator="," >
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List" >
+    id, code, proposer, nextPerson, enterprise_id, status, create_time, content, type,mor_aft_all, 
+    leave_start_time, leave_end_time, leave_days, related_id, remark,kxnj
+  </sql>
+  <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.cost168.costaudit.pojo.work.WorkProcessApplyExample" >
+    select
+    <if test="distinct" >
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from work_process_apply
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null" >
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectListByMap" resultMap="BaseResultMap" parameterType="map" >
+	  	select pa.*,p.name as 'proposerName',p.job as 'proJob',p.enterprise_id as 'enterpriseId',e.name as 'enterpriseName',p.phone AS 'proPhone',
+	  	u2.name as 'nextPersonName',u3.name as 'relatedName',IFNULL(p.annualLeaveTotal,0)-IFNULL(p.annualLeaveUseup,0) AS 'annualLeaveSure'
+	    from work_process_apply pa LEFT JOIN work_person p ON pa.proposer=p.account
+	    LEFT JOIN work_enterprise e ON p.enterprise_id = e.id
+	    LEFT JOIN sys_user u2 ON pa.nextPerson=u2.account
+		LEFT JOIN sys_user u3 ON pa.related_id=u3.account
+       <where>
+       	
+     		<if test="id != null and id !=''" >
+     			and pa.id = #{id}
+   			</if>
+   			<if test="personAll != null and personAll !=''" >
+     			and (pa.proposer=#{personAll} OR pa.nextPerson=#{personAll} or pa.related_id=#{personAll})
+   			</if>
+     		<if test="proposer != null and proposer !=''" >
+     			and pa.proposer = #{proposer}
+   			</if>
+   			<if test="proposerName != null and proposerName !=''" >
+     			and p.name like concat('%',#{proposerName},'%')
+   			</if>
+   			<if test="nextPerson != null and nextPerson !=''" >
+     			and pa.nextPerson = #{nextPerson}
+   			</if>
+   			<if test="type != null and type !=''" >
+     			and pa.type = #{type}
+   			</if>
+   			<if test="status != null and status !=''" >
+     			and pa.status = #{status}
+   			</if>
+   			<if test="startTime!=null and startTime!=''">
+       		   and <![CDATA[ pa.create_time>=#{startTime} ]]>
+	        </if>
+	        <if test="endTime!=null and endTime!=''">
+	       	   and <![CDATA[ pa.create_time<=#{endTime} ]]>
+	        </if>
+        </where>
+        order by pa.create_time desc
+     <if test="isPage==true">
+    		limit #{curPage},#{pageSize}
+    </if>
+  </select>
+  <select id="selectCountByMap" resultType="java.lang.Integer" parameterType="map" >
+    select count(*)  from work_process_apply pa LEFT JOIN work_person p ON pa.proposer=p.account
+     LEFT JOIN work_enterprise e ON p.enterprise_id = e.id
+    LEFT JOIN sys_user u2 ON pa.nextPerson=u2.account
+	LEFT JOIN sys_user u3 ON pa.related_id=u3.account
+     	<where>
+     		<if test="id != null and id !=''" >
+     			and pa.id = #{id}
+   			</if>
+   			<if test="personAll != null and personAll !=''" >
+     			and (pa.proposer=#{personAll} OR pa.nextPerson=#{personAll} or pa.related_id=#{personAll})
+   			</if>
+     		<if test="proposer != null and proposer !=''" >
+     			and pa.proposer = #{proposer}
+   			</if>
+   			<if test="proposerName != null and proposerName !=''" >
+     			and p.name like concat('%',#{proposerName},'%')
+   			</if>
+   			<if test="nextPerson != null and nextPerson !=''" >
+     			and pa.nextPerson = #{nextPerson}
+   			</if>
+   			<if test="type != null and type !=''" >
+     			and pa.type = #{type}
+   			</if>
+   			<if test="status != null and status !=''" >
+     			and pa.status = #{status}
+   			</if>
+   			<if test="startTime!=null and startTime!=''">
+       		   and <![CDATA[ pa.create_time>=#{startTime} ]]>
+	        </if>
+	        <if test="endTime!=null and endTime!=''">
+	       	   and <![CDATA[ pa.create_time<=#{endTime} ]]>
+	        </if>
+        </where>
+        
+  </select>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from work_process_apply
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from work_process_apply
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.cost168.costaudit.pojo.work.WorkProcessApplyExample" >
+    delete from work_process_apply
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.cost168.costaudit.pojo.work.WorkProcessApply" >
+    insert into work_process_apply (id, code, proposer, 
+      nextPerson, enterprise_id, status, 
+      create_time, content, type, 
+      leave_start_time, leave_end_time, leave_days, 
+      related_id, remark)
+    values (#{id,jdbcType=VARCHAR}, #{code,jdbcType=VARCHAR}, #{proposer,jdbcType=VARCHAR}, 
+      #{nextperson,jdbcType=VARCHAR}, #{enterpriseId,jdbcType=VARCHAR}, #{status,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{content,jdbcType=VARCHAR}, #{type,jdbcType=VARCHAR}, 
+      #{leaveStartTime,jdbcType=TIMESTAMP}, #{leaveEndTime,jdbcType=TIMESTAMP}, #{leaveDays,jdbcType=REAL}, 
+      #{relatedId,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.cost168.costaudit.pojo.work.WorkProcessApply" >
+    insert into work_process_apply
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="code != null" >
+        code,
+      </if>
+      <if test="proposer != null" >
+        proposer,
+      </if>
+      <if test="nextperson != null" >
+        nextPerson,
+      </if>
+      <if test="enterpriseId != null" >
+        enterprise_id,
+      </if>
+      <if test="status != null" >
+        status,
+      </if>
+      <if test="createTime != null" >
+        create_time,
+      </if>
+      <if test="content != null" >
+        content,
+      </if>
+      <if test="type != null" >
+        type,
+      </if>
+      <if test="morAftAll != null" >
+        mor_aft_all,
+      </if>
+      <if test="leaveStartTime != null" >
+        leave_start_time,
+      </if>
+      <if test="leaveEndTime != null" >
+        leave_end_time,
+      </if>
+      <if test="leaveDays != null" >
+        leave_days,
+      </if>
+      <if test="kxnj != null" >
+        kxnj,
+      </if>
+      <if test="relatedId != null" >
+        related_id,
+      </if>
+      <if test="remark != null" >
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null" >
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="proposer != null" >
+        #{proposer,jdbcType=VARCHAR},
+      </if>
+      <if test="nextperson != null" >
+        #{nextperson,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseId != null" >
+        #{enterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="morAftAll != null" >
+        #{morAftAll,jdbcType=VARCHAR},
+      </if>
+      <if test="leaveStartTime != null" >
+        #{leaveStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="leaveEndTime != null" >
+        #{leaveEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="leaveDays != null" >
+        #{leaveDays,jdbcType=REAL},
+      </if>
+      <if test="kxnj != null" >
+        #{kxnj,jdbcType=REAL},
+      </if>
+      <if test="relatedId != null" >
+        #{relatedId,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.cost168.costaudit.pojo.work.WorkProcessApplyExample" resultType="java.lang.Integer" >
+    select count(*) from work_process_apply
+    <if test="_parameter != null" >
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map" >
+    update work_process_apply
+    <set >
+      <if test="record.id != null" >
+        id = #{record.id,jdbcType=VARCHAR},
+      </if>
+      <if test="record.code != null" >
+        code = #{record.code,jdbcType=VARCHAR},
+      </if>
+      <if test="record.proposer != null" >
+        proposer = #{record.proposer,jdbcType=VARCHAR},
+      </if>
+      <if test="record.nextperson != null" >
+        nextPerson = #{record.nextperson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.enterpriseId != null" >
+        enterprise_id = #{record.enterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.status != null" >
+        status = #{record.status,jdbcType=VARCHAR},
+      </if>
+      <if test="record.createTime != null" >
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.content != null" >
+        content = #{record.content,jdbcType=VARCHAR},
+      </if>
+      <if test="record.type != null" >
+        type = #{record.type,jdbcType=VARCHAR},
+      </if>
+      <if test="record.leaveStartTime != null" >
+        leave_start_time = #{record.leaveStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.leaveEndTime != null" >
+        leave_end_time = #{record.leaveEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.leaveDays != null" >
+        leave_days = #{record.leaveDays,jdbcType=REAL},
+      </if>
+      <if test="record.kxnj != null" >
+        kxnj = #{record.kxnj,jdbcType=REAL},
+      </if>
+      <if test="record.relatedId != null" >
+        related_id = #{record.relatedId,jdbcType=VARCHAR},
+      </if>
+      <if test="record.remark != null" >
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map" >
+    update work_process_apply
+    set id = #{record.id,jdbcType=VARCHAR},
+      code = #{record.code,jdbcType=VARCHAR},
+      proposer = #{record.proposer,jdbcType=VARCHAR},
+      nextPerson = #{record.nextperson,jdbcType=VARCHAR},
+      enterprise_id = #{record.enterpriseId,jdbcType=VARCHAR},
+      status = #{record.status,jdbcType=VARCHAR},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      content = #{record.content,jdbcType=VARCHAR},
+      type = #{record.type,jdbcType=VARCHAR},
+      leave_start_time = #{record.leaveStartTime,jdbcType=TIMESTAMP},
+      leave_end_time = #{record.leaveEndTime,jdbcType=TIMESTAMP},
+      leave_days = #{record.leaveDays,jdbcType=REAL},
+      related_id = #{record.relatedId,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
+    <if test="_parameter != null" >
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.cost168.costaudit.pojo.work.WorkProcessApply" >
+    update work_process_apply
+    <set >
+      <if test="code != null" >
+        code = #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="proposer != null" >
+        proposer = #{proposer,jdbcType=VARCHAR},
+      </if>
+      <if test="nextperson != null" >
+        nextPerson = #{nextperson,jdbcType=VARCHAR},
+      </if>
+      <if test="enterpriseId != null" >
+        enterprise_id = #{enterpriseId,jdbcType=VARCHAR},
+      </if>
+      <if test="status != null" >
+        status = #{status,jdbcType=VARCHAR},
+      </if>
+      <if test="createTime != null" >
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="content != null" >
+        content = #{content,jdbcType=VARCHAR},
+      </if>
+      <if test="type != null" >
+        type = #{type,jdbcType=VARCHAR},
+      </if>
+      <if test="morAftAll != null" >
+        mor_aft_all = #{morAftAll,jdbcType=VARCHAR},
+      </if>
+      <if test="leaveStartTime != null" >
+        leave_start_time = #{leaveStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="leaveEndTime != null" >
+        leave_end_time = #{leaveEndTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="leaveDays != null" >
+        leave_days = #{leaveDays,jdbcType=REAL},
+      </if>
+      <if test="kxnj != null" >
+        kxnj = #{kxnj,jdbcType=REAL},
+      </if>
+      <if test="relatedId != null" >
+        related_id = #{relatedId,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null" >
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.cost168.costaudit.pojo.work.WorkProcessApply" >
+    update work_process_apply
+    set code = #{code,jdbcType=VARCHAR},
+      proposer = #{proposer,jdbcType=VARCHAR},
+      nextPerson = #{nextperson,jdbcType=VARCHAR},
+      enterprise_id = #{enterpriseId,jdbcType=VARCHAR},
+      status = #{status,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      content = #{content,jdbcType=VARCHAR},
+      type = #{type,jdbcType=VARCHAR},
+      mor_aft_all = #{morAftAll,jdbcType=VARCHAR},
+      leave_start_time = #{leaveStartTime,jdbcType=TIMESTAMP},
+      leave_end_time = #{leaveEndTime,jdbcType=TIMESTAMP},
+      leave_days = #{leaveDays,jdbcType=REAL},
+      related_id = #{relatedId,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+</mapper>
