@@ -20,7 +20,7 @@
 		<servlet-api.version>2.5</servlet-api.version>
 		<jsp-api.version>2.0</jsp-api.version>
 		<aspectjrt.version>1.8.10</aspectjrt.version>
-		<shiro.version>1.3.2</shiro.version>
+		<shiro.version>1.5.0</shiro.version>
 		<cglib.version>2.2.2</cglib.version>
 		<aspectjrt.version>1.8.10</aspectjrt.version>
 		<pagehelper.version>3.4.2-fix</pagehelper.version>
